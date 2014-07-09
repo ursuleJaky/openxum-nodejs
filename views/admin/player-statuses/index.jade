@@ -1,0 +1,35 @@
+extends ../../../layouts/admin
+
+block head
+  title Player Statuses
+
+block neck
+  link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+  link(rel='stylesheet', href='/layouts/openxum.css?#{cacheBreaker}')
+
+block body
+  script(src='/javascripts/AdminClient.js')
+  script(language='javascript').
+    var client = new AdminClient();
+    client.start();
+
+  div.row.vertical-offset-100
+    div.col-md-8.col-md-offset-2
+      div.panel.panel-primary
+        div.panel-heading
+          h3.panel-title Players
+        div.panel-body
+          table.table
+            tr
+              th Login
+              th Role
+              th Status
+            each player in players
+              tr
+                td
+                  if player.role == 'admin'
+                    b #{player.username}
+                  else
+                    | #{player.username}
+                td #{player.role}
+                td(id="status_#{player.username}") no connected

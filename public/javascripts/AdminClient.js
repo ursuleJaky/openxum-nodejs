@@ -17,7 +17,7 @@ AdminClient = function (u) {
                 return;
             }
 
-            connection = new WebSocket('ws://127.0.0.1:1337');
+            connection = new WebSocket('ws://127.0.0.1:3000');
 
             connection.onopen = function () {
                 console.log('open');
@@ -43,7 +43,7 @@ AdminClient = function (u) {
 
                     var msg = {
                         type: 'connect',
-                        user_id: 1
+                        user_id: 'root'
                     };
 
                     connection.send(JSON.stringify(msg));
@@ -59,7 +59,7 @@ AdminClient = function (u) {
             var found = false;
             var j = 0;
 
-            $('td#td_user_' + msg.users[i].id).html(msg.users[i].status);
+            $('td#status_' + msg.users[i].id).html(msg.users[i].status);
             while (j < clients.length && !found) {
                 if (clients[j] == msg.users[i].id) {
                     found = true;
@@ -86,7 +86,7 @@ AdminClient = function (u) {
                 }
             }
             if (!found) {
-                $('td#td_user_' + clients[j]).html('no connected');
+                $('td#status_' + clients[j]).html('no connected');
                 clients.splice(j, 1);
             } else {
                 j++;

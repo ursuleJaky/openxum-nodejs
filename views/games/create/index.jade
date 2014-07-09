@@ -44,23 +44,35 @@ block body
                     h3(class='panel-title') New game [#{game}]
                 div.panel-body
                     form(action='/games/create/',method='post')
-                        fieldset
-                            legend Color:
+                        div.form-group
+                            div.input-group
+                                span.input-group-addon
+                                    span.glyphicon.glyphicon-tower
+                                input.form-control(type="text", name="name", value="", placeholder="Game name")
+                        div.form-group
+                            fieldset
+                                legend Color
                                 each color in color_keys
                                     input(type="radio", name="color", value=color, checked=color==default_color)
-                                    | #{color}
-                        fieldset
-                            legend Mode:
+                                    label.radio-inline #{color}
+                                    &nbsp;&nbsp;
+                        div.form-group
+                            fieldset
+                                legend Mode
                                 each mode in mode_keys
                                     input(type="radio", name="mode", value=mode, checked=mode==default_mode)
-                                    | #{mode}
-                        fieldset
-                            legend Type:
+                                    label.radio-inline #{mode}
+                                    &nbsp;&nbsp;
+                        div.form-group
+                            fieldset
+                                legend Type
                                 input(type='radio',name='game_type',value='online')
-                                | Online
+                                label.radio-inline Online
+                                &nbsp;&nbsp;
                                 input(type='radio',name='game_type',value='offline')
-                                | Offline
-                                input(type='radio',name='game_type',value='ai',checked=true)
-                                | AI
+                                label.radio-inline Offline
+                                &nbsp;&nbsp;
+                                input(type='radio',name='game_type',value='ai',checked="true")
+                                label.radio-inline AI
                         input(type='hidden',name='game',value='#{game}')
                         input(type='submit',value='Create',class='btn btn-lg btn-success btn-block')

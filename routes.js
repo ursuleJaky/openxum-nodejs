@@ -134,6 +134,9 @@ exports = module.exports = function (app, passport) {
     app.post('/admin/accounts/:id/status/', require('./views/admin/accounts/index').newStatus);
     app.delete('/admin/accounts/:id/', require('./views/admin/accounts/index').delete);
 
+    //admin > player statuses
+    app.get('/admin/player-statuses/', require('./views/admin/player-statuses/index').init);
+
     //admin > statuses
     app.get('/admin/statuses/', require('./views/admin/statuses/index').find);
     app.post('/admin/statuses/', require('./views/admin/statuses/index').create);

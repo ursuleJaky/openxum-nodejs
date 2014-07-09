@@ -8,6 +8,7 @@ html
     link(rel='stylesheet', href='/layouts/admin.min.css?#{cacheBreaker}')
     block neck
   body
+    script(src='/layouts/core.min.js?#{cacheBreaker}')
     div.navbar.navbar-inverse.navbar-fixed-top
       div.container
         div.navbar-header
@@ -34,6 +35,9 @@ html
                 li: a(href='/admin/accounts/') Accounts
                 li: a(href='/admin/administrators/') Administrators
                 li: a(href='/admin/admin-groups/') Admin Groups
+                li.divider
+                li.dropdown-header Player Admin
+                li: a(href='/admin/player-statuses/') Statuses
           form.navbar-form.pull-right#_search
 
     div.page
@@ -68,7 +72,5 @@ html
 
     //if lte IE 9
       script(src='/layouts/ie-sucks.min.js?#{cacheBreaker}')
-    script(src='/layouts/core.min.js?#{cacheBreaker}')
-    script(src='/layouts/admin.min.js?#{cacheBreaker}')
 
     block feet

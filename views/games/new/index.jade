@@ -8,7 +8,6 @@ block neck
     link(rel='stylesheet', href='/layouts/openxum.css?#{cacheBreaker}')
 
 block body
-    script(src='/javascripts/jquery.min.js')
     script(src='/javascripts/GameClient.js')
     script(language='javascript').
         var client = new GameClient('#{user.username}', '#{game}');

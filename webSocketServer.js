@@ -23,28 +23,28 @@ exports.Server = function (app) {
     };
 
     var onConnect = function (connection, msg) {
-        console.log('connect ' + msg.user_id);
+        console.log('[OpenXum] connect ' + msg.user_id);
 
         clients[msg.user_id] = connection;
         sendConnectedClients();
     };
 
     var onDisconnect = function (port) {
-        /*    var index;
-         var found = false;
+        var index;
+        var found = false;
 
-         for (index in clients) {
-         if (clients[index] != undefined && clients[index].socket._peername.port == port) {
-         found = true;
-         }
-         }
-         if (found) {
-         console.log('disconnect ' + index);
+        for (index in clients) {
+            if (clients[index] != undefined && clients[index].socket._peername.port == port) {
+                found = true;
+            }
+        }
+        if (found) {
+            console.log('[OpenXum] disconnect ' + index);
 
-         clients[index] = undefined;
-         currentGames[index] = undefined;
-         sendConnectedClients();
-         } */
+            clients[index] = undefined;
+            currentGames[index] = undefined;
+            sendConnectedClients();
+        }
     };
 
     var onConfirm = function (msg) {
@@ -165,7 +165,7 @@ exports.Server = function (app) {
     };
 
     var sendConnectedClients = function () {
-        if (clients['admin'] != undefined) {
+        if (clients['root'] != undefined) {
             var users = [ ];
 
             for (var id in clients) {
@@ -183,7 +183,7 @@ exports.Server = function (app) {
                 users: users
             };
 
-            clients['admin'].send(JSON.stringify(response));
+            clients['root'].send(JSON.stringify(response));
         }
     };
 
