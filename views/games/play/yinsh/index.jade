@@ -1,0 +1,73 @@
+extends ../../../../layouts/default
+
+block head
+    title Games
+
+block neck
+    link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+
+block body
+    script(src='/javascripts/utils/utils.js')
+    script(src='/javascripts/MCTS/MCTS.js')
+    script(src='/javascripts/MCTS/Node.js')
+    script(src='/javascripts/MCTS/Player.js')
+    script(src='/javascripts/yinsh/Yinsh.js')
+    script(src='/javascripts/yinsh/Constants.js')
+    script(src='/javascripts/yinsh/Coordinates.js')
+    script(src='/javascripts/yinsh/Engine.js')
+    script(src='/javascripts/yinsh/GuiPlayer.js')
+    script(src='/javascripts/yinsh/Intersection.js')
+    script(src='/javascripts/yinsh/Manager.js')
+    script(src='/javascripts/yinsh/RandomPlayer.js')
+
+    script(language='javascript').
+        $(document).ready(function() {
+            $('#winnerModal .new-game-button').click(function() {
+                $('#winnerModal').modal('hide');
+                window.location.href = '/games/play/?game=Yinsh';
+            });
+
+            var canvas = document.getElementById("board");
+            var canvas_div = document.getElementById("boardDiv");
+            var markerNumber = document.getElementById("markerNumber");
+            var turnList = document.getElementById("turnList");
+            var engine = new Yinsh.Engine(0, 0);
+            var gui = new Yinsh.GuiPlayer(0, engine);
+            var other = new Yinsh.RandomPlayer(1, engine);
+            var manager = new Yinsh.Manager(engine, gui, other, new Yinsh.Status(markerNumber, turnList));
+
+            if (canvas_div.clientHeight < canvas_div.clientWidth) {
+                canvas.height = canvas_div.clientHeight * 0.95;
+                canvas.width = canvas_div.clientHeight * 0.95;
+            } else {
+                canvas.height = canvas_div.clientWidth * 0.95;
+                canvas.width = canvas_div.clientWidth * 0.95;
+            }
+            gui.set_canvas(canvas);
+            gui.set_manager(manager);
+            other.set_level(manager.load_level());
+            if (engine.current_color() == other.color()) {
+                manager.play_other();
+            }
+        });
+
+    br
+    div.modal.fade#winnerModal(tabindex='-1',role='dialog',aria-labelledby='winnerModelLabel',aria-hidden='true')
+        div.modal-dialog
+            div.modal-content
+                div.modal-body#winnerModalText
+                div.modal-footer
+                    div.btn-group
+                        a.btn.btn-primary.new-game-button(href='#') New game
+
+    div.row
+        div.col-md-3.visible-md.visible-lg
+            table(style='width: 100%; height: 100%; table-layout: fixed; padding: 10px')
+                tr(style='height: 50px')
+                    td
+                        span#markerNumber
+                tr(style='vertical-align: top;')
+                    td
+                        span#turnList(style='display:block; overflow: auto')
+        div.col-md-9#boardDiv
+            canvas#board(style='width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')

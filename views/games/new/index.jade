@@ -1,0 +1,44 @@
+extends ../../../layouts/default
+
+block head
+    title Games
+
+block neck
+    link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+    link(rel='stylesheet', href='/layouts/openxum.css?#{cacheBreaker}')
+
+block body
+    script(src='/javascripts/jquery.min.js')
+    script(src='/javascripts/GameClient.js')
+    script(language='javascript').
+        var client = new GameClient('#{user.username}', '#{game}');
+        client.start();
+
+    br
+    div.row.vertical-offset-100
+        div.col-md-8.col-md-offset-2
+            div.panel.panel-primary
+                div.panel-heading
+                    h3(class='panel-title') Games [#{game}]
+                div.panel-body
+                    a(class='btn btn-primary btn-md active',href='/games/create/?game=#{game}')
+                        i(class='glyphicon glyphicon-plus')
+                        | Create
+                    br
+                    - var list = [ 'My online games', 'My offline games', 'Other online games', 'Other offline games' ]
+                    - each item in list
+                        br
+                        h3 #{item}
+
+                        table.table
+                            tr
+                                th
+                                  | Name
+                                th
+                                  | Color
+                                th
+                                  | Mode
+                                th
+                                  | Opponent
+                                th
+                                  | Actions

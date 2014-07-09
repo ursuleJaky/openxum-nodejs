@@ -1,0 +1,2 @@
+// namespace Yinsh
+var Yinsh = { };

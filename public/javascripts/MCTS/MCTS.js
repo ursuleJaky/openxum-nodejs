@@ -1,0 +1,2 @@
+// namespace MCTS
+var MCTS = { };
