@@ -10,7 +10,8 @@ var config = require('./config'),
     passport = require('passport'),
     mongoose = require('mongoose'),
     helmet = require('helmet'),
-    webSocketServer = require('./webSocketServer');
+    webSocketServer = require('./webSocketServer'),
+    cluster = require('cluster');
 
 //create express app
 var app = express();
@@ -84,8 +85,16 @@ app.utility.workflow = require('./util/workflow');
 app.wsServer = new webSocketServer.Server(app);
 
 //listen up
-app.server.listen(app.config.port, function () {
-    app.wsServer.server.on('request', function (request) {
-        app.wsServer.processRequest(request);
+if (cluster.isMaster) {
+    var cpuCount = require('os').cpus().length;
+
+    for (var i = 0; i < cpuCount; i += 1) {
+        cluster.fork();
+    }
+} else {
+    app.server.listen(app.config.port, function () {
+        app.wsServer.server.on('request', function (request) {
+            app.wsServer.processRequest(request);
+        });
     });
-});
+}
