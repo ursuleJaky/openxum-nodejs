@@ -1,4 +1,6 @@
-Kamisado.RandomPlayer = function (color, engine) {
+"use strict";
+
+Kamisado.RandomPlayer = function (color, e) {
 
 // public methods
     this.color = function() {
@@ -18,7 +20,7 @@ Kamisado.RandomPlayer = function (color, engine) {
 
         var list = engine.get_possible_moving_list({ x: playable_tower.x, y: playable_tower.y, color: mycolor });
 
-        if (list.length != 0) {
+        if (list.length !== 0) {
             var coordinates = list[Math.floor(Math.random() * list.length)];
 
             return { from: playable_tower, to: coordinates };
@@ -29,5 +31,5 @@ Kamisado.RandomPlayer = function (color, engine) {
 
 // private attributes
     var mycolor = color;
-    var engine = engine;
+    var engine = e;
 };

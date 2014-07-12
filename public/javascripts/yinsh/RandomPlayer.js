@@ -1,4 +1,6 @@
-Yinsh.RandomPlayer = function (color, engine) {
+"use strict";
+
+Yinsh.RandomPlayer = function (color, e) {
 
 // public methods
     this.color = function() {
@@ -12,7 +14,7 @@ Yinsh.RandomPlayer = function (color, engine) {
     this.move_ring = function (origin) {
         var list = engine.get_possible_moving_list(origin, mycolor, false);
 
-        if (list.length != 0) {
+        if (list.length !== 0) {
             var ring_coordinates = list[Math.floor(Math.random() * list.length)];
 
             engine.move_ring(origin, ring_coordinates);
@@ -64,5 +66,5 @@ Yinsh.RandomPlayer = function (color, engine) {
 
 // private attributes
     var mycolor = color;
-    var engine = engine;
+    var engine = e;
 };

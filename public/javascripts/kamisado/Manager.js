@@ -1,3 +1,5 @@
+"use strict";
+
 Kamisado.Manager = function (e, gui_player, other_player) {
 
 // public methods
@@ -12,26 +14,26 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     };
 
     this.play = function () {
-        if (engine.current_color() == gui.color()) {
-            if (engine.phase() == Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
+        if (engine.current_color() === gui.color()) {
+            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
                 engine.move_tower(gui.get_selected_tower(), gui.get_selected_cell());
                 gui.unselect();
             }
             gui.draw();
             finish();
-            if (engine.current_color() != gui.color()) {
+            if (engine.current_color() !== gui.color()) {
                 if (!other.is_remote()) {
                     this.play_other();
                 }
             }
         } else {
-            if (engine.phase() == Kamisado.Phase.MOVE_TOWER) {
+            if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
                 engine.move_tower(turn.from, turn.to);
                 gui.unselect();
             }
             gui.draw();
             finish();
-            if (engine.current_color() != gui.color()) {
+            if (engine.current_color() !== gui.color()) {
                 if (!other.is_remote()) {
                     this.play_other();
                 }
@@ -40,7 +42,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     };
 
     this.play_other = function() {
-        if (engine.phase() == Kamisado.Phase.MOVE_TOWER) {
+        if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
             turn = other.move_tower();
             gui.move_tower({
                     x: turn.from.x,
@@ -56,10 +58,10 @@ Kamisado.Manager = function (e, gui_player, other_player) {
             var popup = document.getElementById("winnerModalText");
 
             popup.innerHTML = "<h4>The winner is " +
-                (engine.winner_is() == Kamisado.Color.BLACK ? "black" : "white") + "!</h4>";
+                (engine.winner_is() === Kamisado.Color.BLACK ? "black" : "white") + "!</h4>";
             $("#winnerModal").modal("show");
 
-            if (engine.winner_is() == gui.color()) {
+            if (engine.winner_is() === gui.color()) {
                 var win = load_win() + 1;
 
                 localStorage['openxum:kamisado:win'] = JSON.stringify(win);

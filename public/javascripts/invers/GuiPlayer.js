@@ -1,3 +1,5 @@
+"use strict";
+
 Invers.GuiPlayer = function (color, engine) {
 
 // public methods
@@ -6,7 +8,7 @@ Invers.GuiPlayer = function (color, engine) {
     };
 
     this.draw = function () {
-        context.lineWidth = 1.;
+        context.lineWidth = 1;
 
         // background
         context.fillStyle = "#000000";
@@ -52,7 +54,7 @@ Invers.GuiPlayer = function (color, engine) {
         context.strokeStyle = "#ffffff";
         context.fillStyle = color;
         context.beginPath();
-        if (index == 0) {
+        if (index === 0) {
             context.moveTo(offsetX - 25, offsetY - 25);
             context.lineTo(offsetX - 5, offsetY - 25);
             context.lineTo(offsetX - 5, offsetY - 5);
@@ -93,7 +95,7 @@ Invers.GuiPlayer = function (color, engine) {
         context.strokeStyle = "#000000";
         for (var i = 0; i < 6; ++i) {
             for (var j = 0; j < 6; ++j) {
-                context.fillStyle = engine.get_state()[i][j] == Invers.State.RED_FULL ? 'red' : 'yellow';
+                context.fillStyle = engine.get_state()[i][j] === Invers.State.RED_FULL ? 'red' : 'yellow';
                 context.beginPath();
                 context.moveTo(offsetX + i * deltaX, offsetY + j * deltaY);
                 context.lineTo(offsetX + (i + 1) * deltaX - 2, offsetY + j * deltaY);
@@ -212,7 +214,7 @@ Invers.GuiPlayer = function (color, engine) {
     };
 
     var roundRect = function (x, y, width, height, radius, fill, stroke) {
-        if (typeof stroke == "undefined" ) {
+        if (typeof stroke === "undefined" ) {
             stroke = true;
         }
         if (typeof radius === "undefined") {

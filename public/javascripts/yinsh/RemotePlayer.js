@@ -1,3 +1,5 @@
+"use strict";
+
 Yinsh.RemotePlayer = function (color, e, u, o, g) {
 
 // public methods
@@ -6,7 +8,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
     };
 
     this.move_ring = function (ring, coordinates) {
-        if (coordinates == undefined) {
+        if (coordinates === undefined) {
             engine.move_ring(selected_ring, selected_coordinates);
         } else {
             var msg = {
@@ -27,7 +29,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
     };
 
     this.put_marker = function (coordinates, color) {
-        if (coordinates == undefined) {
+        if (coordinates === undefined) {
             engine.put_marker(selected_coordinates, mycolor);
         } else {
             var msg = {
@@ -45,7 +47,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
     };
 
     this.remove_ring = function (coordinates, color) {
-        if (coordinates == undefined) {
+        if (coordinates === undefined) {
             engine.remove_ring(selected_coordinates, mycolor);
         } else {
             var msg = {
@@ -64,7 +66,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
     };
 
     this.remove_row = function (coordinates, color) {
-        if (coordinates == undefined) {
+        if (coordinates === undefined) {
             engine.remove_row(engine.select_row(selected_coordinates, mycolor), mycolor);
         } else {
             var msg = {
@@ -86,7 +88,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
     };
 
     this.put_ring = function (coordinates, color) {
-        if (coordinates == undefined) {
+        if (coordinates === undefined) {
             engine.put_ring(selected_coordinates, mycolor);
         } else {
             var msg = {
@@ -120,25 +122,25 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
 
-            if (msg.type == 'turn') {
+            if (msg.type === 'turn') {
                 var ok = false;
 
-                if (msg.move == 'put_ring' && engine.phase() == Yinsh.Phase.PUT_RING) {
+                if (msg.move === 'put_ring' && engine.phase() === Yinsh.Phase.PUT_RING) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
                     ok = true;
-                } else if (msg.move == 'put_marker' && engine.phase() == Yinsh.Phase.PUT_MARKER) {
+                } else if (msg.move === 'put_marker' && engine.phase() === Yinsh.Phase.PUT_MARKER) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
                     selected_ring = selected_coordinates;
                     ok = true;
-                } else if (msg.move == 'move_ring' && engine.phase() == Yinsh.Phase.MOVE_RING) {
+                } else if (msg.move === 'move_ring' && engine.phase() === Yinsh.Phase.MOVE_RING) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
                     ok = true;
-                } else if (msg.move == 'remove_row' && (engine.phase() == Yinsh.Phase.REMOVE_ROWS_AFTER ||
-                    engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE)) {
+                } else if (msg.move === 'remove_row' && (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+                    engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE)) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
                     ok = true;
-                } else if (msg.move == 'remove_ring' && (engine.phase() == Yinsh.Phase.REMOVE_RING_AFTER ||
-                    engine.phase() == Yinsh.Phase.REMOVE_RING_BEFORE)) {
+                } else if (msg.move === 'remove_ring' && (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+                    engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE)) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
                     ok = true;
                 }

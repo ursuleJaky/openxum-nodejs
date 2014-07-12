@@ -1,4 +1,6 @@
-Kamisado.MCTSPlayer = function (color, engine) {
+"use strict";
+
+Kamisado.MCTSPlayer = function (color, e) {
 
 // public methods
     this.color = function() {
@@ -19,6 +21,6 @@ Kamisado.MCTSPlayer = function (color, engine) {
 
 // private attributes
     var mycolor = color;
-    var engine = engine;
+    var engine = e;
     var level = 10;
 };

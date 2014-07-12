@@ -1,9 +1,9 @@
+"use strict";
+
 MCTS.Player = function (c, e, sn) {
 
 // public methods
 	this.move = function() {
-        var choice = null;
-
 		init_search();
 		for (var i = 0; i < simulationNumber; i++) {
 			simulate_one_game_from_root();
@@ -23,7 +23,7 @@ MCTS.Player = function (c, e, sn) {
 
     var get_final_choice = function() {
         var finalChoice = root.getChildNodes()[0].getMove();
-        var best = root.getChildNodes()[0].getVisitNumber()
+        var best = root.getChildNodes()[0].getVisitNumber();
 
         for (var i = 1; i < root.getChildNodes().length; i++) {
             if (root.getChildNodes()[i].getVisitNumber() > best) {
@@ -51,7 +51,7 @@ MCTS.Player = function (c, e, sn) {
 		var monteCarloEngine = null;
 
 		// descent
-		while (current != null && !current.getEngine().is_finished()) {
+		while (current !== null && !current.getEngine().is_finished()) {
             var possibleMoves = current.getPossibleMoves();
 
 			if (possibleMoves.length > 0) {
@@ -59,12 +59,12 @@ MCTS.Player = function (c, e, sn) {
 				break;
 			} else {
                 node = current;
-                current = current.choice(current.getEngine().current_color() == color);
+                current = current.choice(current.getEngine().current_color() === color);
             }
 		}
 
 		// expansion
-		if (current == null || !current.getEngine().is_finished()) {
+		if (current === null || !current.getEngine().is_finished()) {
 			current = node;
 
 			var newEngine = clone(current.getEngine());
@@ -90,9 +90,9 @@ MCTS.Player = function (c, e, sn) {
 	};
 
     var updateScore = function(current, winner) {
-        while (current != null) {
+        while (current !== null) {
             current.visit();
-            if (winner == color) {
+            if (winner === color) {
                 current.incWins();
             } else {
                 current.incLosses();

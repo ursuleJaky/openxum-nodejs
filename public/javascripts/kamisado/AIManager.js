@@ -1,12 +1,14 @@
+"use strict";
+
 Kamisado.AIManager = function (e, black_player, white_player) {
 
 // public methods
     this.eval = function () {
         while (!engine.is_finished()) {
-            if (!engine.is_finished() && engine.current_color() == Kamisado.Color.BLACK) {
+            if (!engine.is_finished() && engine.current_color() === Kamisado.Color.BLACK) {
                 play(black);
             }
-            if (!engine.is_finished() && engine.current_color() == Kamisado.Color.WHITE) {
+            if (!engine.is_finished() && engine.current_color() === Kamisado.Color.WHITE) {
                 play(white);
             }
         }
@@ -15,7 +17,7 @@ Kamisado.AIManager = function (e, black_player, white_player) {
 
 // private methods
     var play = function(player) {
-        if (engine.phase() == Kamisado.Phase.MOVE_TOWER) {
+        if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
             var turn = player.move_tower();
 
 //            console.log(player.color() + ": " + turn.from + " => " + turn.to);

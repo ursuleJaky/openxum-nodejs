@@ -1,3 +1,5 @@
+"use strict";
+
 Yinsh.Intersection = function (c) {
 // public methods
     this.hash = function () {
@@ -5,13 +7,13 @@ Yinsh.Intersection = function (c) {
     };
 
     this.color = function () {
-        if (state == Yinsh.State.VACANT) {
+        if (state === Yinsh.State.VACANT) {
             return -1;
         }
 
-        if (state == Yinsh.State.BLACK_RING ||
-            state == Yinsh.State.BLACK_MARKER ||
-            state == Yinsh.State.BLACK_MARKER_RING) {
+        if (state === Yinsh.State.BLACK_RING ||
+            state === Yinsh.State.BLACK_MARKER ||
+            state === Yinsh.State.BLACK_MARKER_RING) {
             return Yinsh.Color.BLACK;
         } else {
             return Yinsh.Color.WHITE;
@@ -19,9 +21,9 @@ Yinsh.Intersection = function (c) {
     };
 
     this.flip = function () {
-        if (state == Yinsh.State.BLACK_MARKER) {
+        if (state === Yinsh.State.BLACK_MARKER) {
             state = Yinsh.State.WHITE_MARKER;
-        } else if (state == Yinsh.State.WHITE_MARKER) {
+        } else if (state === Yinsh.State.WHITE_MARKER) {
             state = Yinsh.State.BLACK_MARKER;
         }
     };
@@ -39,19 +41,19 @@ Yinsh.Intersection = function (c) {
     };
 
     this.put_marker = function (color) {
-        if (color == Yinsh.Color.BLACK) {
-            if (state == Yinsh.State.BLACK_RING) {
+        if (color === Yinsh.Color.BLACK) {
+            if (state === Yinsh.State.BLACK_RING) {
                 state = Yinsh.State.BLACK_MARKER_RING;
             }
         } else {
-            if (state == Yinsh.State.WHITE_RING) {
+            if (state === Yinsh.State.WHITE_RING) {
                 state = Yinsh.State.WHITE_MARKER_RING;
             }
         }
     };
 
     this.put_ring = function (color) {
-        if (color == Yinsh.Color.BLACK) {
+        if (color === Yinsh.Color.BLACK) {
             state = Yinsh.State.BLACK_RING;
         } else {
             state = Yinsh.State.WHITE_RING;
@@ -63,8 +65,8 @@ Yinsh.Intersection = function (c) {
     };
 
     this.remove_ring = function () {
-        if (state == Yinsh.State.BLACK_MARKER_RING || state == Yinsh.State.WHITE_MARKER_RING) {
-            if (state == Yinsh.State.BLACK_MARKER_RING) {
+        if (state === Yinsh.State.BLACK_MARKER_RING || state === Yinsh.State.WHITE_MARKER_RING) {
+            if (state === Yinsh.State.BLACK_MARKER_RING) {
                 state = Yinsh.State.BLACK_MARKER;
             } else {
                 state = Yinsh.State.WHITE_MARKER;

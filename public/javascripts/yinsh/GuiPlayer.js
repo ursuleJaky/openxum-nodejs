@@ -1,4 +1,6 @@
-Yinsh.GuiPlayer = function (color, engine) {
+"use strict";
+
+Yinsh.GuiPlayer = function (color, e) {
 
 // public methods
     this.clear_selected_ring = function () {
@@ -16,7 +18,7 @@ Yinsh.GuiPlayer = function (color, engine) {
     this.draw = function () {
         compute_deltas();
 
-        context.lineWidth = 1.;
+        context.lineWidth = 1;
 
         // background
         context.fillStyle = "#ffffff";
@@ -26,7 +28,7 @@ Yinsh.GuiPlayer = function (color, engine) {
         draw_coordinates();
         draw_state();
 
-        if (engine.phase() == Yinsh.Phase.MOVE_RING && selected_ring.is_valid()) {
+        if (engine.phase() === Yinsh.Phase.MOVE_RING && selected_ring.is_valid()) {
             draw_possible_moving();
         }
     };
@@ -59,7 +61,7 @@ Yinsh.GuiPlayer = function (color, engine) {
 // private methods
     var compute_deltas = function () {
         offset = 30;
-        delta_x = (width - 2 * offset) / 10.;
+        delta_x = (width - 2 * offset) / 10.0;
         delta_y = delta_x;
         delta_xy = delta_y / 2;
     };
@@ -87,8 +89,8 @@ Yinsh.GuiPlayer = function (color, engine) {
         // translation to A1 and rotation
         var X = x - pt[0];
         var Y = y - pt[1];
-        var sin_alpha = 1. / Math.sqrt(5);
-        var cos_alpha = 2. * sin_alpha;
+        var sin_alpha = 1.0 / Math.sqrt(5);
+        var cos_alpha = 2.0 * sin_alpha;
 
         var x2 = Math.floor((X * sin_alpha - Y * cos_alpha) + pt[0]);
         var delta_x2 = Math.floor(delta_x * cos_alpha);
@@ -180,12 +182,12 @@ Yinsh.GuiPlayer = function (color, engine) {
     var draw_marker = function (x, y, color) {
         context.beginPath();
         context.lineWidth = 1;
-        if (color == Yinsh.Color.BLACK) {
+        if (color === Yinsh.Color.BLACK) {
             context.fillStyle = "#000000";
-        } else if (color == Yinsh.Color.WHITE) {
+        } else if (color === Yinsh.Color.WHITE) {
             context.fillStyle = "rgb(192, 192, 192)";
         }
-        context.arc(x, y, delta_x * (1. / 3 - 1. / 10) - 1, 0.0, 2 * Math.PI, false);
+        context.arc(x, y, delta_x * (1.0 / 3 - 1.0 / 10) - 1, 0.0, 2 * Math.PI, false);
         context.fill();
         context.stroke();
         context.closePath();
@@ -214,9 +216,9 @@ Yinsh.GuiPlayer = function (color, engine) {
         context.beginPath();
         context.lineWidth = 1;
         context.strokeStyle = "#000000";
-        context.arc(x, y, delta_x * (1. / 3 + 1. / 10), 0.0, 2 * Math.PI, false);
+        context.arc(x, y, delta_x * (1.0 / 3 + 1.0 / 10), 0.0, 2 * Math.PI, false);
         context.stroke();
-        context.arc(x, y, delta_x * (1. / 3 - 1. / 10) - 1, 0.0, 2 * Math.PI, false);
+        context.arc(x, y, delta_x * (1.0 / 3 - 1.0 / 10) - 1, 0.0, 2 * Math.PI, false);
         context.stroke();
         context.closePath();
 
@@ -224,7 +226,7 @@ Yinsh.GuiPlayer = function (color, engine) {
         context.lineWidth = delta_x / 5;
 
         /*            var gr = context.createLinearGradient(0, 0, 100, 100);
-         if (color == Yinsh.Color.BLACK) {
+         if (color === Yinsh.Color.BLACK) {
          gr.addColorStop(0,'rgb(0,0,0)');
          gr.addColorStop(1,'rgb(192,192,192)');
          } else {
@@ -233,7 +235,7 @@ Yinsh.GuiPlayer = function (color, engine) {
          }
          context.strokeStyle = gr; */
 
-        if (color == Yinsh.Color.BLACK) {
+        if (color === Yinsh.Color.BLACK) {
             context.strokeStyle = "#000000";
         } else {
             context.strokeStyle = "#ffffff";
@@ -245,8 +247,8 @@ Yinsh.GuiPlayer = function (color, engine) {
     };
 
     var draw_rows = function () {
-        if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_AFTER ||
-            engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+        if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
             var srows = [engine.get_rows(engine.current_color())];
 
             for (var i = 0; i < srows.length; ++i) {
@@ -260,7 +262,7 @@ Yinsh.GuiPlayer = function (color, engine) {
                     pt1 = compute_coordinates(begin.letter().charCodeAt(0), begin.number());
                     pt2 = compute_coordinates(end.letter().charCodeAt(0), end.number());
 
-                    if (pt1[0] == pt2[0]) {
+                    if (pt1[0] === pt2[0]) {
                         if (pt1[1] < pt2[1]) {
                             alpha_1 = Math.PI;
                             beta_1 = 0;
@@ -273,7 +275,7 @@ Yinsh.GuiPlayer = function (color, engine) {
                             beta_2 = 0;
                         }
                     } else {
-                        var omega_1 = Math.acos(1. / Math.sqrt(5));
+                        var omega_1 = Math.acos(1.0 / Math.sqrt(5));
 
                         if (pt1[0] < pt2[0]) {
                             if (pt1[1] < pt2[1]) {
@@ -369,7 +371,7 @@ Yinsh.GuiPlayer = function (color, engine) {
             return { x: left, y: top };
         }
         return undefined;
-    }
+    };
 
     var onClick = function (event) {
         var pos = find_pos(canvas);
@@ -379,21 +381,21 @@ Yinsh.GuiPlayer = function (color, engine) {
         var number = compute_number(x, y);
         var ok = false;
 
-        if (letter != 'X' && number != -1 &&
+        if (letter !== 'X' && number !== -1 &&
             engine.exist_intersection(letter, number)) {
-            if (engine.phase() == Yinsh.Phase.PUT_RING &&
-                engine.intersection_state(letter, number) == Yinsh.State.VACANT) {
+            if (engine.phase() === Yinsh.Phase.PUT_RING &&
+                engine.intersection_state(letter, number) === Yinsh.State.VACANT) {
                 selected_coordinates = new Yinsh.Coordinates(letter, number);
                 ok = true;
-            } else if (engine.phase() == Yinsh.Phase.PUT_MARKER &&
-                ((engine.intersection_state(letter, number) == Yinsh.State.BLACK_RING &&
-                    engine.current_color() == Yinsh.Color.BLACK) ||
-                    (engine.intersection_state(letter, number) == Yinsh.State.WHITE_RING &&
-                        engine.current_color() == Yinsh.Color.WHITE))) {
+            } else if (engine.phase() === Yinsh.Phase.PUT_MARKER &&
+                ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
+                    engine.current_color() === Yinsh.Color.BLACK) ||
+                    (engine.intersection_state(letter, number) === Yinsh.State.WHITE_RING &&
+                        engine.current_color() === Yinsh.Color.WHITE))) {
                 selected_coordinates = new Yinsh.Coordinates(letter, number);
                 selected_ring = selected_coordinates;
                 ok = true;
-            } else if (engine.phase() == Yinsh.Phase.MOVE_RING) {
+            } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
                 if (selected_ring.is_valid()) {
                     if (engine.verify_moving(selected_ring,
                         new Yinsh.Coordinates(letter, number))) {
@@ -401,16 +403,16 @@ Yinsh.GuiPlayer = function (color, engine) {
                         ok = true;
                     }
                 }
-            } else if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_AFTER ||
-                engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+            } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+                engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
                 selected_coordinates = new Yinsh.Coordinates(letter, number);
                 ok = true;
-            } else if ((engine.phase() == Yinsh.Phase.REMOVE_RING_AFTER ||
-                engine.phase() == Yinsh.Phase.REMOVE_RING_BEFORE) &&
-                ((engine.intersection_state(letter, number) == Yinsh.State.BLACK_RING &&
-                    engine.current_color() == Yinsh.Color.BLACK) ||
-                    (engine.intersection_state(letter, number) == Yinsh.State.WHITE_RING &&
-                        engine.current_color() == Yinsh.Color.WHITE))) {
+            } else if ((engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+                engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) &&
+                ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
+                    engine.current_color() === Yinsh.Color.BLACK) ||
+                    (engine.intersection_state(letter, number) === Yinsh.State.WHITE_RING &&
+                        engine.current_color() === Yinsh.Color.WHITE))) {
                 selected_coordinates = new Yinsh.Coordinates(letter, number);
                 ok = true;
             }
@@ -421,7 +423,7 @@ Yinsh.GuiPlayer = function (color, engine) {
     };
 
     var roundRect = function (x, y, width, height, radius, fill, stroke) {
-        if (typeof stroke == "undefined" ) {
+        if (typeof stroke === "undefined" ) {
             stroke = true;
         }
         if (typeof radius === "undefined") {
@@ -447,7 +449,7 @@ Yinsh.GuiPlayer = function (color, engine) {
     };
 
 // private attributes
-    var engine = engine;
+    var engine = e;
     var mycolor = color;
 
     var canvas;

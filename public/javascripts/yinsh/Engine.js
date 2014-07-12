@@ -1,3 +1,5 @@
+"use strict";
+
 Yinsh.Engine = function (type, color) {
 
 // public methods
@@ -25,7 +27,7 @@ Yinsh.Engine = function (type, color) {
                  n <= Yinsh.end_number[l.charCodeAt(0) - 'A'.charCodeAt(0)]; ++n) {
                 var coordinates = new Yinsh.Coordinates(l, n);
 
-                if (intersections[coordinates.hash()].state() == Yinsh.State.VACANT) {
+                if (intersections[coordinates.hash()].state() === Yinsh.State.VACANT) {
                     list.push(coordinates);
                 }
             }
@@ -34,21 +36,21 @@ Yinsh.Engine = function (type, color) {
     };
 
     this.get_placed_ring_coordinates = function (color) {
-        return (color == Yinsh.Color.BLACK) ? placed_black_ring_coordinates :
+        return (color === Yinsh.Color.BLACK) ? placed_black_ring_coordinates :
             placed_white_ring_coordinates;
     };
 
     this.get_possible_moving_list = function (origin, color, control) {
-        var list = new Array();
+        var list = [];
 
         if (!origin.hash() in intersections) {
             return list;
         }
 
-        if (control && !((intersections[origin.hash()].state() == Yinsh.State.BLACK_MARKER_RING &&
-            color == Yinsh.Color.BLACK) ||
-            (intersections[origin.hash()].state() == Yinsh.State.WHITE_MARKER_RING &&
-                color == Yinsh.Color.WHITE))) {
+        if (control && !((intersections[origin.hash()].state() === Yinsh.State.BLACK_MARKER_RING &&
+            color === Yinsh.Color.BLACK) ||
+            (intersections[origin.hash()].state() === Yinsh.State.WHITE_MARKER_RING &&
+                color === Yinsh.Color.WHITE))) {
             return list;
         }
 
@@ -150,7 +152,7 @@ Yinsh.Engine = function (type, color) {
     };
 
     this.get_rows = function (color) {
-        var state = (color == Yinsh.Color.BLACK) ? Yinsh.State.BLACK_MARKER : Yinsh.State.WHITE_MARKER;
+        var state = (color === Yinsh.Color.BLACK) ? Yinsh.State.BLACK_MARKER : Yinsh.State.WHITE_MARKER;
         var result = {
             start: false,
             row: [],
@@ -210,10 +212,10 @@ Yinsh.Engine = function (type, color) {
          var found = false;
          SeparatedRows::iterator it = srows.begin();
 
-         while (it != srows.end() and not found) {
+         while (it !== srows.end() and not found) {
          Rows::const_iterator itr = it->begin();
 
-         while (itr != it->end() and not found) {
+         while (itr !== it->end() and not found) {
          if (not row.is_separated(*itr)) {
          it->push_back(row);
          found = true;
@@ -246,24 +248,24 @@ Yinsh.Engine = function (type, color) {
     };
 
     this.is_blitz = function () {
-        return this.type == Yinsh.Engine.GameType.BLITZ;
+        return this.type === Yinsh.Engine.GameType.BLITZ;
     };
 
     this.is_finished = function () {
-        if (type == Yinsh.GameType.BLITZ) {
-            return removed_black_ring_number == 1 || removed_white_ring_number == 1 || marker_number == 0;
+        if (type === Yinsh.GameType.BLITZ) {
+            return removed_black_ring_number === 1 || removed_white_ring_number === 1 || marker_number === 0;
         } else { // type = REGULAR
-            return removed_black_ring_number == 3 || removed_white_ring_number == 3 || marker_number == 0;
+            return removed_black_ring_number === 3 || removed_white_ring_number === 3 || marker_number === 0;
         }
     };
 
     this.is_initialized = function () {
-        return placed_black_ring_coordinates.length == 5 &&
-            placed_white_ring_coordinates.length == 5;
+        return placed_black_ring_coordinates.length === 5 &&
+            placed_white_ring_coordinates.length === 5;
     };
 
     this.is_regular = function () {
-        return this.type == Yinsh.Engine.GameType.REGULAR;
+        return this.type === Yinsh.Engine.GameType.REGULAR;
     };
 
     this.move_ring = function (origin, destination) {
@@ -273,7 +275,7 @@ Yinsh.Engine = function (type, color) {
         if (!destination.hash() in intersections) {
             return false;
         }
-        if (intersections[destination.hash()].state() != Yinsh.State.VACANT) {
+        if (intersections[destination.hash()].state() !== Yinsh.State.VACANT) {
             return false;
         }
         if (!this.verify_moving(origin, destination)) {
@@ -288,7 +290,7 @@ Yinsh.Engine = function (type, color) {
         intersection_destination.put_ring(color);
         flip_row(origin, destination);
 
-        if (color == Yinsh.Color.BLACK) {
+        if (color === Yinsh.Color.BLACK) {
             remove_black_ring(origin);
             placed_black_ring_coordinates.push(destination);
         } else {
@@ -296,7 +298,7 @@ Yinsh.Engine = function (type, color) {
             placed_white_ring_coordinates.push(destination);
         }
         phase = Yinsh.Phase.REMOVE_ROWS_AFTER;
-        turn_list.push("move " + (color == Yinsh.Color.BLACK ? "black" : "white") + " ring from " +
+        turn_list.push("move " + (color === Yinsh.Color.BLACK ? "black" : "white") + " ring from " +
             origin.to_string() + " to " + destination.to_string());
         return true;
     };
@@ -317,16 +319,16 @@ Yinsh.Engine = function (type, color) {
             return false;
         }
         phase = Yinsh.Phase.MOVE_RING;
-        turn_list.push("put " + (color == Yinsh.Color.BLACK ? "black" : "white") + " marker at " + coordinates.to_string());
+        turn_list.push("put " + (color === Yinsh.Color.BLACK ? "black" : "white") + " marker at " + coordinates.to_string());
         return true;
     };
 
     this.put_ring = function (coordinates, color) {
-        if (color != current_color) {
+        if (color !== current_color) {
             return false;
         }
-        if ((color == Yinsh.Color.BLACK && placed_black_ring_coordinates.length == 5) ||
-            (color == Yinsh.Color.WHITE && placed_white_ring_coordinates.length == 5)) {
+        if ((color === Yinsh.Color.BLACK && placed_black_ring_coordinates.length === 5) ||
+            (color === Yinsh.Color.WHITE && placed_white_ring_coordinates.length === 5)) {
             return false;
         }
 
@@ -335,22 +337,22 @@ Yinsh.Engine = function (type, color) {
         } else {
             return false;
         }
-        if (color == Yinsh.Color.WHITE) {
+        if (color === Yinsh.Color.WHITE) {
             placed_white_ring_coordinates.push(coordinates);
         } else {
             placed_black_ring_coordinates.push(coordinates);
         }
-        if (placed_black_ring_coordinates.length == 5 &&
-            placed_white_ring_coordinates.length == 5) {
+        if (placed_black_ring_coordinates.length === 5 &&
+            placed_white_ring_coordinates.length === 5) {
             phase = Yinsh.Phase.PUT_MARKER;
         }
         change_color();
-        turn_list.push("put " + (color == Yinsh.Color.BLACK ? "black" : "white") + " ring at " + coordinates.to_string());
+        turn_list.push("put " + (color === Yinsh.Color.BLACK ? "black" : "white") + " ring at " + coordinates.to_string());
         return true;
     };
 
     this.remove_no_row = function () {
-        if (phase == Yinsh.Phase.REMOVE_ROWS_AFTER) {
+        if (phase === Yinsh.Phase.REMOVE_ROWS_AFTER) {
             change_color();
             phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
         } else {
@@ -360,19 +362,19 @@ Yinsh.Engine = function (type, color) {
 
     this.remove_row = function (row, color) {
         //TODO: multiple rows !
-        if (row.length != 5) {
+        if (row.length !== 5) {
             return false;
         }
         for (var j = 0; j < row.length; ++j) {
             remove_marker(row[j].letter(), row[j].number());
         }
-        if (phase == Yinsh.Phase.REMOVE_ROWS_AFTER) {
+        if (phase === Yinsh.Phase.REMOVE_ROWS_AFTER) {
             phase = Yinsh.Phase.REMOVE_RING_AFTER;
         } else {
             phase = Yinsh.Phase.REMOVE_RING_BEFORE;
         }
 
-        var turn = "remove " + (color == Yinsh.Color.BLACK ? "black" : "white") + " row [ ";
+        var turn = "remove " + (color === Yinsh.Color.BLACK ? "black" : "white") + " row [ ";
         for (var j = 0; j < row.length; ++j) {
             turn += row[j].to_string() + " ";
         }
@@ -384,13 +386,13 @@ Yinsh.Engine = function (type, color) {
     this.remove_ring = function (coordinates, color) {
         var intersection = intersections[coordinates.hash()];
 
-        if (intersection.color() == color) {
+        if (intersection.color() === color) {
             intersection.remove_ring_board();
         } else {
             return false;
         }
 
-        if (color == Yinsh.Color.BLACK) {
+        if (color === Yinsh.Color.BLACK) {
             remove_black_ring(coordinates);
             ++removed_black_ring_number;
         } else {
@@ -400,20 +402,20 @@ Yinsh.Engine = function (type, color) {
         if (this.is_finished()) {
             phase = Yinsh.Phase.FINISH;
         } else {
-            if (phase == Yinsh.Phase.REMOVE_RING_AFTER) {
+            if (phase === Yinsh.Phase.REMOVE_RING_AFTER) {
                 phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
                 change_color();
-            } else { // phase == Yinsh.Phase.REMOVE_RING_BEFORE
+            } else { // phase === Yinsh.Phase.REMOVE_RING_BEFORE
                 phase = Yinsh.Phase.PUT_MARKER;
             }
         }
-        turn_list.push("remove " + (color == Yinsh.Color.BLACK ? "black" : "white") +
+        turn_list.push("remove " + (color === Yinsh.Color.BLACK ? "black" : "white") +
             " ring at " + coordinates.to_string());
         return true;
     };
 
     this.removed_ring_number = function (color) {
-        return (color == Yinsh.Engine.Color.BLACK) ? removed_black_ring_number :
+        return (color === Yinsh.Engine.Color.BLACK) ? removed_black_ring_number :
             removed_white_ring_number;
     };
 
@@ -437,17 +439,17 @@ Yinsh.Engine = function (type, color) {
         var n;
         var l;
 
-        if (intersections[origin.hash()].state() != Yinsh.State.BLACK_MARKER_RING &&
-            intersections[origin.hash()].state() != Yinsh.State.WHITE_MARKER_RING) {
+        if (intersections[origin.hash()].state() !== Yinsh.State.BLACK_MARKER_RING &&
+            intersections[origin.hash()].state() !== Yinsh.State.WHITE_MARKER_RING) {
             return false;
         }
 
-        if (origin.hash() == destination.hash() ||
-            intersections[destination.hash()].state() != Yinsh.State.VACANT) {
+        if (origin.hash() === destination.hash() ||
+            intersections[destination.hash()].state() !== Yinsh.State.VACANT) {
             return false;
         }
 
-        if (origin.letter() == destination.letter()) {
+        if (origin.letter() === destination.letter()) {
             if (origin.number() < destination.number()) {
                 n = origin.number() + 1;
                 state.no_vacant = false;
@@ -463,7 +465,7 @@ Yinsh.Engine = function (type, color) {
                     --n;
                 }
             }
-        } else if (origin.number() == destination.number()) {
+        } else if (origin.number() === destination.number()) {
             if (origin.letter().charCodeAt(0) < destination.letter().charCodeAt(0)) {
                 l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
                 state.no_vacant = false;
@@ -481,7 +483,7 @@ Yinsh.Engine = function (type, color) {
                 }
             }
         } else {
-            if (origin.letter().charCodeAt(0) - destination.letter().charCodeAt(0) ==
+            if (origin.letter().charCodeAt(0) - destination.letter().charCodeAt(0) ===
                 origin.number() - destination.number()) {
                 if (origin.letter().charCodeAt(0) < destination.letter().charCodeAt(0)) {
                     n = origin.number() + 1;
@@ -511,20 +513,20 @@ Yinsh.Engine = function (type, color) {
 
     this.winner_is = function () {
         if (this.is_finished()) {
-            if (type == Yinsh.GameType.REGULAR) {
-                if (removed_black_ring_number == 3 ||
+            if (type === Yinsh.GameType.REGULAR) {
+                if (removed_black_ring_number === 3 ||
                     removed_black_ring_number > removed_white_ring_number) {
                     return Yinsh.Color.BLACK;
-                } else if (removed_white_ring_number == 3 |
+                } else if (removed_white_ring_number === 3 ||
                     removed_black_ring_number < removed_white_ring_number) {
                     return Yinsh.Color.WHITE;
                 } else {
                     return Yinsh.Color.NONE;
                 }
             } else {
-                if (removed_black_ring_number == 1) {
+                if (removed_black_ring_number === 1) {
                     return Yinsh.Color.BLACK;
-                } else if (removed_white_ring_number == 1) {
+                } else if (removed_white_ring_number === 1) {
                     return Yinsh.Color.WHITE;
                 } else {
                     return Yinsh.Color.NONE;
@@ -540,12 +542,12 @@ Yinsh.Engine = function (type, color) {
         var coordinates = new Yinsh.Coordinates(letter, number);
         var intersection = intersections[coordinates.hash()];
 
-        if (!result.start && intersection.state() == state) {
+        if (!result.start && intersection.state() === state) {
             result.start = true;
             result.row.push(coordinates);
-        } else if (result.start && intersection.state() == state) {
+        } else if (result.start && intersection.state() === state) {
             result.row.push(coordinates);
-        } else if (result.start && intersection.state() != state) {
+        } else if (result.start && intersection.state() !== state) {
             if (result.row.length >= 5) {
                 result.rows.push(result.row);
             }
@@ -556,7 +558,7 @@ Yinsh.Engine = function (type, color) {
     };
 
     var change_color = function () {
-        if (current_color == Yinsh.Color.WHITE) {
+        if (current_color === Yinsh.Color.WHITE) {
             current_color = Yinsh.Color.BLACK;
         } else {
             current_color = Yinsh.Color.WHITE;
@@ -575,7 +577,7 @@ Yinsh.Engine = function (type, color) {
         var n;
         var l;
 
-        if (origin.letter() == destination.letter()) {
+        if (origin.letter() === destination.letter()) {
             if (origin.number() < destination.number()) {
                 n = origin.number() + 1;
                 while (n < destination.number()) {
@@ -589,7 +591,7 @@ Yinsh.Engine = function (type, color) {
                     --n;
                 }
             }
-        } else if (origin.number() == destination.number()) {
+        } else if (origin.number() === destination.number()) {
             if (origin.letter() < destination.letter()) {
                 l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
                 while (l < destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
@@ -639,7 +641,7 @@ Yinsh.Engine = function (type, color) {
         var i = 0;
 
         while (i < placed_black_ring_coordinates.length) {
-            if (placed_black_ring_coordinates[i].hash() != coordinates.hash()) {
+            if (placed_black_ring_coordinates[i].hash() !== coordinates.hash()) {
                 list.push(placed_black_ring_coordinates[i]);
             }
             ++i;
@@ -652,7 +654,7 @@ Yinsh.Engine = function (type, color) {
         var i = 0;
 
         while (i < placed_white_ring_coordinates.length) {
-            if (placed_white_ring_coordinates[i].hash() != coordinates.hash()) {
+            if (placed_white_ring_coordinates[i].hash() !== coordinates.hash()) {
                 list.push(placed_white_ring_coordinates[i]);
             }
             ++i;
@@ -675,12 +677,12 @@ Yinsh.Engine = function (type, color) {
         if (coordinates in intersections) {
             var state = intersections[coordinates].state();
 
-            if (state == Yinsh.State.BLACK_RING || state == Yinsh.State.WHITE_RING) {
+            if (state === Yinsh.State.BLACK_RING || state === Yinsh.State.WHITE_RING) {
                 result.no_vacant = false; // if ring is presenter after row of markers
                 result.ok = false;
-            } else if (state == Yinsh.State.BLACK_MARKER || state == Yinsh.State.WHITE_MARKER) {
+            } else if (state === Yinsh.State.BLACK_MARKER || state === Yinsh.State.WHITE_MARKER) {
                 result.no_vacant = true;
-            } else if (state == Yinsh.State.VACANT && result.no_vacant) {
+            } else if (state === Yinsh.State.VACANT && result.no_vacant) {
                 result.ok = false;
             }
         }
@@ -692,7 +694,7 @@ Yinsh.Engine = function (type, color) {
         var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
 
         if (coordinates in intersections) {
-            if (intersections[coordinates].color() != color) {
+            if (intersections[coordinates].color() !== color) {
                 _ok = false;
             }
         }
@@ -704,7 +706,7 @@ Yinsh.Engine = function (type, color) {
         var n;
         var l;
 
-        if (begin.letter() == end.letter()) {
+        if (begin.letter() === end.letter()) {
             if (begin.number() < end.number()) {
                 n = begin.number() + 1;
                 while (n < end.number() && ok) {
@@ -718,7 +720,7 @@ Yinsh.Engine = function (type, color) {
                     --n;
                 }
             }
-        } else if (begin.number() == end.number()) {
+        } else if (begin.number() === end.number()) {
             if (begin.letter() < end.letter()) {
                 l = begin.letter() + 1;
                 while (l < end.letter() && ok) {
@@ -733,7 +735,7 @@ Yinsh.Engine = function (type, color) {
                 }
             }
         } else {
-            if (begin.letter() - end.letter() ==
+            if (begin.letter() - end.letter() ===
                 begin.number() - end.number()) {
                 if (begin.letter() < end.letter()) {
                     n = begin.number() + 1;

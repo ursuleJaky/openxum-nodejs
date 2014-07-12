@@ -5,7 +5,7 @@ exports.init = function (req, res) {
 };
 
 exports.create = function (req, res) {
-    if (req.param('game_type') == 'ai') {
+    if (req.param('game_type') === 'ai') {
         res.redirect('/games/play/?game=' + req.param('game') +
             '&color=' + req.param('color') + '&game_id=-1');
     } else {

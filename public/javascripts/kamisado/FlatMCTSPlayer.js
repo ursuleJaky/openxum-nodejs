@@ -1,3 +1,5 @@
+"use strict";
+
 Kamisado.FlatMCTSPlayer = function (color, engine) {
 
 // public methods
@@ -15,7 +17,7 @@ Kamisado.FlatMCTSPlayer = function (color, engine) {
         if (!playable_tower) {
             playable_tower = {
                 x: Math.floor(Math.random() * 8),
-                y: mycolor == Kamisado.Color.BLACK ? 0 : 7
+                y: mycolor === Kamisado.Color.BLACK ? 0 : 7
             };
         }
 
@@ -34,7 +36,7 @@ Kamisado.FlatMCTSPlayer = function (color, engine) {
                     index = i;
                 }
             }
-            if (index == -1) {
+            if (index === -1) {
                 index = Math.floor(Math.random() * list.length);
             }
             return { from: playable_tower, to: list[index] };
@@ -54,7 +56,7 @@ Kamisado.FlatMCTSPlayer = function (color, engine) {
             while (!e2.is_finished()) {
                 play_a_random_turn(e2, e2.current_color());
             }
-            if (color == e2.winner_is()) {
+            if (color === e2.winner_is()) {
                 ++score;
             }
         }
@@ -67,7 +69,7 @@ Kamisado.FlatMCTSPlayer = function (color, engine) {
         if (!playable_tower) {
             playable_tower = {
                 x: Math.floor(Math.random() * 8),
-                y: color == Kamisado.Color.BLACK ? 0 : 7
+                y: color === Kamisado.Color.BLACK ? 0 : 7
             };
         }
 

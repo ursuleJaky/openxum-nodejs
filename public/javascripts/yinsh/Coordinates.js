@@ -1,8 +1,10 @@
+"use strict";
+
 Yinsh.Coordinates = function (l, n) {
 
 // public methods
     this.distance = function (coordinates) {
-        if (coordinates.letter() == letter) {
+        if (coordinates.letter() === letter) {
             return coordinates.number() - number;
         } else {
             return coordinates.letter().charCodeAt(0) - letter.charCodeAt(0);

@@ -1,3 +1,5 @@
+"use strict";
+
 Kamisado.GuiPlayer = function (color, engine) {
 
 // public methods
@@ -59,7 +61,7 @@ Kamisado.GuiPlayer = function (color, engine) {
     };
 
     var draw2 = function() {
-        context.lineWidth = 1.;
+        context.lineWidth = 1;
 
         // background
         context.fillStyle = "#000000";
@@ -100,8 +102,8 @@ Kamisado.GuiPlayer = function (color, engine) {
 
             context.beginPath();
             context.lineWidth = 2;
-            context.strokeStyle = engine.current_color == Kamisado.Color.BLACK ? "#ffffff" : "#000000";
-            context.fillStyle = engine.current_color == Kamisado.Color.BLACK ? "#000000" : "#ffffff";
+            context.strokeStyle = engine.current_color === Kamisado.Color.BLACK ? "#ffffff" : "#000000";
+            context.fillStyle = engine.current_color === Kamisado.Color.BLACK ? "#000000" : "#ffffff";
             context.arc(x, y, deltaX / 3, 0.0, 2 * Math.PI, false);
             context.stroke();
             context.fill();
@@ -136,14 +138,14 @@ Kamisado.GuiPlayer = function (color, engine) {
 
         for (i = 0; i < 8; ++i) {
             tower = engine.get_white_towers()[i];
-            if (!hidden || (hidden && (selected_tower.x != tower.x || selected_tower.y != tower.y))) {
+            if (!hidden || (hidden && (selected_tower.x !== tower.x || selected_tower.y !== tower.y))) {
                 draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY  + 4,
                     deltaX - 10, deltaY - 10, "#ffffff", tower.color);
             }
         }
         for (i = 0; i < 8; ++i) {
             tower = engine.get_black_towers()[i];
-            if (!hidden || (hidden && (selected_tower.x != tower.x || selected_tower.y != tower.y))) {
+            if (!hidden || (hidden && (selected_tower.x !== tower.x || selected_tower.y !== tower.y))) {
                 draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY  + 4,
                     deltaX - 10, deltaY - 10, "#000000", tower.color);
             }
@@ -176,13 +178,13 @@ Kamisado.GuiPlayer = function (color, engine) {
         var found = false;
         var towers;
 
-        if (engine.current_color() == Kamisado.Color.BLACK) {
+        if (engine.current_color() === Kamisado.Color.BLACK) {
             towers = engine.get_black_towers();
         } else {
             towers = engine.get_white_towers();
         }
         while (!found && k < 8) {
-            if (towers[k].x == coordinates.x && towers[k].y == coordinates.y) {
+            if (towers[k].x === coordinates.x && towers[k].y === coordinates.y) {
                 found = true;
             } else {
                 ++k;
@@ -233,8 +235,8 @@ Kamisado.GuiPlayer = function (color, engine) {
             y: offsetY + selected_cell.y * deltaY  + 4
         };
         delta = {
-            x: (dx == 0 ? 0 : dx > 0 ? 1 : -1) * deltaX / 20,
-            y: (dy == 0 ? 0 : dy > 0 ? 1 : -1) * deltaY / 20
+            x: (dx === 0 ? 0 : dx > 0 ? 1 : -1) * deltaX / 20,
+            y: (dy === 0 ? 0 : dy > 0 ? 1 : -1) * deltaY / 20
         };
         id = setInterval(animate_tower, 10);
     };
@@ -246,9 +248,9 @@ Kamisado.GuiPlayer = function (color, engine) {
         var select = find_tower(x, y);
 
         if (select) {
-            if (select.color == engine.current_color()) {
-                if (engine.phase() == Kamisado.Phase.MOVE_TOWER &&
-                    (!engine.get_play_color() || select.tower_color == engine.get_play_color())) {
+            if (select.color === engine.current_color()) {
+                if (engine.phase() === Kamisado.Phase.MOVE_TOWER &&
+                    (!engine.get_play_color() || select.tower_color === engine.get_play_color())) {
                     selected_tower = select;
                     possible_move_list = engine.get_possible_moving_list(selected_tower);
                     manager.play();
@@ -257,7 +259,7 @@ Kamisado.GuiPlayer = function (color, engine) {
         } else {
             var coordinates = compute_coordinates(x, y);
 
-            if (engine.phase() == Kamisado.Phase.MOVE_TOWER && possible_move_list) {
+            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list) {
                 selected_cell = coordinates;
                 possible_move_list = null;
                 move_tower2();
@@ -266,7 +268,7 @@ Kamisado.GuiPlayer = function (color, engine) {
     };
 
     var roundRect = function (x, y, width, height, radius, fill, stroke) {
-        if (typeof stroke == "undefined" ) {
+        if (typeof stroke === "undefined" ) {
             stroke = true;
         }
         if (typeof radius === "undefined") {
@@ -299,8 +301,8 @@ Kamisado.GuiPlayer = function (color, engine) {
 
             context.beginPath();
             context.lineWidth = 2;
-            context.strokeStyle = engine.current_color != Kamisado.Color.BLACK ? "#ffffff" : "#000000";
-            context.fillStyle = engine.current_color != Kamisado.Color.BLACK ? "#000000" : "#ffffff";
+            context.strokeStyle = engine.current_color !== Kamisado.Color.BLACK ? "#ffffff" : "#000000";
+            context.fillStyle = engine.current_color !== Kamisado.Color.BLACK ? "#000000" : "#ffffff";
             context.arc(x, y, deltaX / 4, 0.0, 2 * Math.PI, false);
             context.stroke();
             context.fill();

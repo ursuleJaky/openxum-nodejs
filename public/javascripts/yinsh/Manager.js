@@ -1,3 +1,5 @@
+"use strict";
+
 Yinsh.Status = function (markerNumber, turnList) {
     this.markerNumber = markerNumber;
     this.turnList = turnList;
@@ -7,44 +9,44 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
 
 // public methods
     this.play = function () {
-        if (engine.phase() == Yinsh.Phase.PUT_RING) {
+        if (engine.phase() === Yinsh.Phase.PUT_RING) {
             if (other.is_remote()) {
                 other.put_ring(gui.get_selected_coordinates(), engine.current_color());
             }
             engine.put_ring(gui.get_selected_coordinates(), engine.current_color());
-        } else if (engine.phase() == Yinsh.Phase.PUT_MARKER) {
+        } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
             if (other.is_remote()) {
                 other.put_marker(gui.get_selected_coordinates(), engine.current_color());
             }
             engine.put_marker(gui.get_selected_coordinates(), engine.current_color());
-        } else if (engine.phase() == Yinsh.Phase.MOVE_RING) {
+        } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
             if (other.is_remote()) {
                 other.move_ring(gui.get_selected_ring(), gui.get_selected_coordinates());
             }
             engine.move_ring(gui.get_selected_ring(), gui.get_selected_coordinates());
             gui.clear_selected_ring();
-            if (engine.get_rows(engine.current_color()).length == 0) {
+            if (engine.get_rows(engine.current_color()).length === 0) {
                 engine.remove_no_row();
-                if (engine.get_rows(engine.current_color()).length == 0) {
+                if (engine.get_rows(engine.current_color()).length === 0) {
                     engine.remove_no_row();
                 }
             }
-        } else if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_AFTER ||
-            engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
             if (other.is_remote()) {
                 other.remove_row(gui.get_selected_coordinates(), engine.current_color());
             }
             engine.remove_row(engine.select_row(gui.get_selected_coordinates(),
                 engine.current_color()), engine.current_color());
             gui.clear_selected_row();
-        } else if (engine.phase() == Yinsh.Phase.REMOVE_RING_AFTER ||
-            engine.phase() == Yinsh.Phase.REMOVE_RING_BEFORE) {
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
             if (other.is_remote()) {
                 other.remove_ring(gui.get_selected_coordinates(), engine.current_color());
             }
             engine.remove_ring(gui.get_selected_coordinates(), engine.current_color());
-            if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-                if (engine.get_rows(engine.current_color()).length == 0) {
+            if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                if (engine.get_rows(engine.current_color()).length === 0) {
                     engine.remove_no_row();
                 }
             }
@@ -52,7 +54,7 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
         gui.draw();
         update_status();
         finish();
-        if (engine.current_color() != gui.color()) {
+        if (engine.current_color() !== gui.color()) {
             if (!other.is_remote()) {
                 this.play_other();
             }
@@ -60,20 +62,20 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
     };
 
     this.play_other = function () {
-        if (engine.phase() == Yinsh.Phase.PUT_RING) {
+        if (engine.phase() === Yinsh.Phase.PUT_RING) {
             other.put_ring();
-        } else if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
             other.remove_rows();
             other.remove_ring();
-        } else if (engine.phase() == Yinsh.Phase.PUT_MARKER) {
+        } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
             if (other.is_remote()) {
                 other.put_marker();
             } else {
                 other.move_ring(other.put_marker());
-                if (engine.get_rows(engine.current_color()).length == 0) {
+                if (engine.get_rows(engine.current_color()).length === 0) {
                     other.remove_no_row();
-                    if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-                        if (engine.get_rows(engine.current_color()).length == 0) {
+                    if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                        if (engine.get_rows(engine.current_color()).length === 0) {
                             engine.remove_no_row();
                         }
                     }
@@ -84,12 +86,12 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
                     }
                 }
             }
-        } else if (engine.phase() == Yinsh.Phase.MOVE_RING) {
+        } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
             other.move_ring();
-            if (engine.get_rows(engine.current_color()).length == 0) {
+            if (engine.get_rows(engine.current_color()).length === 0) {
                 other.remove_no_row();
-                if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-                    if (engine.get_rows(engine.current_color()).length == 0) {
+                if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                    if (engine.get_rows(engine.current_color()).length === 0) {
                         engine.remove_no_row();
                     }
                 }
@@ -99,11 +101,11 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
                     other.remove_ring();
                 }
             }
-        } else if (engine.phase() == Yinsh.Phase.REMOVE_ROWS_AFTER ||
-            engine.phase() == Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
             other.remove_row();
-        } else if (engine.phase() == Yinsh.Phase.REMOVE_RING_AFTER ||
-            engine.phase() == Yinsh.Phase.REMOVE_RING_BEFORE) {
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
             other.remove_ring();
         }
         gui.draw();
@@ -117,7 +119,7 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
             var popup = document.getElementById("winnerModalText");
 
             popup.innerHTML = "<h4>The winner is " +
-                (engine.winner_is() == Yinsh.Color.BLACK ? "black" : "white") + "!</h4>";
+                (engine.winner_is() === Yinsh.Color.BLACK ? "black" : "white") + "!</h4>";
             $("#winnerModal").modal("show");
         }
     };

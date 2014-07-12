@@ -7,7 +7,7 @@ exports.init = function (req, res, next) {
         for(var i in players) {
             list.push({
                 username: players[i].username,
-                role: players[i].roles.admin != undefined ? 'admin' : 'player'});
+                role: players[i].roles.admin !== undefined ? 'admin' : 'player'});
         }
         res.render('admin/player-statuses/index', {players: list});
     });

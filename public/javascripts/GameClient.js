@@ -1,3 +1,5 @@
+"use strict";
+
 GameClient = function (u, g) {
 
     this.confirm = function (owner_id, opponent_id, game_id) {
@@ -26,14 +28,12 @@ GameClient = function (u, g) {
     this.start = function () {
 
         window.onbeforeunload = function () {
-            if (connection.readyState == 1) {
+            if (connection.readyState === 1) {
                 connection.close();
             }
         };
 
         $(document).ready(function () {
-            "use strict";
-
             window.WebSocket = window.WebSocket || window.MozWebSocket;
             if (!window.WebSocket) {
                 return;
@@ -52,27 +52,21 @@ GameClient = function (u, g) {
             connection.onmessage = function (message) {
                 var msg = JSON.parse(message.data);
 
-                if (msg.type == 'join') {
+                if (msg.type === 'join') {
                     console.log('join ACK: ' + msg.game_id + ' by ' + msg.opponent_id + ' against ' + msg.owner_id);
-                    if (msg.opponent_id == uid) {
+                    if (msg.opponent_id === uid) {
                         $('a#button_game_' + msg.game_id).html('<i class="glyphicon glyphicon-pause"></i> confirm...');
                     } else {
                         $('a#button_game_' + msg.game_id).html('<i class="glyphicon glyphicon-exclamation-sign"></i> confirm');
-                        $('a#button_game_' + msg.game_id).attr('href', 'javascript:client.confirm(' + msg.owner_id
-                            + ',' + msg.opponent_id + ',' + msg.game_id + ')');
+                        $('a#button_game_' + msg.game_id).attr('href', 'javascript:client.confirm(' + msg.owner_id + ',' + msg.opponent_id + ',' + msg.game_id + ')');
                         $('div#opponent_' + msg.game_id).html('<b>' + msg.opponent_name + '</b>');
                     }
-                } else if (msg.type == 'confirm') {
-                    console.log('confirm ACK: ' + msg.game_id + ' with ' + msg.owner_id + ' against ' + msg.opponent_id
-                        + ' with ' + msg.color);
-                    if (msg.owner_id == uid) {
-                        window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id
-                            + '&owner_id=' + msg.owner_id + '&opponent_id=' + msg.opponent_id
-                            + '&color=' + msg.color;
+                } else if (msg.type === 'confirm') {
+                    console.log('confirm ACK: ' + msg.game_id + ' with ' + msg.owner_id + ' against ' + msg.opponent_id + ' with ' + msg.color);
+                    if (msg.owner_id === uid) {
+                        window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id + '&owner_id=' + msg.owner_id + '&opponent_id=' + msg.opponent_id + '&color=' + msg.color;
                     } else {
-                        window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id
-                            + '&owner_id=' + msg.opponent_id + '&opponent_id=' + msg.owner_id
-                            + '&color=' + (msg.color == 'black' ? 'white' : 'black');
+                        window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id + '&owner_id=' + msg.opponent_id + '&opponent_id=' + msg.owner_id + '&color=' + (msg.color === 'black' ? 'white' : 'black');
                     }
                 }
             };
@@ -105,4 +99,4 @@ GameClient = function (u, g) {
     var game;
 
     init(u, g);
-}
+};

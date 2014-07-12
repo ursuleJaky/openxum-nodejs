@@ -1,4 +1,6 @@
-Invers.RandomPlayer = function (color, engine) {
+"use strict";
+
+Invers.RandomPlayer = function (color, e) {
 
 // public methods
     this.color = function() {
@@ -18,6 +20,6 @@ Invers.RandomPlayer = function (color, engine) {
 
 // private attributes
     var mycolor = color;
-    var engine = engine;
+    var engine = e;
     var level = 10;
 };

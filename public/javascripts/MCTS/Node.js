@@ -1,10 +1,12 @@
+"use strict";
+
 MCTS.KUCT = 0.25;
 
 MCTS.Node = function (e, f, m, l) {
 
 // public methods
     this.choice = function (max) {
-        if (childNodes.length == 0) {
+        if (childNodes.length === 0) {
             return null;
         } else {
             var best = childNodes[0];

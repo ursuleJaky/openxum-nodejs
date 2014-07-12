@@ -1,10 +1,12 @@
+"use strict";
+
 AdminClient = function (u) {
 
 // public methods
     this.start = function () {
 
         window.onbeforeunload = function () {
-            if (connection.readyState == 1) {
+            if (connection.readyState === 1) {
                 connection.close();
             }
         };
@@ -30,7 +32,7 @@ AdminClient = function (u) {
             connection.onmessage = function (message) {
                 var msg = JSON.parse(message.data);
 
-                if (msg.type == 'connected') {
+                if (msg.type === 'connected') {
                     onConnected(msg);
                 }
             };
@@ -61,7 +63,7 @@ AdminClient = function (u) {
 
             $('td#status_' + msg.users[i].id).html(msg.users[i].status);
             while (j < clients.length && !found) {
-                if (clients[j] == msg.users[i].id) {
+                if (clients[j] === msg.users[i].id) {
                     found = true;
                 } else {
                     j++;
@@ -79,7 +81,7 @@ AdminClient = function (u) {
             var i = 0;
 
             while (i < msg.users.length && !found) {
-                if (clients[j] == msg.users[i].id) {
+                if (clients[j] === msg.users[i].id) {
                     found = true;
                 } else {
                     i++;
