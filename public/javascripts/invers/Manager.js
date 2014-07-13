@@ -3,7 +3,7 @@
 Invers.Manager = function (e, gui_player, other_player) {
 
 // public methods
-    this.load_level = function() {
+    this.load_level = function () {
         var key = 'openxum:invers:level';
 
         level = 10;
@@ -15,20 +15,8 @@ Invers.Manager = function (e, gui_player, other_player) {
 
     this.play = function () {
         if (engine.current_color() === gui.color()) {
-            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
-                engine.move_tower(gui.get_selected_tower(), gui.get_selected_cell());
-                gui.unselect();
-            }
-            gui.draw();
-            finish();
-            if (engine.current_color() !== gui.color()) {
-                if (!other.is_remote()) {
-                    this.play_other();
-                }
-            }
-        } else {
-            if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-                engine.move_tower(turn.from, turn.to);
+            if (engine.phase() === Invers.Phase.PUSH_TILE && gui.get_move()) {
+                engine.move(gui.get_move());
                 gui.unselect();
             }
             gui.draw();
@@ -41,24 +29,21 @@ Invers.Manager = function (e, gui_player, other_player) {
         }
     };
 
-    this.play_other = function() {
-        if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-            turn = other.move_tower();
-            gui.move_tower({
-                    x: turn.from.x,
-                    y: turn.from.y,
-                    tower_color: engine.find_tower(turn.from, engine.current_color()).tower_color },
-                turn.to);
+    this.play_other = function () {
+        if (engine.phase() === Invers.Phase.PUSH_TILE) {
+            engine.move(other.move());
+            gui.draw();
+            finish();
         }
     };
 
 // private methods
-    var finish = function() {
+    var finish = function () {
         if (engine.is_finished()) {
             var popup = document.getElementById("winnerModalText");
 
             popup.innerHTML = "<h4>The winner is " +
-                (engine.winner_is() === Kamisado.Color.BLACK ? "black" : "white") + "!</h4>";
+                (engine.winner_is() === Invers.Color.RED ? "red" : "yellow") + "!</h4>";
             $("#winnerModal").modal("show");
 
             if (engine.winner_is() === gui.color()) {
@@ -73,7 +58,7 @@ Invers.Manager = function (e, gui_player, other_player) {
         }
     };
 
-    var load_win = function() {
+    var load_win = function () {
         var key = 'openxum:invers:win';
         var win = 0;
 
@@ -83,7 +68,7 @@ Invers.Manager = function (e, gui_player, other_player) {
         return win;
     };
 
-    var init = function(e, g, o) {
+    var init = function (e, g, o) {
         engine = e;
         gui = g;
         other = o;

@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.GuiPlayer = function (color, engine) {
+Invers.GuiPlayer = function (color, e) {
 
 // public methods
     this.color = function () {
@@ -17,11 +17,26 @@ Invers.GuiPlayer = function (color, engine) {
         draw_grid();
         draw_inputs();
         draw_free_tiles();
-//        draw_forbidden_moves();
     };
 
     this.engine = function () {
         return engine;
+    };
+
+    this.get_move = function () {
+        if (selected_color !== Invers.Color.NONE && selected_index !== -1 && selected_position !== Invers.Position.NONE) {
+            var letter = 'X';
+            var number = -1;
+
+            if (selected_position === Invers.Position.LEFT || selected_position === Invers.Position.RIGHT) {
+                number = selected_index;
+            } else {
+                letter = String.fromCharCode('A'.charCodeAt(0) + (selected_index - 1));
+            }
+            return { color: selected_color, letter: letter, number: number, position: selected_position };
+        } else {
+            return undefined;
+        }
     };
 
     this.set_canvas = function (c) {
@@ -47,6 +62,9 @@ Invers.GuiPlayer = function (color, engine) {
     };
 
     this.unselect = function () {
+        selected_color = Invers.Color.NONE;
+        selected_index = -1;
+        selected_position = Invers.Position.NONE;
     };
 
 // private methods
@@ -54,8 +72,12 @@ Invers.GuiPlayer = function (color, engine) {
         return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
     };
 
-    var draw_free_tile = function (index, color) {
-        context.lineWidth = 2;
+    var draw_free_tile = function (index, color, selected) {
+        if (selected) {
+            context.lineWidth = 5;
+        } else {
+            context.lineWidth = 2;
+        }
         context.strokeStyle = "#ffffff";
         context.fillStyle = color;
         context.beginPath();
@@ -82,11 +104,13 @@ Invers.GuiPlayer = function (color, engine) {
         var i;
 
         for (i = 0; i < engine.getRedTileNumber(); ++i) {
-            draw_free_tile(index, 'red');
+            draw_free_tile(index, 'red', selected_color == index);
+            free_colors[index] = Invers.Color.RED;
             ++index;
         }
         for (i = 0; i < engine.getYellowTileNumber(); ++i) {
-            draw_free_tile(index, 'yellow');
+            draw_free_tile(index, 'yellow', selected_color == index);
+            free_colors[index] = Invers.Color.YELLOW;
             ++index;
         }
     };
@@ -96,7 +120,9 @@ Invers.GuiPlayer = function (color, engine) {
         context.strokeStyle = "#000000";
         for (var i = 0; i < 6; ++i) {
             for (var j = 0; j < 6; ++j) {
-                context.fillStyle = engine.get_state()[i][j] === Invers.State.RED_FULL ? 'red' : 'yellow';
+                context.fillStyle = (engine.get_state()[i][j] === Invers.State.RED_FULL ||
+                    engine.get_state()[i][j] === Invers.State.RED_REVERSE) ? 'red' : 'yellow';
+                context.lineWidth = 1;
                 context.beginPath();
                 context.moveTo(offsetX + i * deltaX, offsetY + j * deltaY);
                 context.lineTo(offsetX + (i + 1) * deltaX - 2, offsetY + j * deltaY);
@@ -105,69 +131,74 @@ Invers.GuiPlayer = function (color, engine) {
                 context.moveTo(offsetX + i * deltaX, offsetY + j * deltaY);
                 context.closePath();
                 context.fill();
+                if (engine.get_state()[i][j] === Invers.State.RED_REVERSE ||
+                    engine.get_state()[i][j] === Invers.State.YELLOW_REVERSE) {
+                    context.fillStyle = "#000000";
+                    context.beginPath();
+                    context.moveTo(offsetX + (i + 0.4) * deltaX, offsetY + (j + 0.4) * deltaY);
+                    context.lineTo(offsetX + (i + 0.6) * deltaX - 2, offsetY + (j + 0.4) * deltaY);
+                    context.lineTo(offsetX + (i + 0.6) * deltaX - 2, offsetY + (j + 0.6) * deltaY - 2);
+                    context.lineTo(offsetX + (i + 0.4) * deltaX, offsetY + (j + 0.6) * deltaY - 2);
+                    context.moveTo(offsetX + (i + 0.4) * deltaX, offsetY + (j + 0.4) * deltaY);
+                    context.closePath();
+                    context.fill();
+                }
             }
         }
     };
 
     var draw_inputs = function () {
+        var list = engine.get_possible_move_list();
+
         context.lineWidth = 1;
         context.strokeStyle = "#ffffff";
         context.fillStyle = "#ffffff";
         // LEFT
         for (var i = 0; i < 6; ++i) {
-            context.beginPath();
-            context.moveTo(offsetX - 25, offsetY + (i + 0.3) * deltaY);
-            context.lineTo(offsetX - 5, offsetY + (i + 0.5) * deltaY);
-            context.lineTo(offsetX - 25, offsetY + (i + 0.7) * deltaY);
-            context.moveTo(offsetX - 25, offsetY + (i + 0.3) * deltaY);
-            context.closePath();
-            context.fill();
+            if (!is_forbidden(0, i, Invers.Position.LEFT, list)) {
+                context.beginPath();
+                context.moveTo(offsetX - 25, offsetY + (i + 0.3) * deltaY);
+                context.lineTo(offsetX - 5, offsetY + (i + 0.5) * deltaY);
+                context.lineTo(offsetX - 25, offsetY + (i + 0.7) * deltaY);
+                context.moveTo(offsetX - 25, offsetY + (i + 0.3) * deltaY);
+                context.closePath();
+                context.fill();
+            }
         }
         // RIGHT
         for (var i = 0; i < 6; ++i) {
-            context.beginPath();
-            context.moveTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.3) * deltaY);
-            context.lineTo(offsetX + deltaX * 6 + 5, offsetY + (i + 0.5) * deltaY);
-            context.lineTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.7) * deltaY);
-            context.moveTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.3) * deltaY);
-            context.closePath();
-            context.fill();
+            if (!is_forbidden(5, i, Invers.Position.RIGHT, list)) {
+                context.beginPath();
+                context.moveTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.3) * deltaY);
+                context.lineTo(offsetX + deltaX * 6 + 5, offsetY + (i + 0.5) * deltaY);
+                context.lineTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.7) * deltaY);
+                context.moveTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.3) * deltaY);
+                context.closePath();
+                context.fill();
+            }
         }
         // TOP
         for (var i = 0; i < 6; ++i) {
-            context.beginPath();
-            context.moveTo(offsetX + deltaX * (i + 0.3), offsetY - 25);
-            context.lineTo(offsetX + deltaX * (i + 0.5), offsetY - 5);
-            context.lineTo(offsetX + deltaX * (i + 0.7), offsetY - 25);
-            context.moveTo(offsetX + deltaX * (i + 0.3), offsetY - 25);
-            context.closePath();
-            context.fill();
+            if (!is_forbidden(i, 0, Invers.Position.TOP, list)) {
+                context.beginPath();
+                context.moveTo(offsetX + deltaX * (i + 0.3), offsetY - 25);
+                context.lineTo(offsetX + deltaX * (i + 0.5), offsetY - 5);
+                context.lineTo(offsetX + deltaX * (i + 0.7), offsetY - 25);
+                context.moveTo(offsetX + deltaX * (i + 0.3), offsetY - 25);
+                context.closePath();
+                context.fill();
+            }
         }
         // BOTTOM
         for (var i = 0; i < 6; ++i) {
-            context.beginPath();
-            context.moveTo(offsetX + deltaX * (i + 0.3), offsetY + 6 * deltaY + 25);
-            context.lineTo(offsetX + deltaX * (i + 0.5), offsetY + 6 * deltaY + 5);
-            context.lineTo(offsetX + deltaX * (i + 0.7), offsetY + 6 * deltaY + 25);
-            context.moveTo(offsetX + deltaX * (i + 0.3), offsetY + 6 * deltaY + 25);
-            context.closePath();
-            context.fill();
-        }
-    };
-
-    var draw_forbidden_moves = function () {
-        context.lineWidth = 2;
-        context.strokeStyle = "#000000";
-
-        // RIGHT
-        for (var j = 0; j < 6; ++j) {
-            if (!engine.is_possible({letter: String.fromCharCode("A".charCodeAt(0) + j),
-                number: 6})) {
+            if (!is_forbidden(i, 5, Invers.Position.BOTTOM, list)) {
                 context.beginPath();
-                context.moveTo(offsetX + i * deltaX, offsetY + j * deltaY);
-                context.lineTo(offsetX + (i + 1) * deltaX - 2, offsetY + (j + 1) * deltaY - 2);
+                context.moveTo(offsetX + deltaX * (i + 0.3), offsetY + 6 * deltaY + 25);
+                context.lineTo(offsetX + deltaX * (i + 0.5), offsetY + 6 * deltaY + 5);
+                context.lineTo(offsetX + deltaX * (i + 0.7), offsetY + 6 * deltaY + 25);
+                context.moveTo(offsetX + deltaX * (i + 0.3), offsetY + 6 * deltaY + 25);
                 context.closePath();
-                context.stroke();
+                context.fill();
             }
         }
     };
@@ -179,24 +210,98 @@ Invers.GuiPlayer = function (color, engine) {
     };
 
     var init = function () {
+        selected_color = Invers.Color.NONE;
+        selected_index = -1;
+        selected_position = Invers.Position.NONE;
+        free_colors = [];
+    };
+
+    var is_forbidden = function (i, j, position, list) {
+        var ok = false;
+
+        if (position === Invers.Position.LEFT) {
+            ok = true;
+            for (var k = 0; k < list.left.length; ++k) {
+                if (list.left[k].number === j + 1) {
+                    return false;
+                }
+            }
+        } else if (position === Invers.Position.RIGHT) {
+            ok = true;
+            for (var k = 0; k < list.right.length; ++k) {
+                if (list.right[k].number === j + 1) {
+                    return false;
+                }
+            }
+        } else if (position === Invers.Position.TOP) {
+            ok = true;
+            for (var k = 0; k < list.top.length; ++k) {
+                if (list.top[k].letter === String.fromCharCode('A'.charCodeAt(0) + i)) {
+                    return false;
+                }
+            }
+        } else if (position === Invers.Position.BOTTOM) {
+            ok = true;
+            for (var k = 0; k < list.bottom.length; ++k) {
+                if (list.bottom[k].letter === String.fromCharCode('A'.charCodeAt(0) + i)) {
+                    return false;
+                }
+            }
+        }
+        return ok;
     };
 
     var onClick = function (event) {
         var pos = getClickPosition(event);
-        var index = -1;
+        var change_color = false;
 
-        // TOP
-        if (pos.y < offsetY - 5 && pos.y > offsetY - 25) {
+        selected_index = -1;
+        selected_position = Invers.Position.NONE;
+        if (pos.y < offsetY - 5 && pos.y > offsetY - 25) { // TOP
             if (pos.x < offsetX - 5 && pos.x > offsetX - 25) {
-                index = 0;
-                console.log("index 0");
+                selected_color = free_colors[0];
+                change_color = true;
             } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) {
-                index = 1;
-                console.log("index 1");
+                selected_color = free_colors[1];
+                change_color = true;
             } else {
-                index = Math.round((pos.x - offsetX) / deltaX + 0.5);
-                console.log('column: ' + index);
+                selected_index = Math.round((pos.x - offsetX) / deltaX + 0.5);
+                if (selected_index > 0 && selected_index < 7) {
+                    selected_position = Invers.Position.TOP;
+                } else {
+                    selected_index = -1;
+                }
             }
+        } else if (pos.y > offsetY + 6 * deltaY + 5 && pos.y < offsetY + 6 * deltaY + 25) { // BOTTOM
+            selected_index = Math.round((pos.x - offsetX) / deltaX + 0.5);
+            if (selected_index > 0 && selected_index < 7) {
+                selected_position = Invers.Position.BOTTOM;
+            } else {
+                selected_index = -1;
+            }
+        } else if (pos.x < offsetX - 5 && pos.x > offsetX - 25) { // LEFT
+            selected_index = Math.round((pos.y - offsetY) / deltaY + 0.5);
+            if (selected_index > 0 && selected_index < 7) {
+                selected_position = Invers.Position.LEFT;
+            } else {
+                selected_index = -1;
+            }
+        } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) { // RIGHT
+            selected_index = Math.round((pos.y - offsetY) / deltaY + 0.5);
+            if (selected_index > 0 && selected_index < 7) {
+                selected_position = Invers.Position.RIGHT;
+            } else {
+                selected_index = -1;
+            }
+        }
+
+        if (change_color) {
+            draw_free_tiles();
+        }
+
+        if (engine.phase() === Invers.Phase.PUSH_TILE && selected_color !== Invers.Color.NONE &&
+            selected_index !== -1 && selected_position !== Invers.Position.NONE) {
+            manager.play();
         }
     };
 
@@ -227,7 +332,7 @@ Invers.GuiPlayer = function (color, engine) {
     };
 
 // private attributes
-    var engine = engine;
+    var engine = e;
     var mycolor = color;
 
     var canvas;
@@ -243,8 +348,10 @@ Invers.GuiPlayer = function (color, engine) {
     var scaleX;
     var scaleY;
 
-    var selected_cell;
-    var selected_tower;
+    var free_colors;
+    var selected_color;
+    var selected_position;
+    var selected_index;
     var possible_move_list;
 
     var moving_tower;

@@ -12,6 +12,31 @@ Invers.RandomPlayer = function (color, e) {
     };
 
     this.move = function () {
+        var list = engine.get_possible_move_list();
+        var position;
+        var l;
+        var letter = 'X';
+        var number = -1;
+        var color = engine.get_free_tiles()[Math.floor(Math.random() * 2)];
+
+        do {
+            position = Math.floor(Math.random() * 4);
+            if (position === Invers.Position.TOP) {
+                l = list.top;
+            } else if (position === Invers.Position.BOTTOM) {
+                l = list.bottom;
+            } else if (position === Invers.Position.LEFT) {
+                l = list.left;
+            } else if (position === Invers.Position.RIGHT) {
+                l = list.right;
+            }
+        } while (l.length == 0);
+        if (position === Invers.Position.TOP || position === Invers.Position.BOTTOM) {
+            letter = l[Math.floor(Math.random() * l.length)].letter;
+        } else {
+            number = l[Math.floor(Math.random() * l.length)].number;
+        }
+        return { color: color, letter: letter, number: number, position: position };
     };
 
     this.set_level = function (l) {
