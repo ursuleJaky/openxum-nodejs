@@ -39,6 +39,10 @@ Kamisado.GuiPlayer = function (color, engine) {
         deltaY = (height * 0.95 - 10) / 8;
         offsetX = width / 2 - deltaX * 4;
         offsetY = height / 2 - deltaY * 4;
+
+        scaleX = height / canvas.offsetHeight;
+        scaleY = width / canvas.offsetWidth;
+
         this.draw();
     };
 
@@ -156,20 +160,10 @@ Kamisado.GuiPlayer = function (color, engine) {
         draw_towers();
     };
 
-    var find_pos = function(obj) {
-        var left = 0, top = 0;
+    var getClickPosition = function (e) {
+        var rect = canvas.getBoundingClientRect();
 
-        if (obj.offsetParent) {
-            do {
-                left += obj.offsetLeft;
-                top += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-            left -= document.documentElement.scrollLeft +
-		document.body.scrollLeft;
-            top -= document.documentElement.scrollTop + document.body.scrollTop;
-            return { x: left, y: top };
-        }
-        return undefined;
+        return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
     };
 
     var find_tower = function(x, y) {
@@ -242,10 +236,8 @@ Kamisado.GuiPlayer = function (color, engine) {
     };
 
     var onClick = function (event) {
-        var pos = find_pos(canvas);
-        var x = event.clientX - pos.x;
-        var y = event.clientY - pos.y;
-        var select = find_tower(x, y);
+        var pos = getClickPosition(event);
+        var select = find_tower(pos.x, pos.y);
 
         if (select) {
             if (select.color === engine.current_color()) {
@@ -257,7 +249,7 @@ Kamisado.GuiPlayer = function (color, engine) {
                 }
             }
         } else {
-            var coordinates = compute_coordinates(x, y);
+            var coordinates = compute_coordinates(pos.x, pos.y);
 
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list) {
                 selected_cell = coordinates;
@@ -324,6 +316,9 @@ Kamisado.GuiPlayer = function (color, engine) {
     var deltaY;
     var offsetX;
     var offsetY;
+
+    var scaleX;
+    var scaleY;
 
     var selected_cell;
     var selected_tower;

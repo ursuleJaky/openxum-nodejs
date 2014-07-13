@@ -1,6 +1,6 @@
 "use strict";
 
-AdminClient = function (u) {
+var AdminClient = function (u) {
 
 // public methods
     this.start = function () {

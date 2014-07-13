@@ -1,6 +1,6 @@
 "use strict";
 
-GameClient = function (u, g) {
+var GameClient = function (u, g) {
 
     this.confirm = function (owner_id, opponent_id, game_id) {
         var msg = {

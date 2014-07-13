@@ -50,6 +50,10 @@ Yinsh.GuiPlayer = function (color, e) {
         context = c.getContext("2d");
         height = canvas.height;
         width = canvas.width;
+
+        scaleX = height / canvas.offsetHeight;
+        scaleY = width / canvas.offsetWidth;
+
         canvas.addEventListener("click", onClick, true);
         this.draw();
     };
@@ -358,27 +362,16 @@ Yinsh.GuiPlayer = function (color, e) {
         draw_rows();
     };
 
-    var find_pos = function(obj) {
-        var left = 0, top = 0;
+    var getClickPosition = function (e) {
+        var rect = canvas.getBoundingClientRect();
 
-        if (obj.offsetParent) {
-            do {
-                left += obj.offsetLeft;
-                top += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-            left -= document.documentElement.scrollLeft + document.body.scrollLeft;
-            top -= document.documentElement.scrollTop + document.body.scrollTop;
-            return { x: left, y: top };
-        }
-        return undefined;
+        return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
     };
 
     var onClick = function (event) {
-        var pos = find_pos(canvas);
-        var x = event.clientX - pos.x;
-        var y = event.clientY - pos.y;
-        var letter = compute_letter(x, y);
-        var number = compute_number(x, y);
+        var pos = getClickPosition(event);
+        var letter = compute_letter(pos.x, pos.y);
+        var number = compute_number(pos.x, pos.y);
         var ok = false;
 
         if (letter !== 'X' && number !== -1 &&
@@ -463,6 +456,9 @@ Yinsh.GuiPlayer = function (color, e) {
     var delta_y = 0;
     var delta_xy = 0;
     var offset = 0;
+
+    var scaleX;
+    var scaleY;
 
     var selected_coordinates = new Yinsh.Coordinates('X', -1);
     var selected_ring = new Yinsh.Coordinates('X', -1);

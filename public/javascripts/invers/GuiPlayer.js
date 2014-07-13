@@ -3,7 +3,7 @@
 Invers.GuiPlayer = function (color, engine) {
 
 // public methods
-    this.color = function() {
+    this.color = function () {
         return mycolor;
     };
 
@@ -29,11 +29,16 @@ Invers.GuiPlayer = function (color, engine) {
         context = c.getContext("2d");
         height = canvas.height;
         width = canvas.width;
+
         canvas.addEventListener("click", onClick);
         deltaX = (width * 0.95 - 40) / 6;
         deltaY = (height * 0.95 - 40) / 6;
         offsetX = width / 2 - deltaX * 3;
         offsetY = height / 2 - deltaY * 3;
+
+        scaleX = height / canvas.offsetHeight;
+        scaleY = width / canvas.offsetWidth;
+
         this.draw();
     };
 
@@ -41,15 +46,15 @@ Invers.GuiPlayer = function (color, engine) {
         manager = m;
     };
 
-    this.unselect = function() {
+    this.unselect = function () {
     };
 
 // private methods
-    var compute_coordinates = function(x, y) {
+    var compute_coordinates = function (x, y) {
         return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
     };
 
-    var draw_free_tile = function(index, color) {
+    var draw_free_tile = function (index, color) {
         context.lineWidth = 2;
         context.strokeStyle = "#ffffff";
         context.fillStyle = color;
@@ -72,7 +77,7 @@ Invers.GuiPlayer = function (color, engine) {
         context.stroke();
     };
 
-    var draw_free_tiles = function() {
+    var draw_free_tiles = function () {
         var index = 0;
         var i;
 
@@ -87,10 +92,6 @@ Invers.GuiPlayer = function (color, engine) {
     };
 
     var draw_grid = function () {
-
-        console.log('offsetX='+offsetX+";offsetY="+offsetY);
-        console.log('deltaX='+deltaX+";deltaY="+deltaY);
-
         context.lineWidth = 1;
         context.strokeStyle = "#000000";
         for (var i = 0; i < 6; ++i) {
@@ -108,7 +109,7 @@ Invers.GuiPlayer = function (color, engine) {
         }
     };
 
-    var draw_inputs = function() {
+    var draw_inputs = function () {
         context.lineWidth = 1;
         context.strokeStyle = "#ffffff";
         context.fillStyle = "#ffffff";
@@ -171,50 +172,36 @@ Invers.GuiPlayer = function (color, engine) {
         }
     };
 
-    var find_pos = function(obj) {
-        var left = 0, top = 0;
+    var getClickPosition = function (e) {
+        var rect = canvas.getBoundingClientRect();
 
-        if (obj.offsetParent) {
-            do {
-                left += obj.offsetLeft;
-                top += obj.offsetTop;
-            } while (obj = obj.offsetParent);
-            left -= document.documentElement.scrollLeft +
-                document.body.scrollLeft;
-            top -= document.documentElement.scrollTop + document.body.scrollTop;
-            return { x: left, y: top };
-        }
-        return undefined;
+        return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
     };
 
-    var init = function() {
+    var init = function () {
     };
 
     var onClick = function (event) {
-        var pos = find_pos(canvas);
-        var x = event.clientX - pos.x;
-        var y = event.clientY - pos.y;
+        var pos = getClickPosition(event);
         var index = -1;
 
-        console.log('x='+x+";y="+y);
-
         // TOP
-        if (y < offsetY - 5 && y > offsetY - 25) {
-            if (x < offsetX - 5 && x > offsetX - 25) {
+        if (pos.y < offsetY - 5 && pos.y > offsetY - 25) {
+            if (pos.x < offsetX - 5 && pos.x > offsetX - 25) {
                 index = 0;
                 console.log("index 0");
-            } else if (x > offsetX + 6 * deltaX + 5 && x < offsetX + 6 * deltaX + 25) {
+            } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) {
                 index = 1;
                 console.log("index 1");
             } else {
-                index = Math.round((x - offsetX) / deltaX + 0.5);
+                index = Math.round((pos.x - offsetX) / deltaX + 0.5);
                 console.log('column: ' + index);
             }
         }
     };
 
     var roundRect = function (x, y, width, height, radius, fill, stroke) {
-        if (typeof stroke === "undefined" ) {
+        if (typeof stroke === "undefined") {
             stroke = true;
         }
         if (typeof radius === "undefined") {
@@ -253,6 +240,8 @@ Invers.GuiPlayer = function (color, engine) {
     var deltaY;
     var offsetX;
     var offsetY;
+    var scaleX;
+    var scaleY;
 
     var selected_cell;
     var selected_tower;
@@ -264,4 +253,5 @@ Invers.GuiPlayer = function (color, engine) {
     var id;
 
     init();
-};
+}
+;
