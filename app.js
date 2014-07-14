@@ -11,7 +11,8 @@ var config = require('./config'),
     mongoose = require('mongoose'),
     helmet = require('helmet'),
     webSocketServer = require('./webSocketServer'),
-    cluster = require('cluster');
+    cluster = require('cluster'),
+    captcha = require('easy-captcha');
 
 //create express app
 var app = express();
@@ -52,6 +53,14 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 helmet.defaults(app);
+
+//captcha
+app.use('/captcha.jpg', captcha.generate());
+
+//sign up + captcha
+app.get('/signup/', require('./views/signup/index').init);
+app.post('/signup/', captcha.check, require('./views/signup/index').signup);
+
 
 //response locals
 app.use(function (req, res, next) {

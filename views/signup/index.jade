@@ -72,5 +72,11 @@ block body
         label Create a Password:
         input.form-control(type='password', name='password', value!='<%= password %>')
         span.help-block <%- errfor.password %>
+      div.form-group(class!='<%- errfor.captcha ? "has-error" : "" %>')
+        img(src='/captcha.jpg')
+        br
+        br
+        input.form-control(type='text', name='captcha', value!='<%= captcha %>')
+        span.help-block <%- errfor.captcha %>
       div.form-group
         button.btn.btn-primary.btn-signup(type='button') Create My Account
