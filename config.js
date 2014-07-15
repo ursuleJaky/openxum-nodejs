@@ -20,8 +20,8 @@ exports.smtp = {
     address: process.env.SMTP_FROM_ADDRESS || 'admin@openxum.org'
   },
   credentials: {
-    user: process.env.SMTP_USERNAME || 'eric.ramat@gmail.com',
-    password: process.env.SMTP_PASSWORD || 'xxxxx',
+    user: process.env.SMTP_USERNAME || 'ferrand.sylvain@gmail.com',
+    password: process.env.SMTP_PASSWORD || '',
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     ssl: true
   }
