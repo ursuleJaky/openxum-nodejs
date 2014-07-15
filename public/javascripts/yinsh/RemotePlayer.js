@@ -3,6 +3,10 @@
 Yinsh.RemotePlayer = function (color, e, u, o, g) {
 
 // public methods
+    this.color = function () {
+        return mycolor;
+    };
+
     this.is_remote = function () {
         return true;
     };
@@ -61,7 +65,6 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                 color: color
             };
             connection.send(JSON.stringify(msg));
-
         }
     };
 
@@ -111,7 +114,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
 
 // private methods
     var init = function () {
-        connection = new WebSocket('ws://127.0.0.1:1337');
+        connection = new WebSocket('ws://127.0.0.1:3000');
 
         connection.onopen = function () {
 

@@ -53,12 +53,12 @@ var GameClient = function (u, g) {
                 var msg = JSON.parse(message.data);
 
                 if (msg.type === 'join') {
-                    console.log('join ACK: ' + msg.game_id + ' by ' + msg.opponent_id + ' against ' + msg.owner_id);
-                    if (msg.opponent_id === uid) {
+                    console.log('join ACK: ' + msg.game_id + ' by ' + msg.opponent_name + ' against ' + msg.owner_name);
+                    if (msg.opponent_name === uid) {
                         $('a#button_game_' + msg.game_id).html('<i class="glyphicon glyphicon-pause"></i> confirm...');
                     } else {
                         $('a#button_game_' + msg.game_id).html('<i class="glyphicon glyphicon-exclamation-sign"></i> confirm');
-                        $('a#button_game_' + msg.game_id).attr('href', 'javascript:client.confirm(' + msg.owner_id + ',' + msg.opponent_id + ',' + msg.game_id + ')');
+                        $('a#button_game_' + msg.game_id).attr('href', 'javascript:client.confirm("' + msg.owner_id + '","' + msg.opponent_id + '","' + msg.game_id + '")');
                         $('div#opponent_' + msg.game_id).html('<b>' + msg.opponent_name + '</b>');
                     }
                 } else if (msg.type === 'confirm') {

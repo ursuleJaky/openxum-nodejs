@@ -41,3 +41,42 @@ block body
                                   | Opponent
                                 th
                                   | Actions
+                            if item == 'My online games'
+                                each game in my_online_games
+                                    tr
+                                        td #{game.name}
+                                        td #{game.color}
+                                        td #{game.mode}
+                                        td
+                                            div(id='opponent_#{game._id}')
+                                        td
+                                            a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='#')
+                                                i(class='glyphicon glyphicon-pause')
+                                                | &nbsp;waiting...
+                            if item == 'My offline games'
+                                each game in my_offline_games
+                                    tr
+                                        td #{game.name}
+                                        td #{game.color}
+                                        td #{game.mode}
+                                        td
+                                        td
+                            if item == 'Other online games'
+                                each game in other_online_games
+                                    tr
+                                        td #{game.name}
+                                        td #{game.color}
+                                        td #{game.mode}
+                                        td
+                                        td
+                                            a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href="javascript:client.join('#{user_id}','#{game._id}');")
+                                                i(class='glyphicon glyphicon-share')
+                                                | &nbsp;join
+                            if item == 'Other offline games'
+                                each game in other_offline_games
+                                    tr
+                                        td #{game.name}
+                                        td #{game.color}
+                                        td #{game.mode}
+                                        td
+                                        td

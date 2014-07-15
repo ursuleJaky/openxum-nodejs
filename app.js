@@ -91,19 +91,21 @@ app.utility.sendmail = require('./util/sendmail');
 app.utility.slugify = require('./util/slugify');
 app.utility.workflow = require('./util/workflow');
 
-app.wsServer = new webSocketServer.Server(app);
+var wsServer = new webSocketServer.Server(app);
+
+wsServer.server.on('request', function (request) {
+    wsServer.processRequest(request);
+});
 
 //listen up
-if (cluster.isMaster) {
+/*if (cluster.isMaster) {
     var cpuCount = require('os').cpus().length;
 
     for (var i = 0; i < cpuCount; i += 1) {
         cluster.fork();
     }
-} else {
+} else { */
     app.server.listen(app.config.port, function () {
-        app.wsServer.server.on('request', function (request) {
-            app.wsServer.processRequest(request);
-        });
     });
-}
+//}
+

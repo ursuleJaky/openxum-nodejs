@@ -34,7 +34,7 @@ exports.Server = function (app) {
         var found = false;
 
         for (index in clients) {
-            if (clients[index] != undefined && clients[index].socket._peername.port == port) {
+            if (clients[index] && clients[index].socket._peername.port == port) {
                 found = true;
             }
         }
@@ -48,54 +48,65 @@ exports.Server = function (app) {
     };
 
     var onConfirm = function (msg) {
-        /*    databaseConnection.query("UPDATE openxum.games SET status='run', opponent_id=" + msg.opponent_id +
-         " WHERE games.id=" + msg.game_id + ";", function (err, rows, fields) {
-         if (err) throw err;
-         databaseConnection.query("SELECT color FROM openxum.games WHERE games.id=" + msg.game_id + ";",
-         function (err, rows, fields) {
-         if (err) throw err;
-         var c_opponent = clients[msg.opponent_id];
-         var c_owner = clients[msg.owner_id];
-         var response = {
-         type: 'confirm',
-         game_id: msg.game_id,
-         owner_id: msg.owner_id,
-         opponent_id: msg.opponent_id,
-         color: rows[0].color
-         };
+        app.db.models.Game.update({ _id: msg.game_id }, { status: 'run', 'opponent.id': msg.opponent_id }, { }, function (err, numAffected) {
+            app.db.models.Game.findOne({ _id: msg.game_id }, null,
+                { safe: true }, function (err, game) {
+                    app.db.models.User.findOne({ _id: msg.opponent_id }, null,
+                        { safe: true }, function (err, user) {
+                            var c_opponent = clients[user.username];
 
-         console.log('confirm ' + msg.game_id + ' by ' + msg.opponent_id + ' against ' + msg.owner_id);
-         c_owner.send(JSON.stringify(response));
-         if (c_opponent != undefined) {
-         c_opponent.send(JSON.stringify(response));
-         }
-         });
-         }); */
+                            app.db.models.User.findOne({ _id: msg.owner_id }, null,
+                                { safe: true }, function (err, user2) {
+                                    var c_owner = clients[user2.username];
+                                    var response = {
+                                        type: 'confirm',
+                                        game_id: msg.game_id,
+                                        owner_id: user2.username,
+                                        opponent_id: user.username,
+                                        color: game.color
+                                    };
+
+                                    console.log('confirm ' + msg.game_id + ' by ' + user2.username + ' against ' + user.username);
+
+                                    c_owner.send(JSON.stringify(response));
+                                    if (c_opponent) {
+                                        c_opponent.send(JSON.stringify(response));
+                                    }
+                                });
+                        });
+                });
+        });
     };
 
     var onJoin = function (msg) {
-        /*    databaseConnection.query("SELECT owner_id, users.username FROM openxum.games, openxum.users WHERE games.id=" +
-         msg.game_id + " AND users.id=" + msg.opponent_id + ";",
-         function (err, rows, fields) {
-         if (err) throw err;
-         var owner_id = rows[0].owner_id;
-         var c_opponent = clients[msg.opponent_id];
-         var c_owner = clients[owner_id];
-         var response = {
-         type: 'join',
-         game_id: msg.game_id,
-         owner_id: owner_id,
-         opponent_id: msg.opponent_id,
-         opponent_name: rows[0].username
-         };
+        app.db.models.Game.findOne({ _id: msg.game_id }, null,
+            { safe: true }, function (err, game) {
+                app.db.models.User.findOne({ _id: msg.opponent_id }, null,
+                    { safe: true }, function (err, user) {
+                        var owner_id = game.userCreated.id;
+                        var c_opponent = clients[user.username];
 
-         console.log('join ' + msg.game_id + ' by ' + msg.opponent_id + ' against ' + owner_id);
-         c_opponent.send(JSON.stringify(response));
-         if (c_owner != undefined) {
-         c_owner.send(JSON.stringify(response));
-         }
-         }
-         ); */
+                        app.db.models.User.findOne({ _id: owner_id }, null,
+                            { safe: true }, function (err, user2) {
+                                var c_owner = clients[user2.username];
+                                var response = {
+                                    type: 'join',
+                                    game_id: msg.game_id,
+                                    owner_id: owner_id,
+                                    owner_name: user2.username,
+                                    opponent_id: msg.opponent_id,
+                                    opponent_name: user.username
+                                };
+
+                                console.log('join ' + msg.game_id + ' by ' + user2.username + ' [owner] against ' + user.username + ' [opponent]');
+
+                                c_opponent.send(JSON.stringify(response));
+                                if (c_owner) {
+                                    c_owner.send(JSON.stringify(response));
+                                }
+                            });
+                    });
+            });
     };
 
     var onMessage = function (connection, message) {
@@ -115,61 +126,61 @@ exports.Server = function (app) {
     };
 
     var onPlay = function (connection, msg) {
-        /*    console.log('play: ' + msg.game_id + ' by ' + msg.user_id + ' against ' + msg.opponent_id);
+        console.log('play: ' + msg.game_id + ' by ' + msg.user_id + ' against ' + msg.opponent_id);
 
-         clients[msg.user_id] = connection;
-         currentGames[msg.user_id] = {
-         game_id: msg.game_id,
-         opponent_id: msg.opponent_id
-         }; */
+        clients[msg.user_id] = connection;
+        currentGames[msg.user_id] = {
+            game_id: msg.game_id,
+            opponent_id: msg.opponent_id
+        };
     };
 
     var onTurn = function (msg) {
-        /*    var c_opponent = clients[currentGames[msg.user_id].opponent_id];
-         var response;
+        var c_opponent = clients[currentGames[msg.user_id].opponent_id];
+        var response;
 
-         if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
-         msg.move == 'remove_row') {
-         console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-         + ' by ' + msg.color + ' / ' + msg.user_id);
+        if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
+            msg.move == 'remove_row') {
+            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
+                + ' by ' + msg.color + ' / ' + msg.user_id);
 
-         response = {
-         type: 'turn',
-         move: msg.move,
-         coordinates: {
-         letter: msg.coordinates.letter,
-         number: msg.coordinates.number
-         },
-         color: msg.color
-         };
-         } else if (msg.move == 'move_ring') {
-         console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-         + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id);
+            response = {
+                type: 'turn',
+                move: msg.move,
+                coordinates: {
+                    letter: msg.coordinates.letter,
+                    number: msg.coordinates.number
+                },
+                color: msg.color
+            };
+        } else if (msg.move == 'move_ring') {
+            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
+                + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id);
 
-         response = {
-         type: 'turn',
-         move: msg.move,
-         ring: {
-         letter: msg.ring.letter,
-         number: msg.ring.number
-         },
-         coordinates: {
-         letter: msg.coordinates.letter,
-         number: msg.coordinates.number
-         }
-         };
-         }
-         if (c_opponent != undefined) {
-         c_opponent.send(JSON.stringify(response));
-         } */
+            response = {
+                type: 'turn',
+                move: msg.move,
+                ring: {
+                    letter: msg.ring.letter,
+                    number: msg.ring.number
+                },
+                coordinates: {
+                    letter: msg.coordinates.letter,
+                    number: msg.coordinates.number
+                }
+            };
+        }
+        if (c_opponent != undefined) {
+            c_opponent.send(JSON.stringify(response));
+        }
     };
 
     var sendConnectedClients = function () {
-        if (clients['root'] != undefined) {
+        if (clients['root']) {
             var users = [ ];
 
             for (var id in clients) {
-                if (clients[id] != undefined) {
+                if (clients[id]) {
                     if (currentGames[id] != undefined) {
                         users.push({ id: id, status: 'play' });
                     } else {

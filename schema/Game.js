@@ -5,14 +5,14 @@ exports = module.exports = function (app, mongoose) {
         name: { type: String, default: '' },
         game: { type: mongoose.Schema.Types.ObjectId, ref: 'GameType' },
         color: { type: String, default: '' },
-        mode: { type: mongoose.Schema.Types.ObjectId, ref: 'Mode' },
+        mode: { type: String, default: '' },
         type: { type: String, default: '' },
         status: { type: String, default: '' },
         userCreated: {
             id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
         },
         opponent: {
-            id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+            id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', null: true }
         }
     });
     gameSchema.index({ name: 1 });

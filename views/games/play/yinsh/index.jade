@@ -19,21 +19,29 @@ block body
     script(src='/javascripts/yinsh/Intersection.js')
     script(src='/javascripts/yinsh/Manager.js')
     script(src='/javascripts/yinsh/RandomPlayer.js')
+    script(src='/javascripts/yinsh/RemotePlayer.js')
 
     script(language='javascript').
         $(document).ready(function() {
             $('#winnerModal .new-game-button').click(function() {
                 $('#winnerModal').modal('hide');
-                window.location.href = '/games/play/?game=Yinsh';
+                window.location.href = '/games/create/?game=yinsh';
             });
 
             var canvas = document.getElementById("board");
             var canvas_div = document.getElementById("boardDiv");
             var markerNumber = document.getElementById("markerNumber");
             var turnList = document.getElementById("turnList");
-            var engine = new Yinsh.Engine(0, 0);
-            var gui = new Yinsh.GuiPlayer(0, engine);
-            var other = new Yinsh.RandomPlayer(1, engine);
+            var engine = new Yinsh.Engine(#{mode}, 0);
+            var gui = new Yinsh.GuiPlayer(#{color}, engine);
+            var other;
+
+            if ('#{game_id}' === '-1') {
+                other = new Yinsh.RandomPlayer(#{opponent_color}, engine);
+            } else {
+                other = new Yinsh.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
+            }
+
             var manager = new Yinsh.Manager(engine, gui, other, new Yinsh.Status(markerNumber, turnList));
 
             if (canvas_div.clientHeight < canvas_div.clientWidth) {
@@ -45,8 +53,15 @@ block body
             }
             gui.set_canvas(canvas);
             gui.set_manager(manager);
-            other.set_level(manager.load_level());
-            if (engine.current_color() == other.color()) {
+            if ('#{game_id}' === '-1') {
+                other.set_level(manager.load_level());
+            } else {
+                other.set_manager(manager);
+            }
+
+            console.log(engine.current_color() + ";" + other.color());
+
+            if (engine.current_color() === other.color() && !other.is_remote()) {
                 manager.play_other();
             }
         });

@@ -7,7 +7,7 @@ Yinsh.RandomPlayer = function (color, e) {
         return mycolor;
     };
 
-    this.is_remote =function () {
+    this.is_remote = function () {
         return false;
     };
 
