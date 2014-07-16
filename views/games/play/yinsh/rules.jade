@@ -1,0 +1,42 @@
+extends ../../../../layouts/default
+
+block head
+    title Games
+
+block neck
+    link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+
+block body
+    br
+    div.row.vertical-offset-100
+        div.col-md-8.col-md-offset-2
+            div.panel.panel-primary
+                div.panel-heading
+                    h3(class='panel-title') Rules - Yinsh by Kris Burm
+                div.panel-body
+                  h4 Object 
+                  | The object of the game is to remove three of one's own rings from the game. Since this is the goal of the game, getting closer to winning necessitates weakening oneself, which considerably complicates strategy as a move which brings one closer to winning the game may end up being a very poor move.
+
+                  h4 Placement phase 
+                  | The game starts with an empty board, and proceeds in two phases. During the first phase both players, beginning with white, place one of their rings on the board on any point. Once each playe plays all five of their pieces, this phase is over.
+
+                  h4 Movement phase 
+                  | The second phase involves forming lines of five markers, with one's own color face-up. Once this happens (on either player's turn), that player removes the five markers, and also one of their rings. Once a player has removed any three of their rings, they win the game.
+
+                  p A move consists of the following: 
+                  ol 
+                      li The player chooses one of their own rings to move. 
+                      li The player puts a marker, with their own color face-up, in the middle of that ring. 
+                      li The player then moves the ring (but not the marker) to any unoccupied space, straight along any line.
+
+                  p When moving a ring, the following rules apply:
+                  ul 
+                      li The ring may not move over other rings. 
+                      li The ring may move over any number of markers in a row. If it does so, it must stop on the blank space immediately following the last marker moved over. 
+                      ul 
+                          li All markers moved over like this are immediately flipped over. 
+                      li move may not end on a space occupied by a marker.
+
+                  p It is possible, and not unheard of, to make a move which causes your opponent to have a line of five markers in a row. When more than one line is made in the same move, the player who just moved resolves her  own lines (if any) first, and then the other player resolves his lines (if any) before making his next move. Lines are resolved one at a time, so if a single marker is shared by two lines, only one of those lines may be resolved (but the player chooses which).
+
+                  p If all of the markers are placed on the board before either player has won, the game ends, with the winner being the player who has removed more rings. If both players have removed the same number of rings at this point, the game ends in a draw.
