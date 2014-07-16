@@ -7,5 +7,22 @@ block neck
   link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
 block body
-  div(style='margin-left:auto; margin-right:auto; align:center; text-align:center;')
-    img(src='/images/openxum.png')
+  div.row
+    div.col-sm-6
+      div.page-header
+        h1 Welcome to OpenXum
+      div.row
+        div.col-sm-4
+          div.well.stat
+            div.stat-value #{countUser}
+            div.stat-label Nombre de joueurs
+        div.col-sm-4
+          div.well.stat
+            div.stat-value #{countGame}
+            div.stat-label Nombre de jeux
+        div.col-sm-4
+          div.well.stat
+            div.stat-value.week-of-year --
+            div.stat-label Week of Year				
+     div.col-sm-6.special
+       img(src='/images/openxum.png')
