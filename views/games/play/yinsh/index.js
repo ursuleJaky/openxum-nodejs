@@ -6,7 +6,7 @@ exports.init = function (req, res) {
            { game_id: req.param('game_id'),
                owner_id: req.param('owner_id'),
                opponent_id: req.param('opponent_id'),
-               mode: req.param('mode') == 'blitz' ? 0 : 1,
+               mode: req.param('mode') === 'blitz' ? 0 : 1,
                color: req.param('color') === 'black' ? 0 : 1,
                opponent_color: req.param('color') === 'black' ? 1 : 0
            });
@@ -16,7 +16,7 @@ exports.init = function (req, res) {
                 owner_id: -1,
                 opponent_id: -1,
                 color: req.param('color') === 'black' ? 0 : 1,
-                mode: req.param('mode') == 'blitz' ? 0 : 1,
+                mode: req.param('mode') === 'blitz' ? 0 : 1,
                 opponent_color: req.param('color') === 'black' ? 1 : 0
             });
     }

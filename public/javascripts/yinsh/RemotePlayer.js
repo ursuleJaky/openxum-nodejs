@@ -7,6 +7,14 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         return mycolor;
     };
 
+    this.finish = function() {
+        var msg = {
+            type: 'finish',
+            user_id: uid
+        };
+        connection.send(JSON.stringify(msg));
+    };
+
     this.is_remote = function () {
         return true;
     };

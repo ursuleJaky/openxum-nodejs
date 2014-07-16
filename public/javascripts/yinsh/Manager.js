@@ -116,6 +116,10 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
 // private methods
     var finish = function () {
         if (engine.is_finished()) {
+            if (other.is_remote()) {
+                other.finish();
+            }
+
             var popup = document.getElementById("winnerModalText");
 
             popup.innerHTML = "<h4>The winner is " +

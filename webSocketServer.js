@@ -23,7 +23,7 @@ exports.Server = function (app) {
     };
 
     var onConnect = function (connection, msg) {
-        console.log('[OpenXum] connect ' + msg.user_id);
+//        console.log('[OpenXum] connect ' + msg.user_id);
 
         clients[msg.user_id] = connection;
         sendConnectedClients();
@@ -39,7 +39,7 @@ exports.Server = function (app) {
             }
         }
         if (found) {
-            console.log('[OpenXum] disconnect ' + index);
+//            console.log('[OpenXum] disconnect ' + index);
 
             clients[index] = undefined;
             currentGames[index] = undefined;
@@ -63,10 +63,11 @@ exports.Server = function (app) {
                                         game_id: msg.game_id,
                                         owner_id: user2.username,
                                         opponent_id: user.username,
-                                        color: game.color
+                                        color: game.color,
+                                        mode: game.mode
                                     };
 
-                                    console.log('confirm ' + msg.game_id + ' by ' + user2.username + ' against ' + user.username);
+//                                    console.log('confirm ' + msg.game_id + ' by ' + user2.username + ' against ' + user.username);
 
                                     c_owner.send(JSON.stringify(response));
                                     if (c_opponent) {
@@ -76,6 +77,19 @@ exports.Server = function (app) {
                         });
                 });
         });
+    };
+
+    var onFinish = function (msg) {
+        var game_id = currentGames[msg.user_id].game_id;
+
+        app.db.models.Game.findOne({ _id: game_id }, null,
+            { safe: true }, function (err, game) {
+                delete clients[msg.user_id];
+                delete currentGames[msg.user_id];
+                if (game) {
+                    game.remove(function(err) { });
+                }
+            });
     };
 
     var onJoin = function (msg) {
@@ -98,7 +112,7 @@ exports.Server = function (app) {
                                     opponent_name: user.username
                                 };
 
-                                console.log('join ' + msg.game_id + ' by ' + user2.username + ' [owner] against ' + user.username + ' [opponent]');
+//                                console.log('join ' + msg.game_id + ' by ' + user2.username + ' [owner] against ' + user.username + ' [opponent]');
 
                                 c_opponent.send(JSON.stringify(response));
                                 if (c_owner) {
@@ -122,11 +136,13 @@ exports.Server = function (app) {
             onPlay(connection, msg);
         } else if (msg.type === 'turn') {
             onTurn(msg);
+        } else if (msg.type === 'finish') {
+            onFinish(msg);
         }
     };
 
     var onPlay = function (connection, msg) {
-        console.log('play: ' + msg.game_id + ' by ' + msg.user_id + ' against ' + msg.opponent_id);
+//        console.log('play: ' + msg.game_id + ' by ' + msg.user_id + ' against ' + msg.opponent_id);
 
         clients[msg.user_id] = connection;
         currentGames[msg.user_id] = {
@@ -141,8 +157,9 @@ exports.Server = function (app) {
 
         if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
             msg.move == 'remove_row') {
-            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-                + ' by ' + msg.color + ' / ' + msg.user_id);
+
+//            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
+//                + ' by ' + msg.color + ' / ' + msg.user_id);
 
             response = {
                 type: 'turn',
@@ -154,8 +171,9 @@ exports.Server = function (app) {
                 color: msg.color
             };
         } else if (msg.move == 'move_ring') {
-            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-                + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id);
+
+//            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
+//                + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id);
 
             response = {
                 type: 'turn',
