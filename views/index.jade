@@ -1,4 +1,6 @@
 extends ../layouts/default
+script(src='/javascripts/GameClient.js')
+
 
 block head
   title OpenXum
@@ -7,22 +9,29 @@ block neck
   link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
 block body
+  script(src='/javascripts/InfoClient.js')
+  script(language='javascript').
+      var client = new InfoClient();
+      client.start();
   div.row
-    div.col-sm-6
+    div.col-sm-10
       div.page-header
         h1 Welcome to OpenXum
       div.row
-        div.col-sm-4
+        div.col-sm-3
           div.well.stat
             div.stat-value #{countUser}
-            div.stat-label Nombre de joueurs
-        div.col-sm-4
+            div.stat-label Utilisateurs
+        div.col-sm-3
+          div.well.stat
+            div.stat-value #{countGameType}
+            div.stat-label Jeux proposés
+        div.col-sm-3
           div.well.stat
             div.stat-value #{countGame}
-            div.stat-label Nombre de jeux
-        div.col-sm-4
+            div.stat-label Parties en cours	
+        div.col-sm-3
           div.well.stat
-            div.stat-value.week-of-year --
-            div.stat-label Week of Year				
-     div.col-sm-6.special
-       img(src='/images/openxum.png')
+            #countPlayers.stat-value ---
+            div.stat-label Joueurs en ligne   			
+    

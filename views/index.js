@@ -3,7 +3,7 @@
 
 exports.init = function(req, res, next){
   var sigma = {};
-  var collections = ['User', 'Account', 'Game'];
+  var collections = ['User', 'Account', 'GameType', 'Game'];
   var queries = [];
 
   collections.forEach(function(el, i, arr) {

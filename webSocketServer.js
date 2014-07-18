@@ -28,6 +28,7 @@ exports.Server = function (app) {
         clients[msg.user_id] = connection;
         sendConnectedClients();
     };
+	 
 
     var onDisconnect = function (port) {
         var index;
@@ -138,6 +139,8 @@ exports.Server = function (app) {
             onTurn(msg);
         } else if (msg.type === 'finish') {
             onFinish(msg);
+        } else if (msg.type === 'info') {
+            onConnect(connection,msg);
         }
     };
 
