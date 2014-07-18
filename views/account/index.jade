@@ -1,7 +1,7 @@
 extends ../../layouts/default
 
 block head
-  title Account Area
+  title My Profile
 
 block neck
   link(rel='stylesheet', href='/views/account/index.min.css?#{cacheBreaker}')
@@ -10,37 +10,20 @@ block feet
   script(src='/views/account/index.min.js?#{cacheBreaker}')
 
 block body
-  div.row
-    div.col-sm-6
+ div.col-sm-6
       div.page-header
-        h1 My Account
-      div.row
-        div.col-sm-4
-          div.well.stat
-            div.stat-value.day-of-year --
-            div.stat-label Day of Year
-        div.col-sm-4
-          div.well.stat
-            div.stat-value.day-of-month --
-            div.stat-label Day of Month
-        div.col-sm-4
-          div.well.stat
-            div.stat-value.week-of-year --
-            div.stat-label Week of Year
-      div.row
-        div.col-sm-4
-          div.well.stat
-            div.stat-value.day-of-week --
-            div.stat-label Day of Week
-        div.col-sm-4
-          div.well.stat
-            div.stat-value.week-year --
-            div.stat-label Week Year
-        div.col-sm-4
-          div.well.stat
-            div.stat-value.hour-of-day --
-            div.stat-label Hour of Day
-    div.col-sm-6.special
-      div.page-header
-        h1 Go Faster Everyday
-      i.fa.fa-dashboard.super-awesome
+        h1 My Profile
+        | Hi,  #{user.username}!
+      
+      b My email : 
+      | #{email}
+      br   
+      b Full Name :  
+      | #{account.name.full}
+      br  
+      b Country : 
+      | #{account.country}
+      p   
+      a(class='btn btn-primary btn-md active',href='/account/settings')
+        i(class='glyphicon glyphicon-pencil')
+        |  Modify my profile
