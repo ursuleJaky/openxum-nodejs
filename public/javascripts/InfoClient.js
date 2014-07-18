@@ -32,8 +32,8 @@ var InfoClient = function () {
 					 
                 if (msg.type === 'connected') {
                     console.log('nb clients connectes : ' + msg['users'].length);
-						  var playersNumber= msg['users'].length;
-                    $('div#countPlayers').html('<b>' + playersNumber + '</b>');
+						  var playersNumber= msg['users'].length -1;
+                    $('div#countPlayers').html( playersNumber );
 						  
                 }
             };
