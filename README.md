@@ -65,6 +65,13 @@ db.users.save({ username: 'root', isActive: 'yes', email: 'admin@openxum.org', r
 var rootUser = db.users.findOne();
 rootAdmin.user = { id: rootUser._id, name: rootUser.username };
 db.admins.save(rootAdmin);
+db.gametypes.insert({name: 'dvonn'});
+db.gametypes.insert({name: 'invers'});
+db.gametypes.insert({name: 'gipf'});
+db.gametypes.insert({name: 'kamisado'});
+db.gametypes.insert({name: 'tzaar'});
+db.gametypes.insert({name: 'yinsh'});
+db.gametypes.insert({name: 'zertz'});
 ```
 
 Now just use the reset password feature to set a password.
