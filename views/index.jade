@@ -20,18 +20,32 @@ block body
       div.row
         div.col-sm-3
           div.well.stat
-            div.stat-value #{countUser}
+            div.stat-value #{count.countUser}
             div.stat-label Utilisateurs
         div.col-sm-3
           div.well.stat
-            div.stat-value #{countGameType}
+            div.stat-value #{count.countGameType}
             div.stat-label Jeux proposés
         div.col-sm-3
           div.well.stat
-            div.stat-value #{countGame}
+            div.stat-value #{count.countGame}
             div.stat-label Parties en cours	
         div.col-sm-3
           div.well.stat
             #countPlayers.stat-value ---
             div.stat-label Joueurs en ligne   			
-    
+   div.row
+   H2 Dernières parties jouées
+   ul.list-group
+       each item in histo
+          li.list-group-item 
+             if (item.userCreated === item.winner) 
+                b.span.text-warning.offset1 #{item.userCreated}
+                | VS  
+                b.span.text-info #{item.opponent}
+             else 
+                b.span.text-warning #{item.opponent}
+                |  VS  
+                b.span.text-info #{item.userCreated}    
+             
+             span.badge #{item.gameType} 
