@@ -1,0 +1,65 @@
+extends ../../../../layouts/default
+
+block head
+    title Games
+
+block neck
+    link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+
+block body
+    script(src='/javascripts/utils/utils.js')
+    script(src='/javascripts/MCTS/MCTS.js')
+    script(src='/javascripts/MCTS/Node.js')
+    script(src='/javascripts/MCTS/Player.js')
+    script(src='/javascripts/dvonn/Dvonn.js')
+    script(src='/javascripts/dvonn/Constants.js')
+    script(src='/javascripts/dvonn/Coordinates.js')
+    script(src='/javascripts/dvonn/Intersection.js')
+    script(src='/javascripts/dvonn/Piece.js')
+    script(src='/javascripts/dvonn/Stack.js')
+    script(src='/javascripts/dvonn/Engine.js')
+    script(src='/javascripts/dvonn/GuiPlayer.js')
+    script(src='/javascripts/dvonn/Manager.js')
+    script(src='/javascripts/dvonn/RandomPlayer.js')
+
+    script(language='javascript').
+        $(document).ready(function() {
+            $('#winnerModal .new-game-button').click(function() {
+                $('#winnerModal').modal('hide');
+                window.location.href = '/games/play/?game=dvonn';
+            });
+
+            var canvas = document.getElementById("board");
+            var canvas_div = document.getElementById("boardDiv");
+            var engine = new Dvonn.Engine(0, 0);
+            var gui = new Dvonn.GuiPlayer(#{color}, engine);
+            var other = new Dvonn.RandomPlayer(#{other_color}, engine);
+            var manager = new Dvonn.Manager(engine, gui, other);
+
+            if (canvas_div.clientHeight < canvas_div.clientWidth) {
+                canvas.height = canvas_div.clientHeight * 0.95;
+                canvas.width = canvas_div.clientHeight * 0.95;
+            } else {
+                canvas.height = canvas_div.clientWidth * 0.95;
+                canvas.width = canvas_div.clientWidth * 0.95;
+            }
+            gui.set_canvas(canvas);
+            gui.set_manager(manager);
+            other.set_level(manager.load_level());
+            if (engine.current_color() == other.color()) {
+                manager.play_other();
+            }
+        });
+
+    br
+    div.modal.fade(id='winnerModal',tabindex='-1',role='dialog',aria-labelledby='winnerModelLabel',aria-hidden='true')
+        div.modal-dialog
+            div.modal-content
+                div.modal-body(id='winnerModalText')
+                div.modal-footer
+                    div.btn-group
+                        a.btn.btn-primary.new-game-button(href='#') New game
+
+    div.row
+        div.col-md-12(id='boardDiv')
+            canvas(id='board',style='width: 800px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')

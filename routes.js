@@ -36,7 +36,8 @@ exports = module.exports = function (app, passport) {
     app.get('/games/create/', require('./views/games/create/index').init);
     app.post('/games/create/', require('./views/games/create/index').create);
     app.get('/games/play/', require('./views/games/play/index').init);
-//    app.get('/games/play/dvonn', require('./views/games/play/dvonn/index').init);
+    app.get('/games/play/dvonn', require('./views/games/play/dvonn/index').init);
+    app.get('/games/play/dvonn/rules', require('./views/games/play/dvonn/rules').init);
     app.get('/games/play/invers', require('./views/games/play/invers/index').init);
     app.get('/games/play/invers/rules', require('./views/games/play/invers/rules').init);
 //    app.get('/games/play/gipf', require('./views/games/play/gipf/index').init);

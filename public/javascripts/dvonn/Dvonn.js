@@ -1,0 +1,2 @@
+// namespace Invers
+var Dvonn = { };
