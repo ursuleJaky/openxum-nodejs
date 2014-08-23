@@ -537,11 +537,9 @@ Tzaar.GuiPlayer = function (color, e) {
                         var ok = false;
 
                         if (engine.phase() === Tzaar.Phase.FIRST_MOVE) {
-                            if (selected_piece && selected_piece.is_valid()) {
-                                if (engine.get_intersection(letter, number).state() === Tzaar.State.NO_VACANT && engine.get_intersection(letter, number).color() != engine.current_color()) {
-                                    selected_coordinates = new Tzaar.Coordinates(letter, number);
-                                    ok = true;
-                                }
+                            if (selected_piece && selected_piece.is_valid() && engine.get_intersection(letter, number).state() === Tzaar.State.NO_VACANT && engine.get_intersection(letter, number).color() != engine.current_color()) {
+                                selected_coordinates = new Tzaar.Coordinates(letter, number);
+                                ok = true;
                             } else if (engine.get_intersection(letter, number).color() === engine.current_color()) {
                                 selected_piece = new Tzaar.Coordinates(letter, number);
                                 manager.redraw();
