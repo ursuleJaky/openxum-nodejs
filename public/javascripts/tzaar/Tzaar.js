@@ -1,0 +1,2 @@
+// namespace Tzaar
+var Tzaar = { };
