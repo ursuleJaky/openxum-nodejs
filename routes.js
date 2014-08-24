@@ -40,7 +40,8 @@ exports = module.exports = function (app, passport) {
     app.get('/games/play/dvonn/rules', require('./views/games/play/dvonn/rules').init);
     app.get('/games/play/invers', require('./views/games/play/invers/index').init);
     app.get('/games/play/invers/rules', require('./views/games/play/invers/rules').init);
-//    app.get('/games/play/gipf', require('./views/games/play/gipf/index').init);
+    app.get('/games/play/gipf', require('./views/games/play/gipf/index').init);
+    app.get('/games/play/gipf/rules', require('./views/games/play/gipf/rules').init);
     app.get('/games/play/kamisado', require('./views/games/play/kamisado/index').init);
     app.get('/games/play/tzaar', require('./views/games/play/tzaar/index').init);
     app.get('/games/play/tzaar/rules', require('./views/games/play/tzaar/rules').init);

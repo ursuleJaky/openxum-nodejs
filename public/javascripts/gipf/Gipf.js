@@ -1,0 +1,2 @@
+// namespace Gipf
+var Gipf = { };
