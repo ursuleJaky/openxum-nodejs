@@ -1,0 +1,2 @@
+// namespace Zertz
+var Zertz = { };
