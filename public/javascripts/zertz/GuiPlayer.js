@@ -87,6 +87,8 @@ Zertz.GuiPlayer = function (color, e) {
         selected_marble = null;
         selected_marble_in_pool = null;
         selected_color = null;
+        pointerX = -1;
+        pointerY = -1;
     };
 
 // private methods
@@ -308,8 +310,8 @@ Zertz.GuiPlayer = function (color, e) {
         var gr = context.createLinearGradient(x, y, x + delta_x / 3.0, y + delta_x / 3.0);
 
         context.beginPath();
-        gr.addColorStop(0, '#c0c0c0');
-        gr.addColorStop(1, '#ffffff');
+        gr.addColorStop(0, '#008000');
+        gr.addColorStop(1, '#98FB98');
         context.fillStyle = gr;
         context.arc(x, y, delta_x / 2.0 - 1, 0.0, 2 * Math.PI, false);
         context.fill();
@@ -423,11 +425,15 @@ Zertz.GuiPlayer = function (color, e) {
                             ok = true;
                         }
                     } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-                        if (selected_marble) {
-                            selected_coordinates = new Zertz.Coordinates(letter, number);
+                        var coordinates = new Zertz.Coordinates(letter, number);
+
+                        if (selected_marble && engine.is_possible_capturing_marble_with(selected_marble, coordinates)) {
+                            selected_coordinates = coordinates;
                             ok = true;
                         } else {
-                            selected_marble = new Zertz.Coordinates(letter, number);
+                            if (engine.is_possible_to_capture_with(engine.get_intersection(letter, number))) {
+                                selected_marble = coordinates;
+                            }
                         }
                     }
                     if (ok) {

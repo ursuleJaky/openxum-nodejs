@@ -16,7 +16,7 @@ Zertz.Engine = function (t, c) {
         ito.remove_marble();
         capture(intersections[captured.hash()], player);
         itd.put_marble(color);
-        if (!is_possible_to_capture_with(itd)) {
+        if (!this.is_possible_to_capture_with(itd)) {
             change_color();
             if (this.can_capture()) {
                 phase = Zertz.Phase.CAPTURE;
@@ -60,7 +60,7 @@ Zertz.Engine = function (t, c) {
         for (var index in intersections) {
             var intersection = intersections[index];
 
-            if (is_possible_to_capture_with(intersection)) {
+            if (this.is_possible_to_capture_with(intersection)) {
                 list.push(intersection.coordinates());
             }
         }
@@ -240,6 +240,51 @@ Zertz.Engine = function (t, c) {
         return is_finished(Zertz.Color.ONE) || is_finished(Zertz.Color.TWO);
     };
 
+    this.is_possible_capturing_marble_with = function (origin, capturing) {
+        return belong_to2(capturing, this.get_possible_capturing_marbles(origin));
+    };
+
+    this.is_possible_capturing_marbles = function (coordinates) {
+        return this.is_possible_to_capture_with(intersections[coordinates.hash()]);
+    };
+
+    this.is_possible_to_capture_with = function (intersection) {
+        if (intersection.marble_is_present()) {
+            var letter = intersection.letter();
+            var number = intersection.number();
+
+            // letter + number increase
+            if (get_intersection(letter, number + 1) && get_intersection(letter, number + 2) && get_intersection(letter, number + 1).marble_is_present() && get_intersection(letter, number + 2).state() === Zertz.State.VACANT) {
+                return true;
+            }
+
+            // letter + number decrease
+            if (get_intersection(letter, number - 1) && get_intersection(letter, number - 2) && get_intersection(letter, number - 1).marble_is_present() && get_intersection(letter, number - 2).state() === Zertz.State.VACANT) {
+                return true;
+            }
+
+            // letter increase + number
+            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number).state() === Zertz.State.VACANT) {
+                return true;
+            }
+
+            // letter decrease + number
+            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number).state() === Zertz.State.VACANT) {
+                return true;
+            }
+
+            // letter increase + number increase
+            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number + 1) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number + 2) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number + 1).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number + 2).state() === Zertz.State.VACANT) {
+                return true;
+            }
+
+            // letter decrease + number decrease
+            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number - 1) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number - 2) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number - 1).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number - 2).state() === Zertz.State.VACANT) {
+                return true;
+            }
+        }
+    };
+
     this.put_marble = function (coordinates, color, player) {
         var intersection = intersections[coordinates.hash()];
 
@@ -319,6 +364,24 @@ Zertz.Engine = function (t, c) {
     };
 
 // private methods
+    var belong_to = function (element, list) {
+        for (var index in list) {
+            if (list[index].coordinates().hash() === element.coordinates().hash()) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    var belong_to2 = function (element, list) {
+        for (var index in list) {
+            if (list[index].hash() === element.hash()) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     var capture = function (intersection, player) {
         if (intersection.state() === Zertz.State.BLACK_MARBLE) {
             ++capturedBlackMarbleNumber[player];
@@ -447,15 +510,6 @@ Zertz.Engine = function (t, c) {
         }
     };
 
-    var belong_to = function (element, list) {
-        for (var index in list) {
-            if (list[index].hash() === element.hash()) {
-                return true;
-            }
-        }
-        return false;
-    };
-
     var is_isolated_marble = function (intersection) {
         if (intersection.marble_is_present()) {
             var list = [];
@@ -478,43 +532,49 @@ Zertz.Engine = function (t, c) {
                 list.pop();
                 if (N && N.state() === Zertz.State.VACANT) {
                     stop = true;
+                    break;
                 } else if (N && N.state() != Zertz.State.EMPTY) {
-                    if (belong_to(N, list)) {
+                    if (!belong_to(N, list) && !belong_to(N, visited)) {
                         list.push(N);
                     }
                 }
                 if (NE && NE.state() === Zertz.State.VACANT) {
                     stop = true;
+                    break;
                 } else if (NE && NE.state() != Zertz.State.EMPTY) {
-                    if (belong_to(NE, list)) {
+                    if (!belong_to(NE, list) && !belong_to(NE, visited)) {
                         list.push(NE);
                     }
                 }
                 if (SE && SE.state() === Zertz.State.VACANT) {
                     stop = true;
+                    break;
                 } else if (SE && SE.state() != Zertz.State.EMPTY) {
-                    if (belong_to(SE, list)) {
+                    if (!belong_to(SE, list) && !belong_to(SE, visited)) {
                         list.push(SE);
                     }
                 }
                 if (S && S.state() === Zertz.State.VACANT) {
                     stop = true;
+                    break;
                 } else if (S && S.state() != Zertz.State.EMPTY) {
-                    if (belong_to(S, list)) {
+                    if (!belong_to(S, list) && !belong_to(S, visited)) {
                         list.push(S);
                     }
                 }
                 if (SO && SO.state() === Zertz.State.VACANT) {
                     stop = true;
+                    break;
                 } else if (SO && SO.state() != Zertz.State.EMPTY) {
-                    if (belong_to(SO, list)) {
+                    if (!belong_to(SO, list) && !belong_to(SO, visited)) {
                         list.push(SO);
                     }
                 }
                 if (NO && NO.state() === Zertz.State.VACANT) {
                     stop = true;
+                    break;
                 } else if (NO && NO.state() != Zertz.State.EMPTY) {
-                    if (belong_to(NO, list)) {
+                    if (!belong_to(NO, list) && !belong_to(NO, visited)) {
                         list.push(NO);
                     }
                 }
@@ -524,47 +584,6 @@ Zertz.Engine = function (t, c) {
             return false;
         }
         return false;
-    };
-
-    var is_possible_capturing_marbles = function (coordinates) {
-        return is_possible_to_capture_with(intersections[coordinates.hash()]);
-    };
-
-    var is_possible_to_capture_with = function (intersection) {
-        if (intersection.marble_is_present()) {
-            var letter = intersection.letter();
-            var number = intersection.number();
-
-            // letter + number increase
-            if (get_intersection(letter, number + 1) && get_intersection(letter, number + 2) && get_intersection(letter, number + 1).marble_is_present() && get_intersection(letter, number + 2).state() === Zertz.State.VACANT) {
-                return true;
-            }
-
-            // letter + number decrease
-            if (get_intersection(letter, number - 1) && get_intersection(letter, number - 2) && get_intersection(letter, number - 1).marble_is_present() && get_intersection(letter, number - 2).state() === Zertz.State.VACANT) {
-                return true;
-            }
-
-            // letter increase + number
-            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number).state() === Zertz.State.VACANT) {
-                return true;
-            }
-
-            // letter decrease + number
-            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number).state() === Zertz.State.VACANT) {
-                return true;
-            }
-
-            // letter increase + number increase
-            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number + 1) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number + 2) && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 1), number + 1).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) + 2), number + 2).state() === Zertz.State.VACANT) {
-                return true;
-            }
-
-            // letter decrease + number decrease
-            if (get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number - 1) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number - 2) && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 1), number - 1).marble_is_present() && get_intersection(String.fromCharCode(letter.charCodeAt(0) - 2), number - 2).state() === Zertz.State.VACANT) {
-                return true;
-            }
-        }
     };
 
     var next_color = function (c) {
