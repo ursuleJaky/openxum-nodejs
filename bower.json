@@ -1,13 +1,13 @@
 {
-  "name": "OpenXum",
-  "dependencies": {
-    "backbone": "~1.1.0",
-    "html5shiv": "~3.7.0",
-    "jquery": "~2.1.0",
-    "respond": "~1.4.2",
-    "underscore": "~1.5.2",
-    "bootstrap": "3.2.0",
-    "font-awesome": "4.1.0",
-    "momentjs": "2.7.0"
+    "name": "OpenXum",
+    "dependencies": {
+        "backbone": "~1.1.0",
+        "html5shiv": "~3.7.0",
+        "jquery": "~2.1.0",
+        "respond": "~1.4.2",
+        "underscore": "~1.5.2",
+        "bootstrap": "3.2.0",
+        "font-awesome": "4.1.0",
+        "momentjs": "2.7.0"
   }
 }

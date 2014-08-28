@@ -31,6 +31,7 @@ function ensureAccount(req, res, next) {
 exports = module.exports = function (app, passport) {
     //front end
     app.get('/', require('./views/index').init);
+    app.get('/language/', require('./views/language/index').init);
     app.get('/games/', require('./views/games/index').init);
     app.get('/games/new/', require('./views/games/new/index').init);
     app.get('/games/create/', require('./views/games/create/index').init);

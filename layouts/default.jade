@@ -20,26 +20,33 @@ html
             span.icon-bar
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
-            li: a(href='/') Home
-            li: a(href='/games/') Games
+            li: a(href='/') #{__("Home")}
+            li: a(href='/games/') #{__("Games")}
             if user && user.username
-              li: a(href='/tournaments/') Tournaments
-              li: a(href='/players/') Players
-            li: a(href='/ranking/') Ranking
-            li: a(href='/faq/') FAQ
+              li: a(href='/tournaments/') #{__("Tournaments")}
+              li: a(href='/players/') #{__("Players")}
+            li: a(href='/ranking/') #{__("Ranking")}
+            li: a(href='/faq/') #{__("FAQ")}
             if user && user.username
-              li: a(href='/account/') Account
+              li: a(href='/account/') #{__("Account")}
             else
-              li: a(href='/signup/') Sign Up
+              li: a(href='/signup/') #{__("Sign Up")}
           ul.nav.navbar-nav.navbar-right
+            li.dropdown
+              a.dropdown-toggle(href="#",data-toggle="dropdown") #{__("Language")}
+                span.caret
+              ul.dropdown-menu(role="menu")
+                li
+                  a(href="/language/?lg=en") English
+                  a(href="/language/?lg=fr") Français
             if user && user.username
               li: a(href='/logout/')
                 i.fa.fa-user
-                |  Logout #{user.username}
+                |  #{__("Logout")} #{user.username}
             else
               li: a(href='/login/')
                 i.fa.fa-user
-                |  Sign In
+                |  #{__("Sign In")}
 
     div.page
       div.container

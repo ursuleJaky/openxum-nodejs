@@ -15,6 +15,8 @@ Technology
 | Async         | Font-Awesome   |             |
 | EmailJS       | Moment.js      |             |
 | WebSocket     |                |             |
+| Easy-captcha  |                |             |
+| I18n-2        |                |             |
 
 Requirements
 ------------

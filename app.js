@@ -12,13 +12,21 @@ var config = require('./config'),
     helmet = require('helmet'),
     webSocketServer = require('./webSocketServer'),
     cluster = require('cluster'),
-    captcha = require('easy-captcha');
+    captcha = require('easy-captcha'),
+    i18n = require('i18n-2');
 
 //create express app
 var app = express();
 
 //keep reference to config
 app.config = config;
+
+i18n.expressBind(app, {
+    // setup some locales - other locales default to en silently
+    locales: ['en', 'fr'],
+    // change the cookie name from 'lang' to 'locale'
+    cookieName: 'locale'
+});
 
 //setup the web server
 app.server = http.createServer(app);
@@ -56,6 +64,12 @@ helmet.defaults(app);
 
 //captcha
 app.use('/captcha.jpg', captcha.generate());
+
+//i18n
+app.use(function(req, res, next) {
+    req.i18n.setLocaleFromCookie();
+    next();
+});
 
 //sign up + captcha
 app.get('/signup/', require('./views/signup/index').init);
