@@ -135,6 +135,10 @@ Kamisado.Engine = function (t, c) {
         return !found;
     };
 
+    this.is_possible_move = function (coordinates, list) {
+        return belong_to(coordinates, list);
+    };
+
     this.is_finished = function () {
         return phase === Kamisado.Phase.FINISH;
     };
@@ -218,6 +222,15 @@ Kamisado.Engine = function (t, c) {
     };
 
 // private methods
+     var belong_to = function (element, list) {
+        for (var index in list) {
+            if (list[index].x === element.x && list[index].y === element.y) {
+                return true;
+            }
+        }
+        return false;
+    };
+
     var find_tower2 = function(coordinates, color) {
         var tower;
         var list = color === Kamisado.Color.BLACK ? black_towers : white_towers;

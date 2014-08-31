@@ -57,10 +57,6 @@ Kamisado.GuiPlayer = function (color, engine) {
 
 // private methods
     var compute_coordinates = function(x, y) {
-//        console.log((x - offsetX) + ' => ' + ((x - offsetX) / (deltaX + 4)) + ' => ' +
-//            Math.floor((x - offsetX) / (deltaX + 4)) + ' => ' + deltaX);
-//        console.log((y - offsetY) + ' => ' + ((y - offsetY) / (deltaY + 4)) + ' => ' +
-//            Math.floor((y - offsetY) / (deltaY + 4)) + ' => ' + deltaY);
         return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
     };
 
@@ -251,7 +247,7 @@ Kamisado.GuiPlayer = function (color, engine) {
         } else {
             var coordinates = compute_coordinates(pos.x, pos.y);
 
-            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list) {
+            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list && engine.is_possible_move(coordinates, possible_move_list)) {
                 selected_cell = coordinates;
                 possible_move_list = null;
                 move_tower2();
