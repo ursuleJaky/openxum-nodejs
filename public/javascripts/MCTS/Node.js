@@ -72,11 +72,11 @@ MCTS.Node = function (e, f, m, l) {
     };
 
     this.getPossibleMoves = function () {
-        return possibleMoves.list;
+        return possibleMoves;
     };
 
     this.removeFirstPossibleMove = function () {
-        possibleMoves.list.shift();
+        possibleMoves = engine.remove_first_possible_move(possibleMoves);
     };
 
     this.incWins = function () {

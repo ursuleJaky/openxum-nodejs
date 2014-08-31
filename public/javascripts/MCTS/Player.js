@@ -13,7 +13,7 @@ MCTS.Player = function (c, e, sn) {
 
 // private methods
     var evaluate = function(b) {
-        var b2 = clone(b);
+        var b2 = b.clone();
 
         while (!b2.is_finished()) {
             play_a_random_turn(b2);
@@ -40,7 +40,7 @@ MCTS.Player = function (c, e, sn) {
 
     var play_a_random_turn = function (e) {
         var list = e.get_possible_move_list();
-        var move = e.select_move(list, Math.floor(Math.random() * list.list.length));
+        var move = e.select_move(list, Math.floor(Math.random() * e.get_possible_move_number(list)));
 
         e.move(move);
     };
@@ -54,7 +54,7 @@ MCTS.Player = function (c, e, sn) {
 		while (current !== null && !current.getEngine().is_finished()) {
             var possibleMoves = current.getPossibleMoves();
 
-			if (possibleMoves.length > 0) {
+			if (current.getEngine().get_possible_move_number(possibleMoves) > 0) {
 				node = current;
 				break;
 			} else {
@@ -67,7 +67,7 @@ MCTS.Player = function (c, e, sn) {
 		if (current === null || !current.getEngine().is_finished()) {
 			current = node;
 
-			var newEngine = clone(current.getEngine());
+			var newEngine = current.getEngine().clone();
 			var move = current.getFirstPossibleMove();
 
             newEngine.move(move);

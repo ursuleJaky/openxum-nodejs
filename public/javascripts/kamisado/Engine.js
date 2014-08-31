@@ -1,20 +1,31 @@
 "use strict";
 
-Kamisado.Engine = function (type, color) {
+Kamisado.Engine = function (t, c) {
 
 // public methods
+    this.change_color = function () {
+        color = next_color(color);
+    };
+
+    this.clone = function () {
+        var o = new Kamisado.Engine(type, color);
+
+        o.set(phase, black_towers, white_towers, play_color);
+        return o;
+    };
+
     this.current_color = function () {
-        return this.color;
+        return color;
     };
 
     this.find_playable_tower = function(color) {
         var playable_tower = undefined;
 
-        if (this.play_color) {
+        if (play_color) {
             var list = this.get_towers(color);
 
             for (var i = 0; i < 8; ++i) {
-                if (list[i].color === this.play_color) {
+                if (list[i].color === play_color) {
                     playable_tower = { x: list[i].x, y: list[i].y };
                 }
             }
@@ -22,20 +33,22 @@ Kamisado.Engine = function (type, color) {
         return playable_tower;
     };
 
+    this.find_tower = function(coordinates, color) {
+        var tower = find_tower2(coordinates, color);
+
+        return { x: tower.x, y: tower.y, tower_color: tower.color };
+    };
+
     this.get_black_towers = function() {
-        return this.black_towers;
+        return black_towers;
     };
 
     this.get_current_towers = function() {
-        return this.color === Kamisado.Color.BLACK ? this.black_towers : this.white_towers;
+        return color === Kamisado.Color.BLACK ? black_towers : white_towers;
     };
 
     this.get_play_color = function() {
-        return this.play_color;
-    };
-
-    this.get_white_towers = function() {
-        return this.white_towers;
+        return play_color;
     };
 
     this.get_possible_move_list = function() {
@@ -52,6 +65,10 @@ Kamisado.Engine = function (type, color) {
             playable_tower: playable_tower,
             list: this.get_possible_moving_list({ x: playable_tower.x, y: playable_tower.y, color: color })
         };
+    };
+
+    this.get_possible_move_number = function(list) {
+        return list.list.length;
     };
 
     this.get_possible_moving_list = function(tower) {
@@ -88,8 +105,38 @@ Kamisado.Engine = function (type, color) {
         return list;
     };
 
+    this.get_towers = function(color) {
+        return  color === Kamisado.Color.BLACK ? black_towers : white_towers;
+    };
+
+    this.get_white_towers = function() {
+        return white_towers;
+    };
+
+    this.is_empty = function(coordinates) {
+        var found = false;
+        var i = 0;
+
+        while (i < 8 && !found) {
+            if (black_towers[i].x === coordinates.x && black_towers[i].y === coordinates.y) {
+                found = true;
+            } else {
+                ++i;
+            }
+        }
+        i = 0;
+        while (i < 8 && !found) {
+            if (white_towers[i].x === coordinates.x && white_towers[i].y === coordinates.y) {
+                found = true;
+            } else {
+                ++i;
+            }
+        }
+        return !found;
+    };
+
     this.is_finished = function () {
-        return this._phase === Kamisado.Phase.FINISH;
+        return phase === Kamisado.Phase.FINISH;
     };
 
     this.move = function (move) {
@@ -97,26 +144,26 @@ Kamisado.Engine = function (type, color) {
     };
 
     this.move_tower = function(selected_tower, selected_cell) {
-        var tower = this.find_tower2(selected_tower, this.color);
+        var tower = find_tower2(selected_tower, color);
 
         if (tower) {
             tower.x = selected_cell.x;
             tower.y = selected_cell.y;
         }
-        if ((this.color === Kamisado.Color.BLACK && tower.y === 7) ||
-            (this.color === Kamisado.Color.WHITE && tower.y === 0)) {
-            this._phase = Kamisado.Phase.FINISH;
+        if ((color === Kamisado.Color.BLACK && tower.y === 7) ||
+            (color === Kamisado.Color.WHITE && tower.y === 0)) {
+            phase = Kamisado.Phase.FINISH;
         } else {
-            this.play_color = Kamisado.colors[tower.x][tower.y];
-            if (!this.pass(this.next_color(this.color))) {
+            play_color = Kamisado.colors[tower.x][tower.y];
+            if (!this.pass(next_color(color))) {
                 this.change_color();
             } else {
-                var playable_tower = this.find_playable_tower(this.next_color(this.color));
+                var playable_tower = this.find_playable_tower(next_color(color));
 
-                this.play_color = Kamisado.colors[playable_tower.x][playable_tower.y];
-                if (this.pass(this.color)) {
-                    this._phase = Kamisado.Phase.FINISH;
-                    this.color = this.next_color(this.color);
+                play_color = Kamisado.colors[playable_tower.x][playable_tower.y];
+                if (this.pass(color)) {
+                    phase = Kamisado.Phase.FINISH;
+                    color = next_color(color);
                 }
             }
         }
@@ -130,79 +177,50 @@ Kamisado.Engine = function (type, color) {
     };
 
     this.phase = function() {
-        return this._phase;
+        return phase;
+    };
+
+    this.remove_first_possible_move = function(list) {
+        var L = list;
+
+        L.list.shift();
+        return L;
     };
 
     this.select_move = function(list, index) {
         return { from: list.playable_tower, to: list.list[index] };
     };
 
+    this.set = function(_phase, _black_towers,_white_towers, _play_color) {
+        var i = _black_towers.length;
+
+        while (i--) {
+            black_towers[i].x = _black_towers[i].x;
+            black_towers[i].y = _black_towers[i].y;
+            black_towers[i].color = _black_towers[i].color;
+        }
+        i = _white_towers.length;
+        while (i--) {
+            white_towers[i].x = _white_towers[i].x;
+            white_towers[i].y = _white_towers[i].y;
+            white_towers[i].color = _white_towers[i].color;
+        }
+        phase = _phase;
+        play_color = _play_color;
+    };
+
     this.winner_is = function () {
         if (this.is_finished()) {
-            return this.color;
+            return color;
         } else {
             return false;
         }
     };
 
-    this.change_color = function () {
-        this.color = this.next_color(this.color);
-    };
-
-    this.find_tower = function(coordinates, color) {
-        var tower = this.find_tower2(coordinates, color);
-
-        return { x: tower.x, y: tower.y, tower_color: tower.color };
-    };
-
-    this.get_towers = function(color) {
-        return  color === Kamisado.Color.BLACK ? this.black_towers : this.white_towers;
-    };
-
-    this.is_empty = function(coordinates) {
-        var found = false;
-        var i = 0;
-
-        while (i < 8 && !found) {
-            if (this.black_towers[i].x === coordinates.x && this.black_towers[i].y === coordinates.y) {
-                found = true;
-            } else {
-                ++i;
-            }
-        }
-        i = 0;
-        while (i < 8 && !found) {
-            if (this.white_towers[i].x === coordinates.x && this.white_towers[i].y === coordinates.y) {
-                found = true;
-            } else {
-                ++i;
-            }
-        }
-        return !found;
-    };
-
-    this.init = function() {
-        this.black_towers = [];
-        for (var i = 0; i < 8; ++i) {
-            this.black_towers[i] = { x: i, y: 0, color: Kamisado.colors[i][0] };
-        }
-        this.white_towers = [];
-        for (var i = 0; i < 8; ++i) {
-            this.white_towers[i] = { x: i, y: 7, color: Kamisado.colors[i][7] };
-        }
-        this._phase = Kamisado.Phase.MOVE_TOWER;
-        this.color = Kamisado.Color.BLACK;
-        this.play_color = undefined;
-    };
-
-    this.next_color = function(color) {
-        return color === Kamisado.Color.WHITE ? Kamisado.Color.BLACK : Kamisado.Color.WHITE;
-    };
-
 // private methods
-    this.find_tower2 = function(coordinates, color) {
+    var find_tower2 = function(coordinates, color) {
         var tower;
-        var list = color === Kamisado.Color.BLACK ? this.black_towers : this.white_towers;
+        var list = color === Kamisado.Color.BLACK ? black_towers : white_towers;
         var found = false;
         var i = 0;
 
@@ -217,15 +235,37 @@ Kamisado.Engine = function (type, color) {
         return tower;
     };
 
+    var init = function(t, c) {
+        var i;
+
+        type = t;
+        color = c;
+        black_towers = [];
+        for (i = 0; i < 8; ++i) {
+            black_towers[i] = { x: i, y: 0, color: Kamisado.colors[i][0] };
+        }
+        white_towers = [];
+        for (i = 0; i < 8; ++i) {
+            white_towers[i] = { x: i, y: 7, color: Kamisado.colors[i][7] };
+        }
+        phase = Kamisado.Phase.MOVE_TOWER;
+//        color = Kamisado.Color.BLACK;
+        play_color = undefined;
+    };
+
+    var next_color = function(color) {
+        return color === Kamisado.Color.WHITE ? Kamisado.Color.BLACK : Kamisado.Color.WHITE;
+    };
+
 // private attributes
-    this.type = type;
-    this.color = color;
+    var type;
+    var color;
 
-    this.black_towers = [];
-    this.white_towers = [];
-    this.play_color = undefined;
+    var black_towers;
+    var white_towers;
+    var play_color;
 
-    this._phase = undefined;
+    var phase;
 
-    this.init();
+    init(t, c);
 };

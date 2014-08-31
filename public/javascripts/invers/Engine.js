@@ -7,8 +7,19 @@ Invers.Engine = function (t, c) {
         color = this.next_color(color);
     };
 
+    this.clone = function () {
+        var o = new Invers.Engine(type, color);
+
+        o.set(phase, state, redTileNumber, yellowTileNumber);
+        return o;
+    };
+
     this.current_color = function () {
         return color;
+    };
+
+    this.get_different_color_number_of_free_tiles = function () {
+        return (redTileNumber === 2 || yellowTileNumber === 2) ? 1 : 2;
     };
 
     this.get_free_tiles = function () {
@@ -84,6 +95,10 @@ Invers.Engine = function (t, c) {
             }
         }
         return { right: right, left: left, top: top, bottom: bottom };
+    };
+
+    this.get_possible_move_number = function(list) {
+        return (list.top.length + list.bottom.length + list.left.length + list.right.length) * this.get_different_color_number_of_free_tiles();
     };
 
     this.get_state = function () {
@@ -194,7 +209,66 @@ Invers.Engine = function (t, c) {
         return phase;
     };
 
+    this.remove_first_possible_move = function(list) {
+        var L = list;
+
+        if (L.top.length > 0) {
+            L.top.shift();
+        } else if (L.bottom.length > 0) {
+            L.bottom.shift();
+        } else if (L.left.length > 0) {
+            L.left.shift();
+        } else if (L.right.length > 0) {
+            L.right.shift();
+        }
+        return L;
+    };
+
     this.select_move = function (list, index) {
+        var color_index;
+        var position;
+        var N = list.top.length + list.bottom.length + list.left.length + list.right.length;
+        var N2 = N * this.get_different_color_number_of_free_tiles();
+        var L;
+
+        if (index >= N) {
+            index -= N;
+            color_index = 1;
+        } else {
+            color_index = 0;
+        }
+        if (index < list.top.length) {
+            L = list.top;
+            position = Invers.Position.TOP;
+        } else if (index < list.top.length + list.bottom.length) {
+            L = list.bottom;
+            position = Invers.Position.BOTTOM;
+            index -= list.top.length;
+        } else if (index < list.top.length + list.bottom.length + list.left.length) {
+            L = list.left;
+            position = Invers.Position.LEFT;
+            index -= list.top.length + list.bottom.length;
+        } else {
+            L = list.right;
+            position = Invers.Position.RIGHT;
+            index -= list.top.length + list.bottom.length + list.left.length;
+        }
+        return { color: this.get_free_tiles()[color_index], letter: L[index].letter, number: L[index].number, position: position}
+    };
+
+    this.set = function (_phase, _state, _redTileNumber, _yellowTileNumber) {
+        var i = _state.length;
+
+        while (i--) {
+            var j = _state[i].length;
+
+            while (j--) {
+                state[i][j] = _state[i][j];
+            }
+        }
+        phase = _phase;
+        redTileNumber = _redTileNumber;
+        yellowTileNumber = _yellowTileNumber;
     };
 
     this.winner_is = function () {

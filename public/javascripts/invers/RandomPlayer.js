@@ -30,7 +30,7 @@ Invers.RandomPlayer = function (color, e) {
             } else if (position === Invers.Position.RIGHT) {
                 l = list.right;
             }
-        } while (l.length == 0);
+        } while (l.length === 0);
         if (position === Invers.Position.TOP || position === Invers.Position.BOTTOM) {
             letter = l[Math.floor(Math.random() * l.length)].letter;
         } else {
