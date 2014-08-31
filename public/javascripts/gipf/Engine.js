@@ -585,7 +585,7 @@ Gipf.Engine = function (t, c) {
 
                 while (get_intersection(l, n).state() != Gipf.State.VACANT) {
                     row.unshift(new Gipf.Coordinates(l, n));
-                    l = String.fromCharCode(l.charCodeAt(0) - 1)
+                    l = String.fromCharCode(l.charCodeAt(0) - 1);
                     --n;
                 }
             }
@@ -595,7 +595,7 @@ Gipf.Engine = function (t, c) {
 
                 while (get_intersection(l, n).state() != Gipf.State.VACANT) {
                     row.push(new Gipf.Coordinates(l, n));
-                    l = String.fromCharCode(l.charCodeAt(0) + 1)
+                    l = String.fromCharCode(l.charCodeAt(0) + 1);
                     ++n;
                 }
             }

@@ -28,7 +28,7 @@ Zertz.Intersection = function (c) {
 
     this.marble_is_present = function() {
         return state === Zertz.State.BLACK_MARBLE || state === Zertz.State.WHITE_MARBLE || state === Zertz.State.GREY_MARBLE;
-    }
+    };
 
     this.number = function () {
         return coordinates.number();

@@ -35,17 +35,15 @@ Dvonn.RandomPlayer = function (color, e) {
     this.put_dvonn_piece = function () {
         var list = engine.get_free_intersections();
         var index = Math.floor(Math.random() * list.length);
-        var coordinates = list[index];
 
-        return coordinates;
+        return list[index];
     };
 
     this.put_piece = function () {
         var list = engine.get_free_intersections();
         var index = Math.floor(Math.random() * list.length);
-        var coordinates = list[index];
 
-        return coordinates;
+        return list[index];
     };
 
     this.remove_isolated_stacks = function () {

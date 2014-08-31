@@ -583,7 +583,6 @@ Zertz.Engine = function (t, c) {
         } else {
             return false;
         }
-        return false;
     };
 
     var next_color = function (c) {
