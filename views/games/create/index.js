@@ -5,9 +5,9 @@ exports.init = function (req, res) {
 };
 
 exports.create = function (req, res) {
-    if (req.param('game_type') === 'ai') {
+    if (req.param('game_type') === 'ai' || req.param('game_type') === 'remote_ai') {
         res.redirect('/games/play/?game=' + req.param('game') +
-            '&color=' + req.param('color') + '&mode=' + req.param('mode') + '&game_id=-1');
+            '&color=' + req.param('color') + '&mode=' + req.param('mode') + '&game_type=' + req.param('game_type') + '&game_id=-1');
     } else {
         if (req.param('game_type') === 'offline') {
             res.redirect('/');
