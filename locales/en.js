@@ -98,5 +98,6 @@
 	"Blitz version": "Blitz version",
 	"This is a short and very fast way of playing YINSH. You play exactly as described above, but the aim is simpler: now you must form only one row. So be the first to line up 5 markers of your color and you win!": "This is a short and very fast way of playing YINSH. You play exactly as described above, but the aim is simpler: now you must form only one row. So be the first to line up 5 markers of your color and you win!",
 	"Sign Up": "Sign Up",
-	"Sign In": "Sign In"
+	"Sign In": "Sign In",
+	"My profile": "My profile"
 }
