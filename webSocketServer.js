@@ -28,7 +28,7 @@ exports.Server = function (app) {
         clients[msg.user_id] = connection;
         sendConnectedClients();
     };
-	 
+
 
     var onDisconnect = function (port) {
         var index;
@@ -88,24 +88,25 @@ exports.Server = function (app) {
                 delete clients[msg.user_id];
                 delete currentGames[msg.user_id];
                 if (game) {
-						 console.log(game);
-						 // on ajoute le jeu à la collection GameHisto - attention le nom n'est pas unique
-	                app.db.models.User.findOne({ username: msg.user_id }, null,
-	                    { safe: true }, function (err, userinfo) {
-								  console.log(userinfo);
-								 var fieldsToSet = {
-		                        name: game.name,
-		                        game: game.game,
-		                        userCreated: { id: game.userCreated.id },
-		                        opponent: { id: game.opponent.id },
-		 							   winner: { id: userinfo._id }
-		                    };
-								  console.log(fieldsToSet);
-		                    app.db.models.GameHisto.create(fieldsToSet, function (err, user) {
-		                    });
-	                     });
-						 
-						 game.remove(function(err) { });
+                    console.log(game);
+                    // on ajoute le jeu à la collection GameHisto - attention le nom n'est pas unique
+                    app.db.models.User.findOne({ username: msg.user_id }, null,
+                        { safe: true }, function (err, userinfo) {
+                            console.log(userinfo);
+                            var fieldsToSet = {
+                                name: game.name,
+                                game: game.game,
+                                userCreated: { id: game.userCreated.id },
+                                opponent: { id: game.opponent.id },
+                                winner: { id: userinfo._id }
+                            };
+                            console.log(fieldsToSet);
+                            app.db.models.GameHisto.create(fieldsToSet, function (err, user) {
+                            });
+                        });
+
+                    game.remove(function (err) {
+                    });
                 }
             });
     };
@@ -157,7 +158,7 @@ exports.Server = function (app) {
         } else if (msg.type === 'finish') {
             onFinish(msg);
         } else if (msg.type === 'info') {
-            onConnect(connection,msg);
+            onConnect(connection, msg);
         }
     };
 
@@ -178,7 +179,6 @@ exports.Server = function (app) {
         if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
             msg.move == 'remove_row') {
 
-               
 
             console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
                 + ' by ' + msg.color + ' / ' + msg.user_id);
