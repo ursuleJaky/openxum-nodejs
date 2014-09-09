@@ -1,7 +1,11 @@
 'use strict';
 
 exports.init = function (req, res) {
-    res.render('games/create/index', { game: req.param('game') });
+    if (req.user) {
+        res.render('games/create/index', { game: req.param('game') });
+    } else {
+        res.redirect('/');
+    }
 };
 
 exports.create = function (req, res) {
