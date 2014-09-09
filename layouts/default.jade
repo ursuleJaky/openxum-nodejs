@@ -4,6 +4,7 @@ html
     block head
       title #{title}
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/css/flags32.css?#{cacheBreaker}')
     link(rel='stylesheet', href='/layouts/core.min.css?#{cacheBreaker}')
     block neck
   body
@@ -36,9 +37,13 @@ html
               a.dropdown-toggle(href="#",data-toggle="dropdown") #{__("Language")}
                 span.caret
               ul.dropdown-menu(role="menu")
-                li
-                  a(href="/language/?lg=en") English
-                  a(href="/language/?lg=fr") Français
+                li.f32
+                  a(href="/language/?lg=en")
+                    span(class="flag us", style="vertical-align: middle")
+                    | &nbsp; English
+                  a(href="/language/?lg=fr")
+                    span(class="flag fr", style="vertical-align: middle")
+                    | &nbsp; Français
             if user && user.username
               li: a(href='/logout/')
                 i.fa.fa-user
