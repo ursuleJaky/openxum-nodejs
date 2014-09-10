@@ -10,20 +10,20 @@ block feet
   script(src='/views/account/index.min.js?#{cacheBreaker}')
 
 block body
- div.col-sm-6
+   div.f32.col-sm-6
       div.page-header
-        h1 My Profile
-        | Hi,  #{user.username}!
-      
-      b My email : 
+        h1 #{__("My Profile")}
+
+      b #{__("My email")} : &nbsp;
       | #{email}
       br   
-      b Full Name :  
+      b #{__("Full Name")} : &nbsp;
       | #{account.name.full}
       br  
-      b Country : 
-      | #{account.country}
+      b #{__("Country")} : &nbsp;
+      span(class="#{flag}", style="vertical-align: middle")
+      | &nbsp; #{country}
       p   
-      a(class='btn btn-primary btn-md active',href='/account/settings')
+      a(class='btn btn-primary btn-md active',href='/account/settings/')
         i(class='glyphicon glyphicon-pencil')
-        |  Modify my profile
+        |  #{__("Modify")}

@@ -102,5 +102,10 @@
 	"My profile": "Mon profil",
 	"In progress games": "Parties en cours",
 	"Online players": "Joueurs en ligne",
-	"Last games": "Dernières parties jouées"
+	"Last games": "Dernières parties jouées",
+	"My Profile": "Mon profil",
+	"My email": "Email",
+	"Full Name": "Nom complet",
+	"Country": "Pays",
+	"Modify": "Modifier"
 }

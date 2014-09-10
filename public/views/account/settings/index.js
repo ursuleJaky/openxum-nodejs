@@ -24,9 +24,7 @@
       first: '',
       middle: '',
       last: '',
-      company: '',
-      phone: '',
-      zip: ''
+      country: ''
     },
     url: '/account/settings/',
     parse: function(response) {
@@ -98,9 +96,7 @@
         first: app.mainView.account.get('name').first,
         middle: app.mainView.account.get('name').middle,
         last: app.mainView.account.get('name').last,
-        company: app.mainView.account.get('company'),
-        phone: app.mainView.account.get('phone'),
-        zip: app.mainView.account.get('zip')
+        country: app.mainView.account.get('country')
       });
     },
     render: function() {
@@ -117,9 +113,7 @@
         first: this.$el.find('[name="first"]').val(),
         middle: this.$el.find('[name="middle"]').val(),
         last: this.$el.find('[name="last"]').val(),
-        company: this.$el.find('[name="company"]').val(),
-        phone: this.$el.find('[name="phone"]').val(),
-        zip: this.$el.find('[name="zip"]').val()
+        country: this.$el.find('[name="country"]').val()
       });
     }
   });
