@@ -99,5 +99,8 @@
 	"If all of the markers are placed on the board before either player has won, the game ends, with the winner being the player who has removed more rings. If both players have removed the same number of rings at this point, the game ends in a draw.": "If all of the markers are placed on the board before either player has won, the game ends, with the winner being the player who has removed more rings. If both players have removed the same number of rings at this point, the game ends in a draw.",
 	"Blitz version": "Blitz version",
 	"This is a short and very fast way of playing YINSH. You play exactly as described above, but the aim is simpler: now you must form only one row. So be the first to line up 5 markers of your color and you win!": "This is a short and very fast way of playing YINSH. You play exactly as described above, but the aim is simpler: now you must form only one row. So be the first to line up 5 markers of your color and you win!",
-	"My profile": "Mon profil"
+	"My profile": "Mon profil",
+	"In progress games": "Parties en cours",
+	"Online players": "Joueurs en ligne",
+	"Last games": "Dernières parties jouées"
 }

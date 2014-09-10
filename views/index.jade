@@ -21,21 +21,21 @@ block body
         div.col-sm-3
           div.well.stat
             div.stat-value #{count.countUser}
-            div.stat-label Utilisateurs
+            div.stat-label #{__("Players")}
         div.col-sm-3
           div.well.stat
             div.stat-value #{count.countGameType}
-            div.stat-label Jeux proposés
+            div.stat-label #{__("Games")}
         div.col-sm-3
           div.well.stat
             div.stat-value #{count.countGame}
-            div.stat-label Parties en cours	
+            div.stat-label #{__("In progress games")}
         div.col-sm-3
           div.well.stat
             #countPlayers.stat-value ---
-            div.stat-label Joueurs en ligne   			
+            div.stat-label #{__("Online players")}
    div.row
-   H2 Dernières parties jouées
+   H2 #{__("Last games")}
    ul.list-group
        each item in histo
           li.list-group-item 
