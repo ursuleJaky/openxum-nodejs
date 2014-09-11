@@ -179,7 +179,6 @@ exports.Server = function (app) {
         if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
             msg.move == 'remove_row') {
 
-
             console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
                 + ' by ' + msg.color + ' / ' + msg.user_id);
 
