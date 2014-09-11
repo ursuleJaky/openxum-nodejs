@@ -86,7 +86,7 @@ exports.Server = function (app) {
                     if (game) {
 
                         console.log(msg.moves);
-                        
+
                         // on ajoute le jeu à la collection GameHisto - attention le nom n'est pas unique
                         app.db.models.User.findOne({ username: msg.user_id }, null,
                             { safe: true }, function (err, userinfo) {
