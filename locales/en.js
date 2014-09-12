@@ -103,5 +103,10 @@
 	"Possible games": "Possible games",
 	"In progress games": "In progress games",
 	"Online players": "Online players",
-	"Last games": "Last games"
+	"Last games": "Last games",
+	"My Profile": "My Profile",
+	"My email": "My email",
+	"Full Name": "Full Name",
+	"Country": "Country",
+	"Modify": "Modify"
 }

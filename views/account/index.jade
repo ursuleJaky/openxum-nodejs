@@ -5,6 +5,9 @@ block head
 
 block neck
   link(rel='stylesheet', href='/views/account/index.min.css?#{cacheBreaker}')
+  script(src='/javascripts/utils/md5.js?#{cacheBreaker}')
+  script(src='/javascripts/utils/pnglib.js?#{cacheBreaker}')
+  script(src='/javascripts/utils/identicon.js?#{cacheBreaker}')
 
 block feet
   script(src='/views/account/index.min.js?#{cacheBreaker}')
@@ -13,6 +16,12 @@ block body
    div.f32.col-sm-6
       div.page-header
         h1 #{__("My Profile")}
+
+      script(language='javascript').
+        data = new Identicon(md5(#{user.name}), 120).toString();
+        document.write(
+                '<br><img width=120 height=120 src="data:image/png;base64,' + data + '"><br><br>'
+        );
 
       b #{__("My email")} : &nbsp;
       | #{email}
