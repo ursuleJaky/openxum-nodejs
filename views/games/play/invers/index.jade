@@ -18,6 +18,7 @@ block body
     script(src='/javascripts/invers/Manager.js')
     script(src='/javascripts/invers/MCTSPlayer.js')
     script(src='/javascripts/invers/RandomPlayer.js')
+    script(src='/javascripts/invers/RestWebServicePlayer.js')
 
     script(language='javascript').
         $(document).ready(function() {
@@ -30,7 +31,14 @@ block body
             var canvas_div = document.getElementById("boardDiv");
             var engine = new Invers.Engine(0, 0);
             var gui = new Invers.GuiPlayer(#{color}, engine);
-            var other = new Invers.MCTSPlayer(#{other_color}, engine);
+            var other;
+
+            if ('#{game_type}' === 'remote_ai') {
+                other = new Invers.RestWebServicePlayer(#{other_color}, engine, '#{user.username}');
+            } else {
+                other = new Invers.MCTSPlayer(#{other_color}, engine);
+            }
+
             var manager = new Invers.Manager(engine, gui, other);
 
             if (canvas_div.clientHeight < canvas_div.clientWidth) {
@@ -46,6 +54,9 @@ block body
                 other.set_manager(manager);
             } else {
                 other.set_level(manager.load_level());
+                if (other.is_remote()) {
+                    other.set_manager(manager);
+                }
             }
             if (engine.current_color() == other.color()) {
                 manager.play_other();

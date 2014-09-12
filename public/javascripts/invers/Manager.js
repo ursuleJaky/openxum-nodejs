@@ -17,6 +17,9 @@ Invers.Manager = function (e, gui_player, other_player) {
         if (engine.current_color() === gui.color()) {
             if (engine.phase() === Invers.Phase.PUSH_TILE && gui.get_move()) {
                 engine.move(gui.get_move());
+                if (other.is_remote()) {
+                    other.move(gui.get_move());
+                }
                 gui.unselect();
             }
             gui.draw();
@@ -31,7 +34,21 @@ Invers.Manager = function (e, gui_player, other_player) {
 
     this.play_other = function () {
         if (engine.phase() === Invers.Phase.PUSH_TILE) {
-            engine.move(other.move());
+            if (!other.is_remote()) {
+                engine.move(other.move());
+            } else if (other.is_remote() && other.is_ready()) {
+                other.move();
+            }
+            gui.draw();
+            finish();
+        }
+    };
+
+    this.play_remote = function(t) {
+        turn = t;
+        if (engine.phase() === Invers.Phase.PUSH_TILE) {
+            engine.move(turn);
+            other.move(turn);
             gui.draw();
             finish();
         }

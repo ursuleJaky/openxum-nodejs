@@ -1,6 +1,6 @@
 "use strict";
 
-Kamisado.RestWebServicePlayer = function (c, e, l) {
+Invers.RestWebServicePlayer = function (c, e, l) {
 
 // public methods
     this.color = function () {
@@ -15,15 +15,15 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         return true;
     };
 
-    this.move_tower = function (from, to) {
+    this.move = function (move) {
         if (!start) {
             start = true;
         }
-        if (from && to) {
+        if (move) {
             $.ajax({
                 type: "PUT",
                 url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
-                data: { id: id, game: 'kamisado', from: JSON.stringify(from), to: JSON.stringify(to) },
+                data: { id: id, game: 'invers', move: JSON.stringify(move) },
                 xhrFields: { withCredentials: true },
                 success: function(data) {
                     var response = JSON.parse(data);
@@ -37,7 +37,7 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
             $.ajax({
                 type: "GET",
                 url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
-                data: { id: id, game: 'kamisado', color: mycolor },
+                data: { id: id, game: 'invers', color: mycolor },
                 xhrFields: { withCredentials: true },
                 success: function(data) {
                     var move = JSON.parse(data);
@@ -68,7 +68,7 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         $.ajax({
             type: "POST",
             url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/create",
-            data: { game: 'kamisado', color: 0, login: login },
+            data: { game: 'invers', color: 0, login: login },
             xhrFields: { withCredentials: true },
             success: function(data) {
                 var response = JSON.parse(data);
