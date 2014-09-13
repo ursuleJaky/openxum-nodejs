@@ -13,13 +13,17 @@ var config = require('./config'),
     webSocketServer = require('./webSocketServer'),
     cluster = require('cluster'),
     captcha = require('easy-captcha'),
-    i18n = require('i18n-2');
+    i18n = require('i18n-2'),
+    moment= require('moment');
 
 //create express app
 var app = express();
 
 //keep reference to config
 app.config = config;
+
+// moment
+app.moment = moment;
 
 i18n.expressBind(app, {
     // setup some locales - other locales default to en silently
@@ -68,6 +72,7 @@ app.use('/captcha.jpg', captcha.generate());
 //i18n
 app.use(function(req, res, next) {
     req.i18n.setLocaleFromCookie();
+    moment.locale(req.i18n.getLocale());
     next();
 });
 

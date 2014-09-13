@@ -13,26 +13,37 @@ block feet
   script(src='/views/account/index.min.js?#{cacheBreaker}')
 
 block body
-   div.f32.col-sm-6
-      div.page-header
-        h1 #{__("My Profile")}
+    br
+    div.f32.row.vertical-offset-100
+        div.col-md-6.col-md-offset-3
+            div.panel.panel-primary
+                div.panel-heading
+                    h3(class='panel-title') #{__("Profile: ")} #{name}
+                div.panel-body
 
-      script(language='javascript').
-        data = new Identicon(md5(#{user.name}), 120).toString();
-        document.write(
-                '<br><img width=120 height=120 src="data:image/png;base64,' + data + '"><br><br>'
-        );
+                    script(language='javascript').
+                        data = new Identicon(md5('#{name}'), 120).toString();
+                        document.write('<img width=120 height=120 style="float:right;clear:right;" src="data:image/png;base64,' + data + '"><br><br>');
 
-      b #{__("My email")} : &nbsp;
-      | #{email}
-      br   
-      b #{__("Full Name")} : &nbsp;
-      | #{account.name.full}
-      br  
-      b #{__("Country")} : &nbsp;
-      span(class="#{flag}", style="vertical-align: middle")
-      | &nbsp; #{country}
-      p   
-      a(class='btn btn-primary btn-md active',href='/account/settings/')
-        i(class='glyphicon glyphicon-pencil')
-        |  #{__("Modify")}
+                    b #{__("Email")} : &nbsp;
+                    | #{email}
+                    br
+                    b #{__("Full Name")} : &nbsp;
+                    | #{account.name.full}
+                    br
+                    b #{__("Inscription date")} : &nbsp;
+                    | #{timeCreated}
+                    br
+                    b #{__("Country")} : &nbsp;
+                    span(class="#{flag}", style="vertical-align: middle")
+                    | &nbsp; #{country}
+                    br
+                    br
+                    a(class='btn btn-warning btn-block active',href='/account/settings/',style='left:0; bottom: 0')
+                       i(class='glyphicon glyphicon-pencil')
+                       |  #{__("Modify")}
+
+            div.panel.panel-primary
+                div.panel-heading
+                    h3(class='panel-title') #{__("Stats")}
+                div.panel-body

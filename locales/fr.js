@@ -107,5 +107,9 @@
 	"My email": "Email",
 	"Full Name": "Nom complet",
 	"Country": "Pays",
-	"Modify": "Modifier"
+	"Modify": "Modifier",
+	"Profile: ": "Profil: ",
+	"Email": "Email",
+	"Inscription date": "Date d'inscription",
+	"Stats": "Stats"
 }
