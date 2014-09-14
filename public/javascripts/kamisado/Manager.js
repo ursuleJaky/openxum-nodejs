@@ -16,9 +16,11 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     this.play = function () {
         if (engine.current_color() === gui.color()) {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
-                engine.move({ from: gui.get_selected_tower(), to: gui.get_selected_cell() });
+                turn = new Kamisado.Turn(gui.get_selected_tower(), gui.get_selected_cell());
+                engine.move(turn);
+                turns += turn.get() + ';';
                 if (other.is_remote()) {
-                    other.move_tower(gui.get_selected_tower(), gui.get_selected_cell());
+                    other.move_tower(turn.from(), turn.to());
                 }
                 gui.unselect();
             }
@@ -32,8 +34,9 @@ Kamisado.Manager = function (e, gui_player, other_player) {
         } else {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
                 engine.move(turn);
+                turns += turn.get() + ';';
                 if (other.is_remote() && other.confirm()) {
-                    other.move_tower(turn.from, turn.to);
+                    other.move_tower(turn.from(), turn.to());
                 }
                 gui.unselect();
             }
@@ -54,10 +57,10 @@ Kamisado.Manager = function (e, gui_player, other_player) {
             }
             if (!other.is_remote()) {
                 gui.move_tower({
-                        x: turn.from.x,
-                        y: turn.from.y,
-                        tower_color: engine.find_tower(turn.from, engine.current_color()).tower_color },
-                    turn.to);
+                        x: turn.from().x,
+                        y: turn.from().y,
+                        tower_color: engine.find_tower(turn.from(), engine.current_color()).tower_color },
+                    turn.to());
             }
         }
     };
@@ -66,10 +69,10 @@ Kamisado.Manager = function (e, gui_player, other_player) {
         turn = t;
         if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
             gui.move_tower({
-                    x: turn.from.x,
-                    y: turn.from.y,
-                    tower_color: engine.find_tower(turn.from, engine.current_color()).tower_color },
-                turn.to);
+                    x: turn.from().x,
+                    y: turn.from().y,
+                    tower_color: engine.find_tower(turn.from(), engine.current_color()).tower_color },
+                turn.to());
         }
     };
 
@@ -108,6 +111,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
         engine = e;
         gui = g;
         other = o;
+        turns = '';
     };
 
 // private attributes
@@ -118,6 +122,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     var level;
 
     var turn;
+    var turns;
 
     init(e, gui_player, other_player);
 };

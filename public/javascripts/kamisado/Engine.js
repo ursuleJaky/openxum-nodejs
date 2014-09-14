@@ -1,5 +1,32 @@
 "use strict";
 
+Kamisado.Turn = function(f, t) {
+
+    this.from = function () {
+        return _from;
+    };
+
+    this.get = function () {
+        return String.fromCharCode('a'.charCodeAt(0) + _from.x) + (_from.y + 1) +
+            String.fromCharCode('a'.charCodeAt(0) + _to.x) + (_to.y + 1);
+    };
+
+    this.to = function () {
+        return _to;
+    };
+
+// private methods
+    var init = function (f, t) {
+        _from = f;
+        _to = t;
+    };
+
+    var _from;
+    var _to;
+
+    init(f, t);
+};
+
 Kamisado.Engine = function (t, c) {
 
 // public methods
@@ -73,7 +100,7 @@ Kamisado.Engine = function (t, c) {
     };
 
     this.move = function (move) {
-        move_tower(move.from, move.to);
+        move_tower(move.from(), move.to());
     };
 
     this.phase = function () {
@@ -88,7 +115,7 @@ Kamisado.Engine = function (t, c) {
     };
 
     this.select_move = function (list, index) {
-        return { from: list.playable_tower, to: list.list[index] };
+        return new Kamisado.Turn(list.playable_tower, list.list[index]);
     };
 
     this.set = function (_phase, _black_towers, _white_towers, _play_color) {
