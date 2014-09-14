@@ -16,7 +16,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     this.play = function () {
         if (engine.current_color() === gui.color()) {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
-                engine.move_tower(gui.get_selected_tower(), gui.get_selected_cell());
+                engine.move({ from: gui.get_selected_tower(), to: gui.get_selected_cell() });
                 if (other.is_remote()) {
                     other.move_tower(gui.get_selected_tower(), gui.get_selected_cell());
                 }
@@ -31,7 +31,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
             }
         } else {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-                engine.move_tower(turn.from, turn.to);
+                engine.move(turn);
                 if (other.is_remote() && other.confirm()) {
                     other.move_tower(turn.from, turn.to);
                 }

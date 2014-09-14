@@ -15,6 +15,9 @@ Kamisado.MCTSPlayer = function (color, e) {
         return (new MCTS.Player(mycolor, engine, level)).move();
     };
 
+    this.set_manager = function (m) {
+    };
+
     this.set_level = function (l) {
         level = l;
     };

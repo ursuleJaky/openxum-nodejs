@@ -22,7 +22,7 @@ Kamisado.AIManager = function (e, black_player, white_player) {
 
 //            console.log(player.color() + ": " + turn.from + " => " + turn.to);
 
-            engine.move_tower(turn.from , turn.to);
+            engine.move_tower(turn);
         }
     };
 
