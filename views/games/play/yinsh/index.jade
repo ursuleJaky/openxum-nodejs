@@ -58,9 +58,6 @@ block body
             } else {
                 other.set_manager(manager);
             }
-
-            console.log(engine.current_color() + ";" + other.color());
-
             if (engine.current_color() === other.color() && !other.is_remote()) {
                 manager.play_other();
             }

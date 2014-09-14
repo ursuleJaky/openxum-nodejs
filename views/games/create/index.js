@@ -20,7 +20,7 @@ exports.create = function (req, res) {
                 { safe: true }, function (err, gametype) {
                     req.app.db.models.Game.findOne({ name: req.param('name') }, null,
                         { safe: true }, function (err, game) {
-                            if (! game) {
+                            if (!game) {
                                 var fieldsToSet = {
                                     name: req.param('name'),
                                     game: gametype._id,

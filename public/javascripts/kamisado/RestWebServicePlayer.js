@@ -7,6 +7,10 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         return mycolor;
     };
 
+    this.confirm = function () {
+        return true;
+    };
+
     this.is_ready = function() {
         return id !== -1;
     };

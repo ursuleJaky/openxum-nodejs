@@ -1,5 +1,6 @@
 var wss = require('websocket').server;
 
+var kamisado = require('./web_sockets/games/kamisado');
 var yinsh = require('./web_sockets/games/yinsh');
 
 exports.Server = function (app) {
@@ -171,6 +172,7 @@ exports.Server = function (app) {
         } else if (game_type === 'invers') {
         } else if (game_type === 'gipf') {
         } else if (game_type === 'kamisado') {
+            response = new kamisado.play(msg);
         } else if (game_type === 'tzaar') {
         } else if (game_type === 'yinsh') {
             response = new yinsh.play(msg);

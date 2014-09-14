@@ -17,7 +17,7 @@ block body
     script(src='/javascripts/kamisado/GuiPlayer.js')
     script(src='/javascripts/kamisado/Manager.js')
     script(src='/javascripts/kamisado/MCTSPlayer.js')
-    script(src='/javascripts/kamisado/RandomPlayer.js')
+    script(src='/javascripts/kamisado/RemotePlayer.js')
     script(src='/javascripts/kamisado/RestWebServicePlayer.js')
 
     script(language='javascript').
@@ -34,9 +34,11 @@ block body
             var other;
 
             if ('#{game_type}' === 'remote_ai') {
-                other = new Kamisado.RestWebServicePlayer(#{other_color}, engine, '#{user.username}');
+                other = new Kamisado.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+            } else if ('#{game_id}' === '-1') {
+                other = new Kamisado.MCTSPlayer(#{opponent_color}, engine);
             } else {
-                other = new Kamisado.MCTSPlayer(#{other_color}, engine);
+                other = new Kamisado.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
             }
             var manager = new Kamisado.Manager(engine, gui, other);
 
@@ -49,7 +51,7 @@ block body
             }
             gui.set_canvas(canvas);
             gui.set_manager(manager);
-            if (#{game_id} !== -1) {
+            if ('#{game_id}' !== -1) {
                 other.set_manager(manager);
             } else {
                 other.set_level(manager.load_level());
@@ -57,7 +59,7 @@ block body
                     other.set_manager(manager);
                 }
             }
-            if (engine.current_color() == other.color()) {
+            if (engine.current_color() === other.color() && !other.is_remote()) {
                 manager.play_other();
             }
         });

@@ -32,7 +32,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
         } else {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
                 engine.move_tower(turn.from, turn.to);
-                if (other.is_remote()) {
+                if (other.is_remote() && other.confirm()) {
                     other.move_tower(turn.from, turn.to);
                 }
                 gui.unselect();
