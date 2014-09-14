@@ -111,5 +111,5 @@
 	"Profile: ": "Profil: ",
 	"Email": "Email",
 	"Inscription date": "Date d'inscription",
-	"Stats": "Stats"
+	"Stats": "Statistiques"
 }

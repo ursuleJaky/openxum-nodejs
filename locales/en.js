@@ -111,5 +111,6 @@
 	"Modify": "Modify",
 	"Profile: ": "Profile: ",
 	"Email": "Email",
-	"Inscription date": "Inscription date"
+	"Inscription date": "Inscription date",
+	"Stats": "Stats"
 }

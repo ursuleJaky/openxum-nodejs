@@ -122,6 +122,7 @@ exports.signup = function (req, res) {
                 id: workflow.user._id,
                 name: workflow.user.username
             },
+            country: "US",
             search: [
                 workflow.user.username
             ]

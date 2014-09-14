@@ -1,5 +1,7 @@
 var wss = require('websocket').server;
 
+var yinsh = require('./web_sockets/games/yinsh');
+
 exports.Server = function (app) {
 
     this.init = function (app) {
@@ -23,12 +25,9 @@ exports.Server = function (app) {
     };
 
     var onConnect = function (connection, msg) {
-//        console.log('[OpenXum] connect ' + msg.user_id);
-
         clients[msg.user_id] = connection;
         sendConnectedClients();
     };
-
 
     var onDisconnect = function (port) {
         var index;
@@ -40,8 +39,6 @@ exports.Server = function (app) {
             }
         }
         if (found) {
-//            console.log('[OpenXum] disconnect ' + index);
-
             clients[index] = undefined;
             currentGames[index] = undefined;
             sendConnectedClients();
@@ -67,9 +64,6 @@ exports.Server = function (app) {
                                         color: game.color,
                                         mode: game.mode
                                     };
-
-//                                    console.log('confirm ' + msg.game_id + ' by ' + user2.username + ' against ' + user.username);
-
                                     c_owner.send(JSON.stringify(response));
                                     if (c_opponent) {
                                         c_opponent.send(JSON.stringify(response));
@@ -130,9 +124,6 @@ exports.Server = function (app) {
                                     opponent_id: msg.opponent_id,
                                     opponent_name: user.username
                                 };
-
-//                                console.log('join ' + msg.game_id + ' by ' + user2.username + ' [owner] against ' + user.username + ' [opponent]');
-
                                 c_opponent.send(JSON.stringify(response));
                                 if (c_owner) {
                                     c_owner.send(JSON.stringify(response));
@@ -163,51 +154,27 @@ exports.Server = function (app) {
     };
 
     var onPlay = function (connection, msg) {
-//        console.log('play: ' + msg.game_id + ' by ' + msg.user_id + ' against ' + msg.opponent_id);
-
         clients[msg.user_id] = connection;
         currentGames[msg.user_id] = {
             game_id: msg.game_id,
+            game_type: msg.game_type,
             opponent_id: msg.opponent_id
         };
     };
 
     var onTurn = function (msg) {
         var c_opponent = clients[currentGames[msg.user_id].opponent_id];
-        var response;
+        var response = {};
+        var game_type = currentGames[msg.user_id].game_type;
 
-        if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
-            msg.move == 'remove_row') {
-
-            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-                + ' by ' + msg.color + ' / ' + msg.user_id);
-
-            response = {
-                type: 'turn',
-                move: msg.move,
-                coordinates: {
-                    letter: msg.coordinates.letter,
-                    number: msg.coordinates.number
-                },
-                color: msg.color
-            };
-        } else if (msg.move == 'move_ring') {
-
-            console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-                + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id);
-
-            response = {
-                type: 'turn',
-                move: msg.move,
-                ring: {
-                    letter: msg.ring.letter,
-                    number: msg.ring.number
-                },
-                coordinates: {
-                    letter: msg.coordinates.letter,
-                    number: msg.coordinates.number
-                }
-            };
+        if (game_type === 'dvonn') {
+        } else if (game_type === 'invers') {
+        } else if (game_type === 'gipf') {
+        } else if (game_type === 'kamisado') {
+        } else if (game_type === 'tzaar') {
+        } else if (game_type === 'yinsh') {
+            response = new yinsh.play(msg);
+        } else if (game_type === 'zertz') {
         }
         if (c_opponent != undefined) {
             c_opponent.send(JSON.stringify(response));

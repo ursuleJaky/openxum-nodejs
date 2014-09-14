@@ -171,7 +171,8 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                     type: 'play',
                     user_id: uid,
                     opponent_id: opponent_id,
-                    game_id: game_id
+                    game_id: game_id,
+                    game_type: 'yinsh'
                 };
 
                 connection.send(JSON.stringify(msg));
