@@ -9,7 +9,8 @@ exports = module.exports = function (app, mongoose) {
         type: { type: String, default: '' },
         status: { type: String, default: '' },
         userCreated: {
-            id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+            id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+            name: { type: String, default: '' }
         },
         opponent: {
             id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', null: true }

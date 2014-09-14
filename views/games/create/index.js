@@ -28,7 +28,10 @@ exports.create = function (req, res) {
                                     mode: req.param('mode'),
                                     type: 'online',
                                     status: 'wait',
-                                    userCreated: { id: req.user._id },
+                                    userCreated: {
+                                        id: req.user._id,
+                                        name: req.user.username
+                                    },
                                     opponent: { id: null }
                                 };
 

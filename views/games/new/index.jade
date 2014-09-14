@@ -67,7 +67,7 @@ block body
                                         td #{game.name}
                                         td #{game.color}
                                         td #{game.mode}
-                                        td
+                                        td #{game.userCreated.name}
                                         td
                                             a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href="javascript:client.join('#{user_id}','#{game._id}');")
                                                 i(class='glyphicon glyphicon-share')
@@ -78,5 +78,5 @@ block body
                                         td #{game.name}
                                         td #{game.color}
                                         td #{game.mode}
-                                        td
+                                        td #{game.userCreated.name}
                                         td
