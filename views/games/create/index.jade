@@ -14,6 +14,9 @@ block body
         - var mode_keys = [ 'regular' ]
         - var modes = [ 'Regular' ]
         - var default_mode = 'regular'
+        - var type_keys = [ 'ai' ]
+        - var types = [ 'AI' ]
+        - var default_type = 'ai'
     if game=="tzaar"
         - var color_keys = ['black','white']
         - var colors = ['Black','White']
@@ -21,6 +24,9 @@ block body
         - var mode_keys = [ 'regular' ]
         - var modes = [ 'Regular' ]
         - var default_mode = 'regular'
+        - var type_keys = [ 'ai' ]
+        - var types = [ 'AI' ]
+        - var default_type = 'ai'
     if game=="gipf"
         - var color_keys = ['black','white']
         - var colors = ['Black','White']
@@ -28,6 +34,9 @@ block body
         - var mode_keys = [ 'basic', 'standard', 'tournament' ]
         - var modes = [ 'Basic', 'Standard', 'Tournament' ]
         - var default_mode = 'basic'
+        - var type_keys = [ 'ai' ]
+        - var types = [ 'AI' ]
+        - var default_type = 'ai'
     if game=="yinsh"
         - var color_keys = ['black','white']
         - var colors = ['Black','White']
@@ -35,6 +44,9 @@ block body
         - var mode_keys = [ 'regular' , 'blitz' ]
         - var modes = [ 'Regular', 'Blitz' ]
         - var default_mode = 'regular'
+        - var type_keys = [ 'online', 'ai' ]
+        - var types = [ 'Online', 'AI' ]
+        - var default_type = 'ai'
     if game=="kamisado"
         - var color_keys = [ 'black', 'white' ]
         - var colors = [ 'Black', 'White' ]
@@ -42,6 +54,9 @@ block body
         - var mode_keys = [ 'simple' , 'standard', 'long', 'marathon' ]
         - var modes = [ 'Simple', 'Standard', 'Long', 'Marathon' ]
         - var default_mode = 'simple'
+        - var type_keys = [ 'online', 'ai', 'remote_ai' ]
+        - var types = [ 'Online', 'AI', 'Remote AI' ]
+        - var default_type = 'ai'
     if game=="invers"
         - var color_keys = [ 'red', 'yellow' ]
         - var colors = [ 'Red', 'Yellow' ]
@@ -49,6 +64,9 @@ block body
         - var mode_keys = [ 'standard' ]
         - var modes = [ 'Standard' ]
         - var default_mode = 'standard'
+        - var type_keys = [ 'ai', 'remote_ai' ]
+        - var types = [ 'AI', 'Remote AI' ]
+        - var default_type = 'ai'
     if game=="zertz"
         - var color_keys = ['one','two']
         - var colors = ['One','Two']
@@ -56,6 +74,10 @@ block body
         - var mode_keys = [ 'regular' , 'blitz' ]
         - var modes = [ 'Regular', 'Blitz' ]
         - var default_mode = 'regular'
+        - var type_keys = [ 'ai' ]
+        - var types = [ 'AI' ]
+        - var default_type = 'ai'
+
 
     br
     div.row.vertical-offset-100
@@ -73,30 +95,23 @@ block body
                         div.form-group
                             fieldset
                                 legend Color
-                                each color in color_keys
+                                each color,index in color_keys
                                     input(type="radio", name="color", value=color, checked=color==default_color)
-                                    label.radio-inline #{color}
+                                    label.radio-inline #{colors[index]}
                                     &nbsp;&nbsp;
                         div.form-group
                             fieldset
                                 legend Mode
-                                each mode in mode_keys
+                                each mode, index in mode_keys
                                     input(type="radio", name="mode", value=mode, checked=mode==default_mode)
-                                    label.radio-inline #{mode}
+                                    label.radio-inline #{modes[index]}
                                     &nbsp;&nbsp;
                         div.form-group
                             fieldset
                                 legend Type
-                                input(type='radio',name='game_type',value='online')
-                                label.radio-inline Online
-                                &nbsp;&nbsp;
-                                input(type='radio',name='game_type',value='offline')
-                                label.radio-inline Offline
-                                &nbsp;&nbsp;
-                                input(type='radio',name='game_type',value='ai',checked="true")
-                                label.radio-inline AI
-                                &nbsp;&nbsp;
-                                input(type='radio',name='game_type',value='remote_ai')
-                                label.radio-inline Remote AI
+                                each type, index in type_keys
+                                    input(type='radio',name='game_type',value=mode, checked=type==default_type)
+                                    label.radio-inline #{types[index]}
+                                    &nbsp;&nbsp;
                         input(type='hidden',name='game',value='#{game}')
                         input(type='submit',value='Create',class='btn btn-lg btn-success btn-block')
