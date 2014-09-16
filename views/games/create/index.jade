@@ -78,7 +78,6 @@ block body
         - var types = [ 'AI' ]
         - var default_type = 'ai'
 
-
     br
     div.row.vertical-offset-100
         div.col-md-8.col-md-offset-2
@@ -98,20 +97,20 @@ block body
                                 each color,index in color_keys
                                     input(type="radio", name="color", value=color, checked=color==default_color)
                                     label.radio-inline #{colors[index]}
-                                    &nbsp;&nbsp;
+                                    | &nbsp;&nbsp;
                         div.form-group
                             fieldset
                                 legend Mode
                                 each mode, index in mode_keys
                                     input(type="radio", name="mode", value=mode, checked=mode==default_mode)
                                     label.radio-inline #{modes[index]}
-                                    &nbsp;&nbsp;
+                                    | &nbsp;&nbsp;
                         div.form-group
                             fieldset
                                 legend Type
                                 each type, index in type_keys
                                     input(type='radio',name='game_type',value=mode, checked=type==default_type)
                                     label.radio-inline #{types[index]}
-                                    &nbsp;&nbsp;
+                                    | &nbsp;&nbsp;
                         input(type='hidden',name='game',value='#{game}')
                         input(type='submit',value='Create',class='btn btn-lg btn-success btn-block')
