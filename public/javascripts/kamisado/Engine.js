@@ -1,7 +1,17 @@
 "use strict";
 
-Kamisado.Turn = function(f, t) {
+Kamisado.Turn = function (f, t) {
 
+// private attributes
+    var _from, _to;
+
+// private methods
+    var init = function (f, t) {
+        _from = f;
+        _to = t;
+    };
+
+// public methods
     this.from = function () {
         return _from;
     };
@@ -11,18 +21,14 @@ Kamisado.Turn = function(f, t) {
             String.fromCharCode('a'.charCodeAt(0) + _to.x) + (_to.y + 1);
     };
 
+    this.parse = function (str) {
+        _from = { x: str.charCodeAt(0) - 'a'.charCodeAt(0), y: str.charCodeAt(1) - '1'.charCodeAt(0) };
+        _to = { x: str.charCodeAt(2) - 'a'.charCodeAt(0), y: str.charCodeAt(3) - '1'.charCodeAt(0) };
+    };
+
     this.to = function () {
         return _to;
     };
-
-// private methods
-    var init = function (f, t) {
-        _from = f;
-        _to = t;
-    };
-
-    var _from;
-    var _to;
 
     init(f, t);
 };
@@ -53,10 +59,6 @@ Kamisado.Engine = function (t, c) {
 
     this.get_black_towers = function () {
         return black_towers;
-    };
-
-    this.get_current_towers = function () {
-        return color === Kamisado.Color.BLACK ? black_towers : white_towers;
     };
 
     this.get_play_color = function () {
@@ -107,6 +109,16 @@ Kamisado.Engine = function (t, c) {
         return phase;
     };
 
+    this.play = function (str) {
+        var index, list = str.split(';');
+        var turn;
+
+        for (index = 0; index < list.length; ++index) {
+            turn = new Kamisado.Turn(list[index]);
+            move_tower(turn.from(), turn.to());
+        }
+    };
+
     this.remove_first_possible_move = function (list) {
         var L = list;
 
@@ -139,14 +151,15 @@ Kamisado.Engine = function (t, c) {
     this.winner_is = function () {
         if (this.is_finished()) {
             return color;
-        } else {
-            return false;
         }
+        return false;
     };
 
 // private methods
     var belong_to = function (element, list) {
-        for (var index in list) {
+        var index;
+
+        for (index = 0; index < list.length; index++) {
             if (list[index].x === element.x && list[index].y === element.y) {
                 return true;
             }
@@ -159,7 +172,7 @@ Kamisado.Engine = function (t, c) {
     };
 
     var find_playable_tower = function (color) {
-        var playable_tower = undefined;
+        var playable_tower;
 
         if (play_color) {
             var list = get_towers(color);
