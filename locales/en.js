@@ -113,4 +113,5 @@
 	"Email": "Email",
 	"Inscription date": "Inscription date",
 	"Stats": "Stats"
+	"My offline games": "My offline games"
 }

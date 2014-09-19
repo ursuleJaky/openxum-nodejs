@@ -61,6 +61,9 @@ block body
                                         td #{game.mode}
                                         td
                                         td
+                                           a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='#')
+                                               i(class='glyphicon glyphicon-pause')
+                                               | &nbsp;waiting...
                             if item == 'Other online games'
                                 each game in other_online_games
                                     tr
@@ -80,3 +83,6 @@ block body
                                         td #{game.mode}
                                         td #{game.userCreated.name}
                                         td
+                                           a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href="javascript:client.join('#{user_id}','#{game._id}');")
+                                               i(class='glyphicon glyphicon-share')
+                                               | &nbsp;join

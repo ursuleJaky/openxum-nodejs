@@ -7,7 +7,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         return mycolor;
     };
 
-    this.finish = function(moves) {
+    this.finish = function (moves) {
         var msg = {
             type: 'finish',
             user_id: uid,
@@ -25,6 +25,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
             engine.move_ring(selected_ring, selected_coordinates);
         } else {
             var msg = {
+                game_id: game_id,
                 type: 'turn',
                 user_id: uid,
                 move: 'move_ring',
@@ -46,6 +47,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
             engine.put_marker(selected_coordinates, mycolor);
         } else {
             var msg = {
+                game_id: game_id,
                 type: 'turn',
                 user_id: uid,
                 move: 'put_marker',
@@ -64,6 +66,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
             engine.put_ring(selected_coordinates, mycolor);
         } else {
             var msg = {
+                game_id: game_id,
                 type: 'turn',
                 user_id: uid,
                 move: 'put_ring',
@@ -82,6 +85,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
             engine.remove_ring(selected_coordinates, mycolor);
         } else {
             var msg = {
+                game_id: game_id,
                 type: 'turn',
                 user_id: uid,
                 move: 'remove_ring',
@@ -106,6 +110,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                 r.push({ letter: row[index].letter(), number: row[index].number() });
             }
             msg = {
+                game_id: game_id,
                 type: 'turn',
                 user_id: uid,
                 move: 'remove_row',

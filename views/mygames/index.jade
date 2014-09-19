@@ -1,0 +1,36 @@
+extends ../../layouts/default
+
+block head
+  title My offline games
+
+block neck
+  link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+
+block body
+  div.row
+    div.col-sm-12
+      div.page-header
+        h1 My Offline games
+        table.table
+           tr
+               th
+                 | Name
+               th
+                 | Color
+               th
+                 | Mode
+               th
+                 | Opponent
+               th
+                 | Actions
+        
+           each game in my_offline_games
+               tr
+                   td #{game.name}
+                   td #{game.color}
+                   td #{game.mode}
+                   td
+                   td
+                      a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='#')
+                          i(class='glyphicon glyphicon-pause')
+                          | &nbsp;waiting...

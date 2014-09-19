@@ -175,6 +175,8 @@ exports.Server = function (app) {
             onFinish(msg);
         } else if (msg.type === 'info') {
             onConnect(connection, msg);
+        } else if (msg.type === 'replay') {
+            onReplay(connection, msg);
         }
     };
 
@@ -213,6 +215,15 @@ exports.Server = function (app) {
         if (c_opponent) {
             c_opponent.send(JSON.stringify(response));
         }
+        app.db.models.TurnHisto.update({ gameId: msg.game_id }, { $push: { gameDetail: response  } }, function (err, numAffected) {
+        });
+    };
+
+    var onReplay = function (connection, msg) {
+        app.db.models.TurnHisto.find({ gameId: msg.game_id }, null, function (err, turns) {
+            console.log(turns);
+
+        });
     };
 
     var sendConnectedClients = function () {
