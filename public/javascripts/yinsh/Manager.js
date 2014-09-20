@@ -52,8 +52,9 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
             if (other.is_remote()) {
                 other.remove_row(gui.get_selected_coordinates(), engine.current_color());
             }
-            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, engine.select_row(gui.get_selected_coordinates(),
-                engine.current_color()));
+/*            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, engine.select_row(gui.get_selected_coordinates(),
+ engine.current_color())); */
+            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, gui.get_selected_row());
             engine.move(move);
             moves += move.get() + ';';
             gui.clear_selected_row();
@@ -131,6 +132,10 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
         gui.draw();
         update_status();
         finish();
+    };
+
+    this.redraw = function () {
+        gui.draw();
     };
 
 // private methods

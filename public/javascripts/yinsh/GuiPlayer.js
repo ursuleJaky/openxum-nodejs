@@ -9,6 +9,7 @@ Yinsh.GuiPlayer = function (color, e) {
 
     this.clear_selected_row = function () {
         selected_row = [];
+        row_index = -1;
     };
 
     this.color = function () {
@@ -30,7 +31,12 @@ Yinsh.GuiPlayer = function (color, e) {
 
         if (engine.phase() === Yinsh.Phase.MOVE_RING && selected_ring.is_valid()) {
             draw_possible_moving();
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER || engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+            draw_remove_markers();
         }
+
+        //intersection
+        show_intersection();
     };
 
     this.engine = function () {
@@ -55,6 +61,7 @@ Yinsh.GuiPlayer = function (color, e) {
         scaleY = width / canvas.offsetWidth;
 
         canvas.addEventListener("click", onClick, true);
+        canvas.addEventListener('mousemove', onMove, false);
         this.draw();
     };
 
@@ -63,6 +70,15 @@ Yinsh.GuiPlayer = function (color, e) {
     };
 
 // private methods
+    var compute_coordinates = function (letter, number) {
+        var index_x = letter - 'A'.charCodeAt(0);
+        var x = offset + delta_x * index_x;
+        var y = offset + 7 * delta_y + delta_xy * index_x -
+            (number - 1) * delta_y;
+
+        return [x, y];
+    };
+
     var compute_deltas = function () {
         offset = 30;
         delta_x = (width - 2 * offset) / 10.0;
@@ -115,13 +131,37 @@ Yinsh.GuiPlayer = function (color, e) {
         return _number;
     };
 
-    var compute_coordinates = function (letter, number) {
-        var index_x = letter - 'A'.charCodeAt(0);
-        var x = offset + delta_x * index_x;
-        var y = offset + 7 * delta_y + delta_xy * index_x -
-            (number - 1) * delta_y;
+    var compute_pointer = function (x, y) {
+        var change = false;
+        var letter = compute_letter(x, y);
 
-        return [x, y];
+        if (letter != 'X') {
+            var number = compute_number(x, y);
+
+            if (number != -1) {
+                if (engine.exist_intersection(letter, number)) {
+                    var pt = compute_coordinates(letter.charCodeAt(0), number);
+
+                    pointerX = pt[0];
+                    pointerY = pt[1];
+                    change = true;
+                } else {
+                    pointerX = pointerY = -1;
+                    change = true;
+                }
+            } else {
+                if (pointerX != -1) {
+                    pointerX = pointerY = -1;
+                    change = true;
+                }
+            }
+        } else {
+            if (pointerX != -1) {
+                pointerX = pointerY = -1;
+                change = true;
+            }
+        }
+        return change;
     };
 
     var draw_coordinates = function () {
@@ -190,6 +230,8 @@ Yinsh.GuiPlayer = function (color, e) {
             context.fillStyle = "#000000";
         } else if (color === Yinsh.Color.WHITE) {
             context.fillStyle = "rgb(192, 192, 192)";
+        } else {
+            context.fillStyle = "#ff0000";
         }
         context.arc(x, y, delta_x * (1.0 / 3 - 1.0 / 10) - 1, 0.0, 2 * Math.PI, false);
         context.fill();
@@ -201,19 +243,29 @@ Yinsh.GuiPlayer = function (color, e) {
         var list = engine.get_possible_moving_list(selected_ring, engine.current_color(), true);
 
         context.strokeStyle = "#FFFFFF";
-        context.fillStyle = "#0000FF";
+        context.fillStyle = "#FF0000";
         context.lineWidth = 1;
         for (var i = 0; i < list.length; ++i) {
             var pt;
 
             pt = compute_coordinates(list[i].letter().charCodeAt(0), list[i].number());
             context.beginPath();
-            context.arc(pt[0], pt[1], 5, 0.0, 2 * Math.PI, false);
+            context.arc(pt[0], pt[1], 10, 0.0, 2 * Math.PI, false);
             context.fill();
             context.stroke();
             context.closePath();
         }
 
+    };
+
+    var draw_remove_markers = function () {
+        if (selected_row.length > 0) {
+            for (var index = 0; index < selected_row.length; ++index) {
+                var pt = compute_coordinates(selected_row[index].letter().charCodeAt(0), selected_row[index].number());
+
+                draw_marker(pt[0], pt[1]);
+            }
+        }
     };
 
     var draw_ring = function (x, y, color) {
@@ -300,10 +352,10 @@ Yinsh.GuiPlayer = function (color, e) {
                     context.lineWidth = 4;
                     context.arc(pt1[0], pt1[1], delta_x / 3 + 5, alpha_1, beta_1, false);
                     context.lineTo(pt2[0] + (delta_x / 3 + 5) * Math.cos(alpha_2),
-                        pt2[1] + (delta_x / 3 + 5) * Math.sin(alpha_2));
+                            pt2[1] + (delta_x / 3 + 5) * Math.sin(alpha_2));
                     context.arc(pt2[0], pt2[1], delta_x / 3 + 5, alpha_2, beta_2, false);
                     context.lineTo(pt1[0] + (delta_x / 3 + 5) * Math.cos(alpha_1),
-                        pt1[1] + (delta_x / 3 + 5) * Math.sin(alpha_1));
+                            pt1[1] + (delta_x / 3 + 5) * Math.sin(alpha_1));
                     context.stroke();
                     context.closePath();
                 }
@@ -368,6 +420,10 @@ Yinsh.GuiPlayer = function (color, e) {
         return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
     };
 
+    this.get_selected_row = function () {
+        return selected_row;
+    };
+
     var onClick = function (event) {
         if (engine.current_color() === mycolor) {
             var pos = getClickPosition(event);
@@ -399,9 +455,9 @@ Yinsh.GuiPlayer = function (color, e) {
                     }
                 } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
                     engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-                    selected_coordinates = new Yinsh.Coordinates(letter, number);
-                    ok = true;
-                } else if ((engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+/*                 selected_coordinates = new Yinsh.Coordinates(letter, number);
+                 ok = true; */
+                    } else if ((engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
                     engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) &&
                     ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
                         engine.current_color() === Yinsh.Color.BLACK) ||
@@ -413,6 +469,82 @@ Yinsh.GuiPlayer = function (color, e) {
             }
             if (ok) {
                 manager.play();
+            }
+        }
+    };
+
+    var onMove = function (event) {
+        var pos = getClickPosition(event);
+        var letter = compute_letter(pos.x, pos.y);
+
+        if (letter !== 'X') {
+            var number = compute_number(pos.x, pos.y);
+
+            if (number !== -1) {
+                if (compute_pointer(pos.x, pos.y)) {
+                    if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+                        engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                        if ((engine.current_color() === Yinsh.Color.BLACK && engine.intersection_state(letter, number) === Yinsh.State.BLACK_MARKER) ||
+                            (engine.current_color() === Yinsh.Color.WHITE && engine.intersection_state(letter, number) === Yinsh.State.WITHE_MARKER)) {
+                            var coordinates = new Yinsh.Coordinates(letter, number);
+                            var found = false;
+                            var index, index2, index3;
+
+                            for (index = 0; index < selected_row.length && !found; ++index) {
+                                found = selected_row[index].letter() === letter && selected_row[index].number() === number;
+                            }
+                            if (!found) {
+                                var rows = engine.get_rows(engine.current_color());
+                                var ok = false;
+
+                                if (row_index === -1) {
+                                    found = false;
+                                    for (index = 0; index < rows.length && !found; ++index) {
+                                        var row = rows[index];
+
+                                        for (index2 = 0; index2 < row.length && !found; ++index2) {
+                                            found = row[index2].letter() === coordinates.letter() &&
+                                                row[index2].number() === coordinates.number();
+                                            if (found) {
+                                                row_index = index;
+                                                ok = true;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    var row = rows[row_index];
+
+                                    found = false;
+                                    for (index2 = 0; index2 < row.length && !found; ++index2) {
+                                        found = row[index2].letter() === coordinates.letter() &&
+                                            row[index2].number() === coordinates.number();
+                                        if (found) {
+                                            ok = true;
+                                        }
+                                    }
+                                }
+                                if (ok) {
+                                    selected_row.push(coordinates);
+                                    if (selected_row.length === 5) {
+                                        manager.play();
+                                    }
+                                } else {
+                                    selected_row = [];
+                                    row_index = -1;
+                                    manager.redraw();
+                                }
+                            } else {
+                                manager.redraw();
+                            }
+                        } else {
+                            selected_row = [];
+                            row_index = -1;
+                            manager.redraw();
+                        }
+                    } else {
+                        manager.redraw();
+                    }
+                }
             }
         }
     };
@@ -443,6 +575,19 @@ Yinsh.GuiPlayer = function (color, e) {
         }
     };
 
+    var show_intersection = function () {
+        if (pointerX != -1 && pointerY != -1) {
+            context.fillStyle = "#0000ff";
+            context.strokeStyle = "#0000ff";
+            context.lineWidth = 1;
+            context.beginPath();
+            context.arc(pointerX, pointerY, 5, 0.0, 2 * Math.PI);
+            context.closePath();
+            context.fill();
+            context.stroke();
+        }
+    };
+
 // private attributes
     var engine = e;
     var mycolor = color;
@@ -462,7 +607,11 @@ Yinsh.GuiPlayer = function (color, e) {
     var scaleX;
     var scaleY;
 
+    var pointerX = -1;
+    var pointerY = -1;
+
     var selected_coordinates = new Yinsh.Coordinates('X', -1);
     var selected_ring = new Yinsh.Coordinates('X', -1);
     var selected_row = [];
+    var row_index = -1;
 };
