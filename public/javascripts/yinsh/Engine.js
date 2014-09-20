@@ -1,5 +1,99 @@
 "use strict";
 
+Yinsh.MoveType = { PUT_RING: 0, PUT_MARKER: 1, MOVE_RING: 2, REMOVE_ROW: 3, REMOVE_RING: 4 };
+
+Yinsh.Move = function (t, c1, c2) {
+
+// private attributes
+    var _type;
+    var _coordinates;
+    var _from;
+    var _to;
+    var _row;
+
+// private methods
+    var init = function (t, c1, c2) {
+        _type = t;
+        if (_type === Yinsh.MoveType.PUT_RING || _type === Yinsh.MoveType.PUT_MARKER || _type === Yinsh.MoveType.REMOVE_RING) {
+            _coordinates = c1;
+        } else if (_type === Yinsh.MoveType.MOVE_RING) {
+            _from = c1;
+            _to = c2;
+        } else {
+            _row = c1;
+        }
+    };
+
+// public methods
+    this.get = function () {
+        if (t === Yinsh.MoveType.PUT_RING) {
+            return 'Pr' + _coordinates.to_string();
+        } else if (t === Yinsh.MoveType.PUT_MARKER) {
+            return 'Pm' + _coordinates.to_string();
+        } else if (t === Yinsh.MoveType.REMOVE_RING) {
+            return 'Rr' + _coordinates.to_string();
+        } else if (t === Yinsh.MoveType.MOVE_RING) {
+            return 'Mr' + _from.to_string() + _to.to_string();
+        } else {
+            var str = 'RR';
+            for (var index = 0; index < _row.length; ++index) {
+                str += _row[index].to_string();
+            }
+            return str;
+        }
+    };
+
+    this.coordinates = function () {
+        return _coordinates;
+    };
+
+    this.from = function () {
+        return _from;
+    };
+
+    this.row = function () {
+        return _row;
+    };
+
+    this.to = function () {
+        return _to;
+    };
+
+    this.type = function () {
+        return _type;
+    };
+
+    this.parse = function (str) {
+        var type = str.substring(0, 2);
+
+        if (type === 'Pr') {
+            _type = Yinsh.MoveType.PUT_RING;
+        } else if (type === 'Pm') {
+            _type = Yinsh.MoveType.PUT_MARKER;
+        } else if (type === 'Rr') {
+            _type = Yinsh.MoveType.REMOVE_RING;
+        } else if (type === 'Mr') {
+            _type = Yinsh.MoveType.MOVE_RING;
+        } else if (type === 'RR') {
+            _type = Yinsh.MoveType.REMOVE_ROW;
+        }
+        if (_type === Yinsh.MoveType.PUT_RING || t === Yinsh.MoveType.PUT_MARKER || t === Yinsh.MoveType.REMOVE_RING) {
+            _coordinates = new Yinsh.Coordinates(str.charCodeAt(2), parseInt(str.charCodeAt(3)));
+        } else if (_type === Yinsh.MoveType.MOVE_RING) {
+            _from = new Yinsh.Coordinates(str.charCodeAt(2), parseInt(str.charCodeAt(3)));
+            _to = new Yinsh.Coordinates(str.charCodeAt(4), parseInt(str.charCodeAt(5)));
+        } else {
+            _row = [];
+            for (var index = 0; index < 5; ++index) {
+                _row.push(new Yinsh.Coordinates(str.charCodeAt(2 + 2 * index),
+                    parseInt(str.charCodeAt(3 + 2 * index))));
+            }
+        }
+    };
+
+    init(t, c1, c2);
+};
+
 Yinsh.Engine = function (type, color) {
 
 // public methods
@@ -266,6 +360,20 @@ Yinsh.Engine = function (type, color) {
 
     this.is_regular = function () {
         return this.type === Yinsh.Engine.GameType.REGULAR;
+    };
+
+    this.move = function (move) {
+        if (move.type() === Yinsh.MoveType.PUT_RING) {
+            this.put_ring(move.coordinates(), current_color);
+        } else if (move.type() === Yinsh.MoveType.PUT_MARKER) {
+            this.put_marker(move.coordinates(), current_color);
+        } else if (move.type() === Yinsh.MoveType.REMOVE_RING) {
+            this.remove_ring(move.coordinates(), current_color);
+        } else if (move.type() === Yinsh.MoveType.MOVE_RING) {
+            this.move_ring(move.from(), move.to());
+        } else if (move.type() === Yinsh.MoveType.REMOVE_ROW) {
+            this.remove_row(move.row(), current_color)
+        }
     };
 
     this.move_ring = function (origin, destination) {

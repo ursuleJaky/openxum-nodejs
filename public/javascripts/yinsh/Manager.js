@@ -8,22 +8,38 @@ Yinsh.Status = function (markerNumber, turnList) {
 Yinsh.Manager = function (e, gui_player, other_player, s) {
 
 // public methods
+    this.load_level = function() {
+        var key = 'openxum:yinsh:level';
+
+        level = 10;
+        if (localStorage[key]) {
+            level = JSON.parse(localStorage[key]);
+        }
+        return level;
+    };
+
     this.play = function () {
         if (engine.phase() === Yinsh.Phase.PUT_RING) {
             if (other.is_remote()) {
                 other.put_ring(gui.get_selected_coordinates(), engine.current_color());
             }
-            engine.put_ring(gui.get_selected_coordinates(), engine.current_color());
+            move = new Yinsh.Move(Yinsh.MoveType.PUT_RING, gui.get_selected_coordinates());
+            engine.move(move);
+            moves += move.get() + ';';
         } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
             if (other.is_remote()) {
                 other.put_marker(gui.get_selected_coordinates(), engine.current_color());
             }
-            engine.put_marker(gui.get_selected_coordinates(), engine.current_color());
+            move = new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, gui.get_selected_coordinates());
+            engine.move(move);
+            moves += move.get() + ';';
         } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
             if (other.is_remote()) {
                 other.move_ring(gui.get_selected_ring(), gui.get_selected_coordinates());
             }
-            engine.move_ring(gui.get_selected_ring(), gui.get_selected_coordinates());
+            move = new Yinsh.Move(Yinsh.MoveType.MOVE_RING, gui.get_selected_ring(), gui.get_selected_coordinates());
+            engine.move(move);
+            moves += move.get() + ';';
             gui.clear_selected_ring();
             if (engine.get_rows(engine.current_color()).length === 0) {
                 engine.remove_no_row();
@@ -36,15 +52,19 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
             if (other.is_remote()) {
                 other.remove_row(gui.get_selected_coordinates(), engine.current_color());
             }
-            engine.remove_row(engine.select_row(gui.get_selected_coordinates(),
-                engine.current_color()), engine.current_color());
+            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, engine.select_row(gui.get_selected_coordinates(),
+                engine.current_color()));
+            engine.move(move);
+            moves += move.get() + ';';
             gui.clear_selected_row();
         } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
             engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
             if (other.is_remote()) {
                 other.remove_ring(gui.get_selected_coordinates(), engine.current_color());
             }
-            engine.remove_ring(gui.get_selected_coordinates(), engine.current_color());
+            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, gui.get_selected_coordinates());
+            engine.move(move);
+            moves += move.get() + ';';
             if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
                 if (engine.get_rows(engine.current_color()).length === 0) {
                     engine.remove_no_row();
@@ -125,7 +145,27 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
             popup.innerHTML = "<h4>The winner is " +
                 (engine.winner_is() === Yinsh.Color.BLACK ? "black" : "white") + "!</h4>";
             $("#winnerModal").modal("show");
+
+            if (engine.winner_is() === gui.color()) {
+                var win = load_win() + 1;
+
+                localStorage['openxum:yinsh:win'] = JSON.stringify(win);
+                if (win > 5) {
+                    localStorage['openxum:yinsh:level'] = JSON.stringify(level + 10);
+                    localStorage['openxum:yinsh:win'] = JSON.stringify(0);
+                }
+            }
         }
+    };
+
+    var load_win = function() {
+        var key = 'openxum:yinsh:win';
+        var win = 0;
+
+        if (localStorage[key]) {
+            win = JSON.parse(localStorage[key]);
+        }
+        return win;
     };
 
     var update_status = function () {
@@ -143,6 +183,11 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
     var gui = gui_player;
     var other = other_player;
     var status = s;
+
+    var level;
+
+    var move;
+    var moves;
 
     status.markerNumber.innerHTML = engine.available_marker_number();
 };

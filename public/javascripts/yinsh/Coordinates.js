@@ -27,8 +27,7 @@ Yinsh.Coordinates = function (l, n) {
         return number;
     };
 
-    this.to_string = function()
-    {
+    this.to_string = function () {
         return letter + number;
     };
 

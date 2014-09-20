@@ -62,9 +62,15 @@ Yinsh.RandomPlayer = function (color, e) {
         engine.remove_no_row();
     };
 
+    this.set_level = function (l) {
+        level = l;
+    };
+
 // private methods
 
 // private attributes
     var mycolor = color;
     var engine = e;
+
+    var level;
 };

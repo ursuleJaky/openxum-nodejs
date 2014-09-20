@@ -109,7 +109,7 @@ block body
                             fieldset
                                 legend Type
                                 each type, index in type_keys
-                                    input(type='radio',name='game_type',value=mode, checked=type==default_type)
+                                    input(type='radio',name='game_type',value=type, checked=type==default_type)
                                     label.radio-inline #{types[index]}
                                     | &nbsp;&nbsp;
                         input(type='hidden',name='game',value='#{game}')
