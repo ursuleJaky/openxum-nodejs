@@ -58,6 +58,24 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         }
     };
 
+    this.put_ring = function (coordinates, color) {
+        if (coordinates === undefined) {
+            engine.put_ring(selected_coordinates, mycolor);
+        } else {
+            var msg = {
+                type: 'turn',
+                user_id: uid,
+                move: 'put_ring',
+                coordinates: {
+                    letter: coordinates.letter(),
+                    number: coordinates.number()
+                },
+                color: color
+            };
+            connection.send(JSON.stringify(msg));
+        }
+    };
+
     this.remove_ring = function (coordinates, color) {
         if (coordinates === undefined) {
             engine.remove_ring(selected_coordinates, mycolor);
@@ -76,40 +94,21 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         }
     };
 
-    this.remove_row = function (coordinates, color) {
-        if (coordinates === undefined) {
+    this.remove_row = function (row, color) {
+        if (row === undefined) {
             engine.remove_row(engine.select_row(selected_coordinates, mycolor), mycolor);
         } else {
-            var msg = {
+            var r = [];
+            var msg;
+
+            for (var index = 0; index < row.length; ++index) {
+                r.push({ letter: row[index].letter(), number: row[index].number() });
+            }
+            msg = {
                 type: 'turn',
                 user_id: uid,
                 move: 'remove_row',
-                coordinates: {
-                    letter: coordinates.letter(),
-                    number: coordinates.number()
-                },
-                color: color
-            };
-            connection.send(JSON.stringify(msg));
-        }
-    };
-
-    this.remove_no_row = function () {
-        engine.remove_no_row();
-    };
-
-    this.put_ring = function (coordinates, color) {
-        if (coordinates === undefined) {
-            engine.put_ring(selected_coordinates, mycolor);
-        } else {
-            var msg = {
-                type: 'turn',
-                user_id: uid,
-                move: 'put_ring',
-                coordinates: {
-                    letter: coordinates.letter(),
-                    number: coordinates.number()
-                },
+                row: r,
                 color: color
             };
             connection.send(JSON.stringify(msg));
@@ -135,28 +134,38 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
 
             if (msg.type === 'turn') {
                 var ok = false;
+                var move;
 
                 if (msg.move === 'put_ring' && engine.phase() === Yinsh.Phase.PUT_RING) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
+                    move = new Yinsh.Move(Yinsh.MoveType.PUT_RING, selected_coordinates);
                     ok = true;
                 } else if (msg.move === 'put_marker' && engine.phase() === Yinsh.Phase.PUT_MARKER) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
+                    move = new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, selected_coordinates);
                     selected_ring = selected_coordinates;
                     ok = true;
                 } else if (msg.move === 'move_ring' && engine.phase() === Yinsh.Phase.MOVE_RING) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
+                    move = new Yinsh.Move(Yinsh.MoveType.MOVE_RING, selected_ring, selected_coordinates);
                     ok = true;
                 } else if (msg.move === 'remove_row' && (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
                     engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE)) {
-                    selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
+                    var r = [];
+
+                    for (var index = 0; index < msg.row.length; ++index) {
+                        r.push(new Yinsh.Coordinates(msg.row[index].letter, msg.row[index].number));
+                    }
+                    move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, r);
                     ok = true;
                 } else if (msg.move === 'remove_ring' && (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
                     engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE)) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
+                    move = new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, selected_coordinates);
                     ok = true;
                 }
                 if (ok) {
-                    manager.play_other();
+                    manager.play_remote(move);
                 }
             }
         };

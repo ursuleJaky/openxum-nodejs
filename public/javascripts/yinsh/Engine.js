@@ -292,44 +292,6 @@ Yinsh.Engine = function (type, color) {
                 result.rows.push(result.row);
             }
         }
-
-        /*            var srows = [];
-
-         if (!result.rows.empty()) {
-         var list = [];
-
-         list.push(result.rows.back());
-         srows.push(list);
-         result.rows.pop();
-         while (!rows.empty()) {
-         var row = rows.back();
-         var found = false;
-         SeparatedRows::iterator it = srows.begin();
-
-         while (it !== srows.end() and not found) {
-         Rows::const_iterator itr = it->begin();
-
-         while (itr !== it->end() and not found) {
-         if (not row.is_separated(*itr)) {
-         it->push_back(row);
-         found = true;
-         } else {
-         ++itr;
-         }
-         }
-         ++it;
-         }
-         if (not found) {
-         Rows list;
-
-         list.push_back(row);
-         srows.push_back(list);
-         }
-         rows.pop_back();
-         }
-         }
-         return srows; */
-
         return result.rows;
     };
 
@@ -405,7 +367,16 @@ Yinsh.Engine = function (type, color) {
             remove_white_ring(origin);
             placed_white_ring_coordinates.push(destination);
         }
-        phase = Yinsh.Phase.REMOVE_ROWS_AFTER;
+        if (this.get_rows(current_color).length > 0) {
+            phase = Yinsh.Phase.REMOVE_ROWS_AFTER;
+        } else {
+            change_color();
+            if (this.get_rows(current_color).length === 0) {
+                phase = Yinsh.Phase.PUT_MARKER;
+            } else {
+                phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
+            }
+        }
         turn_list.push("move " + (color === Yinsh.Color.BLACK ? "black" : "white") + " ring from " +
             origin.to_string() + " to " + destination.to_string());
         return true;
@@ -459,17 +430,7 @@ Yinsh.Engine = function (type, color) {
         return true;
     };
 
-    this.remove_no_row = function () {
-        if (phase === Yinsh.Phase.REMOVE_ROWS_AFTER) {
-            change_color();
-            phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
-        } else {
-            phase = Yinsh.Phase.PUT_MARKER;
-        }
-    };
-
     this.remove_row = function (row, color) {
-        //TODO: multiple rows !
         if (row.length !== 5) {
             return false;
         }
@@ -511,10 +472,22 @@ Yinsh.Engine = function (type, color) {
             phase = Yinsh.Phase.FINISH;
         } else {
             if (phase === Yinsh.Phase.REMOVE_RING_AFTER) {
-                phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
-                change_color();
+                if (this.get_rows(current_color).length === 0) {
+                    change_color();
+                    if (this.get_rows(current_color).length === 0) {
+                        phase = Yinsh.Phase.PUT_MARKER;
+                    } else {
+                        phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
+                    }
+                } else {
+                    phase = Yinsh.Phase.REMOVE_ROWS_AFTER;
+                }
             } else { // phase === Yinsh.Phase.REMOVE_RING_BEFORE
-                phase = Yinsh.Phase.PUT_MARKER;
+                if (this.get_rows(current_color).length === 0) {
+                    phase = Yinsh.Phase.PUT_MARKER;
+                } else {
+                    phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
+                }
             }
         }
         turn_list.push("remove " + (color === Yinsh.Color.BLACK ? "black" : "white") +

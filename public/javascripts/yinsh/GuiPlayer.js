@@ -485,7 +485,7 @@ Yinsh.GuiPlayer = function (color, e) {
                     if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
                         engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
                         if ((engine.current_color() === Yinsh.Color.BLACK && engine.intersection_state(letter, number) === Yinsh.State.BLACK_MARKER) ||
-                            (engine.current_color() === Yinsh.Color.WHITE && engine.intersection_state(letter, number) === Yinsh.State.WITHE_MARKER)) {
+                            (engine.current_color() === Yinsh.Color.WHITE && engine.intersection_state(letter, number) === Yinsh.State.WHITE_MARKER)) {
                             var coordinates = new Yinsh.Coordinates(letter, number);
                             var found = false;
                             var index, index2, index3;

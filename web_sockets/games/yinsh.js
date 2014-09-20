@@ -6,11 +6,10 @@ var yinsh = module.exports = function () {
 yinsh.play = function (msg) {
     var response;
 
-    if (msg.move == 'put_ring' || msg.move == 'put_marker' || msg.move == 'remove_ring' ||
-        msg.move == 'remove_row') {
+    if (msg.move === 'put_ring' || msg.move === 'put_marker' || msg.move === 'remove_ring') {
 
-        console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-            + ' by ' + msg.color + ' / ' + msg.user_id);
+/*        console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
+            + ' by ' + msg.color + ' / ' + msg.user_id); */
 
         response = {
             type: 'turn',
@@ -21,10 +20,10 @@ yinsh.play = function (msg) {
             },
             color: msg.color
         };
-    } else if (msg.move == 'move_ring') {
+    } else if (msg.move === 'move_ring') {
 
-        console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
-            + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id);
+/*        console.log('turn: ' + msg.move + ' ' + msg.coordinates.letter + msg.coordinates.number
+            + ' to ' + msg.ring.letter + msg.ring.number + ' / ' + msg.user_id); */
 
         response = {
             type: 'turn',
@@ -37,6 +36,16 @@ yinsh.play = function (msg) {
                 letter: msg.coordinates.letter,
                 number: msg.coordinates.number
             }
+        };
+    } else if (msg.move === 'remove_row') {
+
+//        console.log('turn: ' + msg.move + ' ' + JSON.stringify(msg.row) + ' / ' + msg.user_id);
+
+        response = {
+            type: 'turn',
+            move: msg.move,
+            row: msg.row,
+            color: msg.color
         };
     }
     return response;
