@@ -7,10 +7,11 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         return mycolor;
     };
 
-    this.finish = function() {
+    this.finish = function(moves) {
         var msg = {
             type: 'finish',
-            user_id: uid
+            user_id: uid,
+            moves: moves
         };
         connection.send(JSON.stringify(msg));
     };

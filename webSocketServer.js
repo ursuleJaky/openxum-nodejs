@@ -76,34 +76,35 @@ exports.Server = function (app) {
     };
 
     var onFinish = function (msg) {
-        var game_id = currentGames[msg.user_id].game_id;
+        if (msg.user_id in currentGames) {
+            var game_id = currentGames[msg.user_id].game_id;
 
-        app.db.models.Game.findOne({ _id: game_id }, null,
-            { safe: true }, function (err, game) {
-                delete clients[msg.user_id];
-                delete currentGames[msg.user_id];
-                if (game) {
-                    console.log(game);
-                    // on ajoute le jeu à la collection GameHisto - attention le nom n'est pas unique
-                    app.db.models.User.findOne({ username: msg.user_id }, null,
-                        { safe: true }, function (err, userinfo) {
-                            console.log(userinfo);
-                            var fieldsToSet = {
-                                name: game.name,
-                                game: game.game,
-                                userCreated: { id: game.userCreated.id },
-                                opponent: { id: game.opponent.id },
-                                winner: { id: userinfo._id }
-                            };
-                            console.log(fieldsToSet);
-                            app.db.models.GameHisto.create(fieldsToSet, function (err, user) {
+            app.db.models.Game.findOne({ _id: game_id }, null,
+                { safe: true }, function (err, game) {
+                    delete clients[msg.user_id];
+                    delete currentGames[msg.user_id];
+                    if (game) {
+
+                        console.log(msg.moves);
+                        
+                        // on ajoute le jeu à la collection GameHisto - attention le nom n'est pas unique
+                        app.db.models.User.findOne({ username: msg.user_id }, null,
+                            { safe: true }, function (err, userinfo) {
+                                var fieldsToSet = {
+                                    name: game.name,
+                                    game: game.game,
+                                    userCreated: { id: game.userCreated.id },
+                                    opponent: { id: game.opponent.id },
+                                    winner: { id: userinfo._id }
+                                };
+                                app.db.models.GameHisto.create(fieldsToSet, function (err, user) {
+                                });
                             });
+                        game.remove(function (err) {
                         });
-
-                    game.remove(function (err) {
-                    });
-                }
-            });
+                    }
+                });
+        }
     };
 
     var onJoin = function (msg) {

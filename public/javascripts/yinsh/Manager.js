@@ -106,7 +106,7 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
     var finish = function () {
         if (engine.is_finished()) {
             if (other.is_remote()) {
-                other.finish();
+                other.finish(moves);
             }
 
             var popup = document.getElementById("winnerModalText");
@@ -155,7 +155,7 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
 
     var level;
 
-    var moves;
+    var moves = '';
 
     status.markerNumber.innerHTML = engine.available_marker_number();
 };
