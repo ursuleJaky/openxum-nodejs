@@ -360,22 +360,6 @@ Yinsh.GuiPlayer = function (color, e) {
                     context.closePath();
                 }
             }
-
-            //TODO
-            /*                yinsh::Row::const_iterator it = mSelectedRow.begin();
-
-             while (it != mSelectedRow.end()) {
-             int x,y;
-
-             computeCoordinates(it->letter(), it->number(), x, y);
-             mContext->set_source_rgb(0, 0, 255);
-             mContext->set_line_width(1.);
-             mContext->arc(x, y, mDelta_x * (1. / 3 - 1. / 10) - 1,
-             0.0, 2 * M_PI);
-             mContext->fill();
-             mContext->stroke();
-             ++it;
-             } */
         }
     };
 
