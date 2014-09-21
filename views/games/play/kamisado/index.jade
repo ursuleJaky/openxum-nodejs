@@ -20,7 +20,7 @@ block body
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Kamisado.Engine(0, 0);
-                var gui = new Kamisado.GuiPlayer(#{color}, engine);
+                var gui = new Kamisado.GuiPlayer(#{color}, engine, '#{game_id}' === '-1');
                 var other;
 
                 if ('#{game_type}' === 'remote_ai') {
@@ -44,6 +44,7 @@ block body
                 gui.set_manager(manager);
                 if ('#{game_id}' !== -1) {
                     other.set_manager(manager);
+                    other.set_gui(gui);
                 } else {
                     other.set_level(manager.load_level());
                     if (other.is_remote()) {

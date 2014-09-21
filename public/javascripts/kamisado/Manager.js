@@ -76,6 +76,10 @@ Kamisado.Manager = function (e, gui_player, other_player) {
         }
     };
 
+    this.redraw = function () {
+        gui.draw();
+    };
+
 // private methods
     var finish = function() {
         if (engine.is_finished()) {

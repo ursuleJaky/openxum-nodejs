@@ -1,6 +1,6 @@
 "use strict";
 
-Kamisado.GuiPlayer = function (color, engine) {
+Kamisado.GuiPlayer = function (color, engine, local) {
 
 // public methods
     this.color = function() {
@@ -27,6 +27,11 @@ Kamisado.GuiPlayer = function (color, engine) {
         selected_tower = from;
         selected_cell = to;
         move_tower2();
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        manager.redraw();
     };
 
     this.set_canvas = function (c) {
@@ -75,6 +80,9 @@ Kamisado.GuiPlayer = function (color, engine) {
         if (possible_move_list) {
             draw_possible_move();
         }
+
+        // opponent status
+        show_opponent_status(0, 0);
     };
 
     var draw_grid = function () {
@@ -281,6 +289,48 @@ Kamisado.GuiPlayer = function (color, engine) {
         }
     };
 
+    var show_opponent_status = function (x, y)
+    {
+        var text;
+        var _height = 20;
+        var _width = 100;
+
+        context.lineWidth = 1;
+        if (opponentPresent) {
+            if (engine.current_color() === mycolor) {
+                context.strokeStyle = "#00ff00";
+                context.fillStyle = "#00ff00";
+                text = 'ready';
+            } else {
+                context.strokeStyle = "#ffa500";
+                context.fillStyle = "#ffa500";
+                text = 'wait';
+            }
+        } else {
+            context.strokeStyle = "#ff0000";
+            context.fillStyle = "#ff0000";
+            text = 'disconnect';
+        }
+        context.beginPath();
+        context.fillRect(x, y, _width, _height);
+        context.strokeRect(x, y, _width, _height);
+        context.closePath();
+
+        context.strokeStyle = "#000000";
+        context.fillStyle = "#000000";
+        context.font = "12px arial";
+        context.textBaseline = "top";
+
+        var textWidth = context.measureText(text).width;
+
+        context.fillText(text, x + (_width - textWidth) / 2, y + 4);
+
+        context.strokeStyle = "#000000";
+        context.beginPath();
+        context.strokeRect(x, y, _width, _height);
+        context.closePath();
+    };
+
     var show_selectable_tower = function() {
         if (engine.get_play_color()) {
             var selectable_tower = engine.find_playable_tower(engine.current_color());
@@ -315,6 +365,8 @@ Kamisado.GuiPlayer = function (color, engine) {
 
     var scaleX;
     var scaleY;
+
+    var opponentPresent = local;
 
     var selected_cell;
     var selected_tower;

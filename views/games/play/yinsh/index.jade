@@ -25,7 +25,9 @@ block body
                 var gui = new Yinsh.GuiPlayer(#{color}, engine, '#{game_id}' === '-1');
                 var other;
 
-                if ('#{game_id}' === '-1') {
+                if ('#{game_type}' === 'remote_ai') {
+                    // other = new Yinsh.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                } else if ('#{game_id}' === '-1') {
                     other = new Yinsh.RandomPlayer(#{opponent_color}, engine);
                 } else {
                     other = new Yinsh.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
@@ -42,11 +44,14 @@ block body
                 }
                 gui.set_canvas(canvas);
                 gui.set_manager(manager);
-                if ('#{game_id}' === '-1') {
-                    other.set_level(manager.load_level());
-                } else {
+                if ('#{game_id}' !== '-1') {
                     other.set_manager(manager);
                     other.set_gui(gui);
+                } else {
+                    other.set_level(manager.load_level());
+                    if (other.is_remote()) {
+                        other.set_manager(manager);
+                    }
                 }
                 if (engine.current_color() === other.color() && !other.is_remote()) {
                     manager.play_other();

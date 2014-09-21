@@ -14,7 +14,8 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
     this.finish = function() {
         var msg = {
             type: 'finish',
-            user_id: uid
+            user_id: uid,
+            moves: moves
         };
         connection.send(JSON.stringify(msg));
     };
@@ -25,10 +26,6 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
 
     this.is_remote = function () {
         return true;
-    };
-
-    this.set_manager = function (m) {
-        manager = m;
     };
 
     this.move_tower = function (from, to) {
@@ -44,6 +41,14 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
         }
     };
 
+    this.set_manager = function (m) {
+        manager = m;
+    };
+
+    this.set_gui = function (g) {
+        gui = g;
+    };
+
 // private methods
     var init = function () {
         connection = new WebSocket('ws://127.0.0.1:3000');
@@ -57,16 +62,20 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
         connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
 
-            if (msg.type === 'turn') {
+            if (msg.type === 'start') {
+                gui.ready(true);
+            } else if (msg.type === 'disconnect') {
+                gui.ready(false);
+            } else if (msg.type === 'turn') {
                 var ok = false;
-                var turn;
+                var move;
 
                 if (msg.move === 'move_tower' && engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-                    turn = new Kamisado.Turn(msg.from, msg.to);
+                    move = new Kamisado.Turn(msg.from, msg.to);
                     ok = true;
                 }
                 if (ok) {
-                    manager.play_remote(turn);
+                    manager.play_remote(move);
                 }
             }
         };
@@ -101,6 +110,7 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
     var game_id = g;
     var opponent_id = o;
     var manager;
+    var gui;
     var connection;
 
     init();
