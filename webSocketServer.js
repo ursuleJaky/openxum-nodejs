@@ -10,6 +10,7 @@ exports.Server = function (app) {
             httpServer: app.server
         });
         clients = { };
+        playingClients = { };
         currentGames = { };
     };
 
@@ -35,13 +36,17 @@ exports.Server = function (app) {
         var found = false;
 
         for (index in clients) {
-            if (clients[index] && clients[index].socket._peername.port == port) {
+            if (clients[index] && clients[index].socket._peername.port === port) {
                 found = true;
             }
         }
         if (found) {
-            clients[index] = undefined;
-            currentGames[index] = undefined;
+
+            console.log('disconnect: ' + index);
+
+            delete clients[index];
+            delete playingClients[index];
+            delete currentGames[index];
             sendConnectedClients();
         }
     };
@@ -81,7 +86,7 @@ exports.Server = function (app) {
 
             app.db.models.Game.findOne({ _id: game_id }, null,
                 { safe: true }, function (err, game) {
-                    delete clients[msg.user_id];
+                    delete playingClients[msg.user_id];
                     delete currentGames[msg.user_id];
                     if (game) {
 
@@ -115,22 +120,25 @@ exports.Server = function (app) {
                         var owner_id = game.userCreated.id;
                         var c_opponent = clients[user.username];
 
-                        app.db.models.User.findOne({ _id: owner_id }, null,
-                            { safe: true }, function (err, user2) {
-                                var c_owner = clients[user2.username];
-                                var response = {
-                                    type: 'join',
-                                    game_id: msg.game_id,
-                                    owner_id: owner_id,
-                                    owner_name: user2.username,
-                                    opponent_id: msg.opponent_id,
-                                    opponent_name: user.username
-                                };
-                                c_opponent.send(JSON.stringify(response));
-                                if (c_owner) {
-                                    c_owner.send(JSON.stringify(response));
-                                }
-                            });
+                        if (c_opponent) {
+                            app.db.models.User.findOne({ _id: owner_id }, null,
+                                { safe: true }, function (err, user2) {
+                                    var c_owner = clients[user2.username];
+                                    var response = {
+                                        type: 'join',
+                                        game_id: msg.game_id,
+                                        owner_id: owner_id,
+                                        owner_name: user2.username,
+                                        opponent_id: msg.opponent_id,
+                                        opponent_name: user.username
+                                    };
+                                    if (c_owner) {
+                                        c_opponent.send(JSON.stringify(response));
+                                        c_owner.send(JSON.stringify(response));
+                                    }
+                                });
+                        }
+                        ;
                     });
             });
     };
@@ -156,7 +164,7 @@ exports.Server = function (app) {
     };
 
     var onPlay = function (connection, msg) {
-        clients[msg.user_id] = connection;
+        playingClients[msg.user_id] = connection;
         currentGames[msg.user_id] = {
             game_id: msg.game_id,
             game_type: msg.game_type,
@@ -165,8 +173,8 @@ exports.Server = function (app) {
     };
 
     var onTurn = function (msg) {
-        var c_opponent = clients[currentGames[msg.user_id].opponent_id];
-        var response = {};
+        var c_opponent = playingClients[currentGames[msg.user_id].opponent_id];
+        var response = { };
         var game_type = currentGames[msg.user_id].game_type;
 
         if (game_type === 'dvonn') {
@@ -179,7 +187,7 @@ exports.Server = function (app) {
             response = new yinsh.play(msg);
         } else if (game_type === 'zertz') {
         }
-        if (c_opponent != undefined) {
+        if (c_opponent) {
             c_opponent.send(JSON.stringify(response));
         }
     };
@@ -208,6 +216,7 @@ exports.Server = function (app) {
     };
 
     var clients;
+    var playingClients;
     var currentGames;
 
     this.init(app);

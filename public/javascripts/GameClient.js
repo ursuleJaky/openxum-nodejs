@@ -3,26 +3,30 @@
 var GameClient = function (u, g) {
 
     this.confirm = function (owner_id, opponent_id, game_id) {
-        var msg = {
-            type: 'confirm',
-            owner_id: owner_id,
-            opponent_id: opponent_id,
-            game_id: game_id
-        };
+        if (connection) {
+            var msg = {
+                type: 'confirm',
+                owner_id: owner_id,
+                opponent_id: opponent_id,
+                game_id: game_id
+            };
 
-        console.log('confirm ' + game_id + ' with ' + owner_id + ' against ' + opponent_id);
-        connection.send(JSON.stringify(msg));
+            console.log('confirm ' + game_id + ' with ' + owner_id + ' against ' + opponent_id);
+            connection.send(JSON.stringify(msg));
+        }
     };
 
     this.join = function (user_id, game_id) {
-        var msg = {
-            type: 'join',
-            opponent_id: user_id,
-            game_id: game_id
-        };
+        if (connection) {
+            var msg = {
+                type: 'join',
+                opponent_id: user_id,
+                game_id: game_id
+            };
 
-        console.log('join ' + game_id);
-        connection.send(JSON.stringify(msg));
+            console.log('join ' + game_id);
+            connection.send(JSON.stringify(msg));
+        }
     };
 
     this.start = function () {
