@@ -33,7 +33,7 @@ block body
             var markerNumber = document.getElementById("markerNumber");
             var turnList = document.getElementById("turnList");
             var engine = new Yinsh.Engine(#{mode}, 0);
-            var gui = new Yinsh.GuiPlayer(#{color}, engine);
+            var gui = new Yinsh.GuiPlayer(#{color}, engine, '#{game_id}' === '-1');
             var other;
 
             if ('#{game_id}' === '-1') {
@@ -57,6 +57,7 @@ block body
                 other.set_level(manager.load_level());
             } else {
                 other.set_manager(manager);
+                other.set_gui(gui);
             }
             if (engine.current_color() === other.color() && !other.is_remote()) {
                 manager.play_other();

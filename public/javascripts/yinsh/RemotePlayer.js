@@ -116,12 +116,22 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         }
     };
 
+    this.set_gui = function (g) {
+        gui = g;
+    };
+
     this.set_manager = function (m) {
         manager = m;
     };
 
 // private methods
     var init = function () {
+        window.onbeforeunload = function () {
+            if (connection.readyState === 1) {
+                connection.close();
+            }
+        };
+
         connection = new WebSocket('ws://127.0.0.1:3000');
 
         connection.onopen = function () {
@@ -133,7 +143,11 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
 
-            if (msg.type === 'turn') {
+            if (msg.type === 'start') {
+                gui.ready(true);
+            } else if (msg.type === 'disconnect') {
+                gui.ready(false);
+            } else if (msg.type === 'turn') {
                 var ok = false;
                 var move;
 
@@ -201,6 +215,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
     var game_id = g;
     var opponent_id = o;
     var manager;
+    var gui;
     var connection;
 
     var selected_coordinates = new Yinsh.Coordinates('X', -1);

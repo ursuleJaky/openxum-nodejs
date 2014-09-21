@@ -38,16 +38,30 @@ exports.Server = function (app) {
         for (index in clients) {
             if (clients[index] && clients[index].socket._peername.port === port) {
                 found = true;
+                break;
             }
         }
         if (found) {
-
-            console.log('disconnect: ' + index);
-
             delete clients[index];
-            delete playingClients[index];
-            delete currentGames[index];
             sendConnectedClients();
+        }
+        if (!found) {
+            for (index in playingClients) {
+                if (playingClients[index] && playingClients[index].socket._peername.port === port) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                var response = { type: 'disconnect' };
+
+                if (currentGames[index].opponent_id in playingClients) {
+                    playingClients[currentGames[index].opponent_id].send(JSON.stringify(response));
+                }
+                delete playingClients[index];
+                delete currentGames[index];
+                sendConnectedClients();
+            }
         }
     };
 
@@ -170,6 +184,13 @@ exports.Server = function (app) {
             game_type: msg.game_type,
             opponent_id: msg.opponent_id
         };
+
+        if (msg.opponent_id in playingClients) {
+            var response = { type: 'start' };
+
+            playingClients[msg.user_id].send(JSON.stringify(response));
+            playingClients[msg.opponent_id].send(JSON.stringify(response));
+        }
     };
 
     var onTurn = function (msg) {
