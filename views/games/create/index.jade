@@ -5,8 +5,10 @@ block head
 
 block neck
     link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+    link(rel='stylesheet', href='/css/openxum.css?#{cacheBreaker}')
 
 block body
+    - var button_classes = [ 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger' ]
     if game=="dvonn"
         - var color_keys = ['black','white']
         - var colors = ['Black','White']
@@ -85,32 +87,60 @@ block body
                 div.panel-heading
                     h3(class='panel-title') New game [#{game}]
                 div.panel-body
-                    form(action='/games/create/',method='post')
+                    - var i = 2
+                    form.form-horizontal.col-md-10.col-md-offset-1(role='form', action='/games/create/',method='post')
                         div.form-group
                             div.input-group
                                 span.input-group-addon
                                     span.glyphicon.glyphicon-tower
                                 input.form-control(type="text", name="name", value="", placeholder="Game name")
                         div.form-group
-                            fieldset
-                                legend Color
-                                each color,index in color_keys
-                                    input(type="radio", name="color", value=color, checked=color==default_color)
-                                    label.radio-inline #{colors[index]}
-                                    | &nbsp;&nbsp;
+                            label.control-label.col-sm-3 Color
+                            div.col-sm-9
+                                div.btn-group.input-group(data-toggle="buttons")
+                                    each color,index in color_keys
+                                        if color==default_color
+                                            label(class="btn #{button_classes[i]} active")
+                                                input(type="radio", name="color", value=color, checked=color==default_color)
+                                                | #{colors[index]}
+                                        else
+                                            label(class="btn #{button_classes[i]}")
+                                                input(type="radio", name="color", value=color, checked=color==default_color)
+                                                | #{colors[index]}
+                                    - i = i + 1
+                                    if i == 5
+                                        - i = 0
                         div.form-group
-                            fieldset
-                                legend Mode
-                                each mode, index in mode_keys
-                                    input(type="radio", name="mode", value=mode, checked=mode==default_mode)
-                                    label.radio-inline #{modes[index]}
-                                    | &nbsp;&nbsp;
+                            label.control-label.col-sm-3 Mode
+                            div.col-sm-9
+                                div.btn-group.input-group(data-toggle="buttons")
+                                    each mode, index in mode_keys
+                                        if mode == default_mode
+                                            label(class="btn #{button_classes[i]} active")
+                                                input(type="radio", name="mode", value=mode, checked=mode==default_mode)
+                                                | #{modes[index]}
+                                        else
+                                            label(class="btn #{button_classes[i]}")
+                                                input(type="radio", name="mode", value=mode, checked=mode==default_mode)
+                                                | #{modes[index]}
+                                    - i = i + 1
+                                    if i == 5
+                                        - i = 0
                         div.form-group
-                            fieldset
-                                legend Type
-                                each type, index in type_keys
-                                    input(type='radio',name='game_type',value=type, checked=type==default_type)
-                                    label.radio-inline #{types[index]}
-                                    | &nbsp;&nbsp;
+                            label.control-label.col-sm-3 Type
+                            div.col-sm-9
+                                div.btn-group.input-group(data-toggle="buttons")
+                                    each type, index in type_keys
+                                        if type == default_type
+                                            label(class="btn #{button_classes[i]} active")
+                                                input(type='radio',name='game_type',value=type, checked=type==default_type)
+                                                | #{types[index]}
+                                        else
+                                            label(class="btn #{button_classes[i]}")
+                                                input(type='radio',name='game_type',value=type, checked=type==default_type)
+                                                | #{types[index]}
+                                    - i = i + 1
+                                    if i == 5
+                                        - i = 0
                         input(type='hidden',name='game',value='#{game}')
-                        input(type='submit',value='Create',class='btn btn-lg btn-success btn-block')
+                        input(type='submit',value='Create',class='btn btn-md btn-success btn-block')
