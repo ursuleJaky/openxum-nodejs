@@ -7,60 +7,51 @@ block neck
     link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
 block body
-    script(src='/javascripts/utils/utils.js')
-    script(src='/javascripts/MCTS/MCTS.js')
-    script(src='/javascripts/MCTS/Node.js')
-    script(src='/javascripts/MCTS/Player.js')
     script(src='/javascripts/invers/Invers.js')
-    script(src='/javascripts/invers/Constants.js')
-    script(src='/javascripts/invers/Engine.js')
-    script(src='/javascripts/invers/GuiPlayer.js')
-    script(src='/javascripts/invers/Manager.js')
-    script(src='/javascripts/invers/MCTSPlayer.js')
-    script(src='/javascripts/invers/RandomPlayer.js')
-    script(src='/javascripts/invers/RestWebServicePlayer.js')
 
     script(language='javascript').
         $(document).ready(function() {
-            $('#winnerModal .new-game-button').click(function() {
-                $('#winnerModal').modal('hide');
-                window.location.href = '/games/play/?game=invers';
-            });
+            Invers.load(function() {
+                $('#winnerModal .new-game-button').click(function() {
+                    $('#winnerModal').modal('hide');
+                    window.location.href = '/games/play/?game=invers';
+                });
 
-            var canvas = document.getElementById("board");
-            var canvas_div = document.getElementById("boardDiv");
-            var engine = new Invers.Engine(0, 0);
-            var gui = new Invers.GuiPlayer(#{color}, engine);
-            var other;
+                var canvas = document.getElementById("board");
+                var canvas_div = document.getElementById("boardDiv");
+                var engine = new Invers.Engine(0, 0);
+                var gui = new Invers.GuiPlayer(#{color}, engine);
+                var other;
 
-            if ('#{game_type}' === 'remote_ai') {
-                other = new Invers.RestWebServicePlayer(#{other_color}, engine, '#{user.username}');
-            } else {
-                other = new Invers.MCTSPlayer(#{other_color}, engine);
-            }
-
-            var manager = new Invers.Manager(engine, gui, other);
-
-            if (canvas_div.clientHeight < canvas_div.clientWidth) {
-                canvas.height = canvas_div.clientHeight * 0.95;
-                canvas.width = canvas_div.clientHeight * 0.95;
-            } else {
-                canvas.height = canvas_div.clientWidth * 0.95;
-                canvas.width = canvas_div.clientWidth * 0.95;
-            }
-            gui.set_canvas(canvas);
-            gui.set_manager(manager);
-            if (#{game_id} != -1) {
-                other.set_manager(manager);
-            } else {
-                other.set_level(manager.load_level());
-                if (other.is_remote()) {
-                    other.set_manager(manager);
+                if ('#{game_type}' === 'remote_ai') {
+                    other = new Invers.RestWebServicePlayer(#{other_color}, engine, '#{user.username}');
+                } else {
+                    other = new Invers.MCTSPlayer(#{other_color}, engine);
                 }
-            }
-            if (engine.current_color() == other.color()) {
-                manager.play_other();
-            }
+
+                var manager = new Invers.Manager(engine, gui, other);
+
+                if (canvas_div.clientHeight < canvas_div.clientWidth) {
+                    canvas.height = canvas_div.clientHeight * 0.95;
+                    canvas.width = canvas_div.clientHeight * 0.95;
+                } else {
+                    canvas.height = canvas_div.clientWidth * 0.95;
+                    canvas.width = canvas_div.clientWidth * 0.95;
+                }
+                gui.set_canvas(canvas);
+                gui.set_manager(manager);
+                if (#{game_id} != -1) {
+                    other.set_manager(manager);
+                } else {
+                    other.set_level(manager.load_level());
+                    if (other.is_remote()) {
+                        other.set_manager(manager);
+                    }
+                }
+                if (engine.current_color() == other.color()) {
+                    manager.play_other();
+                }
+            });
         });
 
     br

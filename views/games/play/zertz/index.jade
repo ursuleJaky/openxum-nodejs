@@ -7,46 +7,37 @@ block neck
     link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
 block body
-    script(src='/javascripts/utils/utils.js')
-    script(src='/javascripts/MCTS/MCTS.js')
-    script(src='/javascripts/MCTS/Node.js')
-    script(src='/javascripts/MCTS/Player.js')
     script(src='/javascripts/zertz/Zertz.js')
-    script(src='/javascripts/zertz/Constants.js')
-    script(src='/javascripts/zertz/Coordinates.js')
-    script(src='/javascripts/zertz/Intersection.js')
-    script(src='/javascripts/zertz/Engine.js')
-    script(src='/javascripts/zertz/GuiPlayer.js')
-    script(src='/javascripts/zertz/Manager.js')
-    script(src='/javascripts/zertz/RandomPlayer.js')
 
     script(language='javascript').
         $(document).ready(function() {
-            $('#winnerModal .new-game-button').click(function() {
-                $('#winnerModal').modal('hide');
-                window.location.href = '/games/play/?game=zertz';
+            Zertz.load(function() {
+                $('#winnerModal .new-game-button').click(function() {
+                    $('#winnerModal').modal('hide');
+                    window.location.href = '/games/play/?game=zertz';
+                });
+
+                var canvas = document.getElementById("board");
+                var canvas_div = document.getElementById("boardDiv");
+                var engine = new Zertz.Engine(#{mode}, 0);
+                var gui = new Zertz.GuiPlayer(#{color}, engine);
+                var other = new Zertz.RandomPlayer(#{other_color}, engine);
+                var manager = new Zertz.Manager(engine, gui, other);
+
+                if (canvas_div.clientHeight < canvas_div.clientWidth) {
+                    canvas.height = canvas_div.clientHeight * 0.95;
+                    canvas.width = canvas_div.clientHeight * 0.95;
+                } else {
+                    canvas.height = canvas_div.clientWidth * 0.95;
+                    canvas.width = canvas_div.clientWidth * 0.95;
+                }
+                gui.set_canvas(canvas);
+                gui.set_manager(manager);
+                other.set_level(manager.load_level());
+                if (engine.current_color() == other.color()) {
+                    manager.play_other();
+                }
             });
-
-            var canvas = document.getElementById("board");
-            var canvas_div = document.getElementById("boardDiv");
-            var engine = new Zertz.Engine(#{mode}, 0);
-            var gui = new Zertz.GuiPlayer(#{color}, engine);
-            var other = new Zertz.RandomPlayer(#{other_color}, engine);
-            var manager = new Zertz.Manager(engine, gui, other);
-
-            if (canvas_div.clientHeight < canvas_div.clientWidth) {
-                canvas.height = canvas_div.clientHeight * 0.95;
-                canvas.width = canvas_div.clientHeight * 0.95;
-            } else {
-                canvas.height = canvas_div.clientWidth * 0.95;
-                canvas.width = canvas_div.clientWidth * 0.95;
-            }
-            gui.set_canvas(canvas);
-            gui.set_manager(manager);
-            other.set_level(manager.load_level());
-            if (engine.current_color() == other.color()) {
-                manager.play_other();
-            }
         });
 
     br

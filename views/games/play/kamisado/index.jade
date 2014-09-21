@@ -7,61 +7,53 @@ block neck
     link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
 block body
-    script(src='/javascripts/utils/utils.js')
-    script(src='/javascripts/MCTS/MCTS.js')
-    script(src='/javascripts/MCTS/Node.js')
-    script(src='/javascripts/MCTS/Player.js')
     script(src='/javascripts/kamisado/Kamisado.js')
-    script(src='/javascripts/kamisado/Constants.js')
-    script(src='/javascripts/kamisado/Engine.js')
-    script(src='/javascripts/kamisado/GuiPlayer.js')
-    script(src='/javascripts/kamisado/Manager.js')
-    script(src='/javascripts/kamisado/MCTSPlayer.js')
-    script(src='/javascripts/kamisado/RemotePlayer.js')
-    script(src='/javascripts/kamisado/RestWebServicePlayer.js')
 
     script(language='javascript').
         $(document).ready(function() {
-            $('#winnerModal .new-game-button').click(function() {
-                $('#winnerModal').modal('hide');
-                window.location.href = '/games/play/?game=kamisado';
-            });
+            Kamisado.load(function() {
+                $('#winnerModal .new-game-button').click(function() {
+                    $('#winnerModal').modal('hide');
+                    window.location.href = '/games/play/?game=kamisado';
+                });
 
-            var canvas = document.getElementById("board");
-            var canvas_div = document.getElementById("boardDiv");
-            var engine = new Kamisado.Engine(0, 0);
-            var gui = new Kamisado.GuiPlayer(#{color}, engine);
-            var other;
+                var canvas = document.getElementById("board");
+                var canvas_div = document.getElementById("boardDiv");
+                var engine = new Kamisado.Engine(0, 0);
+                var gui = new Kamisado.GuiPlayer(#{color}, engine);
+                var other;
 
-            if ('#{game_type}' === 'remote_ai') {
-                other = new Kamisado.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
-            } else if ('#{game_id}' === '-1') {
-                other = new Kamisado.MCTSPlayer(#{opponent_color}, engine);
-            } else {
-                other = new Kamisado.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
-            }
-            var manager = new Kamisado.Manager(engine, gui, other);
-
-            if (canvas_div.clientHeight < canvas_div.clientWidth) {
-                canvas.height = canvas_div.clientHeight * 0.95;
-                canvas.width = canvas_div.clientHeight * 0.95;
-            } else {
-                canvas.height = canvas_div.clientWidth * 0.95;
-                canvas.width = canvas_div.clientWidth * 0.95;
-            }
-            gui.set_canvas(canvas);
-            gui.set_manager(manager);
-            if ('#{game_id}' !== -1) {
-                other.set_manager(manager);
-            } else {
-                other.set_level(manager.load_level());
-                if (other.is_remote()) {
-                    other.set_manager(manager);
+                if ('#{game_type}' === 'remote_ai') {
+                    other = new Kamisado.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                } else if ('#{game_id}' === '-1') {
+                    other = new Kamisado.MCTSPlayer(#{opponent_color}, engine);
+                } else {
+                    other = new Kamisado.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
                 }
-            }
-            if (engine.current_color() === other.color() && !other.is_remote()) {
-                manager.play_other();
-            }
+
+                var manager = new Kamisado.Manager(engine, gui, other);
+
+                if (canvas_div.clientHeight < canvas_div.clientWidth) {
+                    canvas.height = canvas_div.clientHeight * 0.95;
+                    canvas.width = canvas_div.clientHeight * 0.95;
+                } else {
+                    canvas.height = canvas_div.clientWidth * 0.95;
+                    canvas.width = canvas_div.clientWidth * 0.95;
+                }
+                gui.set_canvas(canvas);
+                gui.set_manager(manager);
+                if ('#{game_id}' !== -1) {
+                    other.set_manager(manager);
+                } else {
+                    other.set_level(manager.load_level());
+                    if (other.is_remote()) {
+                        other.set_manager(manager);
+                    }
+                }
+                if (engine.current_color() === other.color() && !other.is_remote()) {
+                    manager.play_other();
+                }
+            });
         });
 
     br
