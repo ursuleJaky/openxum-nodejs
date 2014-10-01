@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.GuiPlayer = function (color, e) {
+Invers.GuiPlayer = function (color, e, local) {
 
 // public methods
     this.color = function () {
@@ -33,10 +33,15 @@ Invers.GuiPlayer = function (color, e) {
             } else {
                 letter = String.fromCharCode('A'.charCodeAt(0) + (selected_index - 1));
             }
-            return { color: selected_color, letter: letter, number: number, position: selected_position };
+            return new Invers.Move(selected_color, letter, number, selected_position);
         } else {
             return undefined;
         }
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        manager.redraw();
     };
 
     this.set_canvas = function (c) {
@@ -347,6 +352,8 @@ Invers.GuiPlayer = function (color, e) {
     var offsetY;
     var scaleX;
     var scaleY;
+
+    var opponentPresent = local;
 
     var free_colors;
     var selected_color;

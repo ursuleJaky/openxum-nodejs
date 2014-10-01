@@ -11,8 +11,10 @@ Invers.load = function (callback) {
                             $.getScript('/javascripts/invers/Manager.js', function () {
                                 $.getScript('/javascripts/invers/GuiPlayer.js', function () {
                                     $.getScript('/javascripts/invers/MCTSPlayer.js', function () {
-                                        $.getScript('/javascripts/invers/RestWebServicePlayer.js', function () {
-                                            callback();
+                                        $.getScript('/javascripts/invers/RemotePlayer.js', function () {
+                                            $.getScript('/javascripts/invers/RestWebServicePlayer.js', function () {
+                                                callback();
+                                            });
                                         });
                                     });
                                 });

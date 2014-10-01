@@ -16,45 +16,62 @@ Invers.Manager = function (e, gui_player, other_player) {
     this.play = function () {
         if (engine.current_color() === gui.color()) {
             if (engine.phase() === Invers.Phase.PUSH_TILE && gui.get_move()) {
-                engine.move(gui.get_move());
+                move = gui.get_move();
+                apply_move(move);
                 if (other.is_remote()) {
-                    other.move(gui.get_move());
+                    other.move(move);
                 }
                 gui.unselect();
             }
-            gui.draw();
-            finish();
-            if (engine.current_color() !== gui.color()) {
-                if (!other.is_remote()) {
-                    this.play_other();
-                }
+        }
+        gui.draw();
+        finish();
+        if (!engine.is_finished() && engine.current_color() !== gui.color()) {
+            if (!other.is_remote()) {
+                this.play_other();
             }
         }
     };
 
     this.play_other = function () {
         if (engine.phase() === Invers.Phase.PUSH_TILE) {
-            if (!other.is_remote()) {
-                engine.move(other.move());
-            } else if (other.is_remote() && other.is_ready()) {
-                other.move();
+            if (other.is_remote() || (other.is_remote() && other.is_ready())) {
+                move = other.move();
             }
-            gui.draw();
-            finish();
+            if (!other.is_remote()) {
+                move = other.move();
+                apply_move(move);
+                if (other.is_remote() && other.confirm()) {
+                    other.move(move);
+                }
+                gui.unselect();
+            }
+        }
+        gui.draw();
+        finish();
+        if (!engine.is_finished() && engine.current_color() !== gui.color()) {
+            if (!other.is_remote()) {
+                this.play_other();
+            }
         }
     };
 
-    this.play_remote = function(t) {
-        turn = t;
-        if (engine.phase() === Invers.Phase.PUSH_TILE) {
-            engine.move(turn);
-            other.move(turn);
-            gui.draw();
-            finish();
-        }
+    this.play_remote = function(move) {
+        apply_move(move);
+        gui.draw();
+        finish();
+    };
+
+    this.redraw = function () {
+        gui.draw();
     };
 
 // private methods
+    var apply_move = function (move) {
+        engine.move(move);
+        moves += move.get() + ';';
+    };
+
     var finish = function () {
         if (engine.is_finished()) {
             var popup = document.getElementById("winnerModalText");
@@ -98,7 +115,8 @@ Invers.Manager = function (e, gui_player, other_player) {
 
     var level;
 
-    var turn;
+    var move;
+    var moves;
 
     init(e, gui_player, other_player);
 };

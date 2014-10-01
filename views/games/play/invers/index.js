@@ -2,12 +2,25 @@
 
 exports.init = function (req, res) {
     if (req.user) {
-        res.render('games/play/invers/index', {
-            color: req.param('color') === 'red' ? 0 : 1,
-            other_color: req.param('color') === 'red' ? 1 : 0,
-            game_type: req.param('game_type'),
-            game_id: req.param('game_id')
-        });
+        if (req.param('game_id') !== '-1') {
+            res.render('games/play/invers/index',
+                { game_id: req.param('game_id'),
+                    owner_id: req.param('owner_id'),
+                    opponent_id: req.param('opponent_id'),
+                    mode: req.param('mode') === 'standard' ? 0 : 1,
+                    color: req.param('color') === 'red' ? 0 : 1,
+                    opponent_color: req.param('color') === 'red' ? 1 : 0
+                });
+        } else {
+            res.render('games/play/invers/index',
+                { game_id: -1,
+                    owner_id: -1,
+                    opponent_id: -1,
+                    color: req.param('color') === 'red' ? 0 : 1,
+                    mode: req.param('mode') === 'standard' ? 0 : 1,
+                    opponent_color: req.param('color') === 'red' ? 1 : 0
+                });
+        }
     } else {
         res.redirect('/');
     }

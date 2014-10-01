@@ -1,5 +1,53 @@
 "use strict";
 
+Invers.Move = function (c, l, n, p) {
+
+// private attributes
+    var _color;
+    var _letter;
+    var _number;
+    var _position;
+
+// private methods
+    var init = function (c, l, n, p) {
+        _color = c;
+        _letter = l;
+        _number = n;
+        _position = p;
+    };
+
+// public methods
+    this.color = function () {
+        return _color;
+    };
+
+    this.get = function () {
+        return (_color === Invers.Color.RED ? 'R' : 'Y') + _letter + _number +
+            (_position === Invers.Position.BOTTOM ? 'b' : (_position === Invers.Position.TOP ? 't' : (_position === Invers.Position.RIGHT ? 'r' : 'l')));
+    };
+
+    this.letter = function () {
+        return _letter;
+    };
+
+    this.number = function () {
+        return _number;
+    };
+
+    this.parse = function (str) {
+        _color = str.charCodeAt(0) === 'R' ? Invers.Color.RED : Invers.Color.YELLOW;
+        _letter = str.charCodeAt(1);
+        _number = str.charCodeAt(2) - '1'.charCodeAt(0) + 1;
+        _position = str.charCodeAt(3) === 'b' ? Invers.Position.BOTTOM : str.charCodeAt(3) === 't' ? Invers.Position.TOP : str.charCodeAt(3) === 'r' ? Invers.Position.RIGHT: Invers.Position.LEFT;
+    };
+
+    this.position = function () {
+        return _position;
+    };
+
+    init(c, l, n, p);
+};
+
 Invers.Engine = function (t, c) {
 
 // public methods
@@ -127,10 +175,10 @@ Invers.Engine = function (t, c) {
     this.move = function (move) {
         var out;
 
-        if (move.letter !== 'X') {
-            var letter = move.letter;
+        if (move.letter() !== 'X') {
+            var letter = move.letter();
 
-            if (move.position === Invers.Position.TOP) {
+            if (move.position() === Invers.Position.TOP) {
                 var state = get_tile_state({ letter: letter, number: 6 });
 
                 out = state === Invers.State.RED_FULL || state === Invers.State.RED_REVERSE ? Invers.Color.RED : Invers.Color.YELLOW;
@@ -141,7 +189,7 @@ Invers.Engine = function (t, c) {
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: letter, number: 1 },
-                    (move.color === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
+                    (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             } else {
                 var state = get_tile_state({ letter: letter, number: 1 });
 
@@ -153,12 +201,12 @@ Invers.Engine = function (t, c) {
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: letter, number: 6 },
-                    (move.color === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
+                    (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             }
         } else {
-            var number = move.number;
+            var number = move.number();
 
-            if (move.position === Invers.Position.RIGHT) {
+            if (move.position() === Invers.Position.RIGHT) {
                 var state = get_tile_state({letter: 'A', number: number });
 
                 out = state === Invers.State.RED_FULL || state === Invers.State.RED_REVERSE ? Invers.Color.RED : Invers.Color.YELLOW;
@@ -169,7 +217,7 @@ Invers.Engine = function (t, c) {
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: 'F', number: number },
-                    (move.color === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
+                    (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             } else {
                 var state = get_tile_state({ letter: 'F', number: number });
 
@@ -181,10 +229,10 @@ Invers.Engine = function (t, c) {
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: 'A', number: number },
-                    (move.color === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
+                    (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             }
         }
-        if (move.color === Invers.Color.RED) {
+        if (move.color() === Invers.Color.RED) {
             --redTileNumber;
         } else {
             --yellowTileNumber;
@@ -273,7 +321,11 @@ Invers.Engine = function (t, c) {
 
     this.winner_is = function () {
         if (this.is_finished()) {
-            return color;
+            if (is_finished(Invers.Color.RED)) {
+                return Invers.Color.RED;
+            } else {
+                return Invers.Color.YELLOW;
+            }
         } else {
             return false;
         }
@@ -301,15 +353,15 @@ Invers.Engine = function (t, c) {
         yellowTileNumber = 1;
     };
 
-    var get_tile_state = function (coordinator) {
-        var i = coordinator.letter.charCodeAt(0) - "A".charCodeAt(0);
-        var j = coordinator.number - 1;
+    var get_tile_state = function (coordinates) {
+        var i = coordinates.letter.charCodeAt(0) - "A".charCodeAt(0);
+        var j = coordinates.number - 1;
 
         return state[i][j];
     };
 
     var is_finished = function(color) {
-        var state = (color == Invers.Color.RED ? Invers.State.RED_FULL : Invers.State.YELLOW_FULL);
+        var state = (color === Invers.Color.RED ? Invers.State.RED_FULL : Invers.State.YELLOW_FULL);
         var found = false;
 
         for (var n = 1; n <= 6 && !found; ++n) {
@@ -320,9 +372,9 @@ Invers.Engine = function (t, c) {
         return !found;
     };
 
-    var set_tile_state = function (coordinator, s) {
-        var i = coordinator.letter.charCodeAt(0) - "A".charCodeAt(0);
-        var j = coordinator.number - 1;
+    var set_tile_state = function (coordinates, s) {
+        var i = coordinates.letter.charCodeAt(0) - "A".charCodeAt(0);
+        var j = coordinates.number - 1;
 
         state[i][j] = s;
     };
