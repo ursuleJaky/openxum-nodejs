@@ -189,7 +189,7 @@ Yinsh.GuiPlayer = function (color, e, local) {
         }
 
         // numbers
-       context.textBaseline = "bottom";
+        context.textBaseline = "bottom";
         for (var n = 1; n < 12; ++n) {
             pt = compute_coordinates(Yinsh.begin_letter[n - 1].charCodeAt(0), n);
             pt[0] -= 15 + (n > 9 ? 5 : 0);
@@ -417,39 +417,138 @@ Yinsh.GuiPlayer = function (color, e, local) {
     };
 
     var onClick = function (event) {
+        if (/type=offline/.test(self.location.href)) {
+            opponentPresent = 'local';
+        }
         if (opponentPresent && engine.current_color() === mycolor) {
+            if (engine.current_color() === mycolor) {
+
+                var pos = getClickPosition(event);
+                var letter = compute_letter(pos.x, pos.y);
+                var number = compute_number(pos.x, pos.y);
+                var ok = false;
+
+                if (letter !== 'X' && number !== -1 &&
+                    engine.exist_intersection(letter, number)) {
+                    if (engine.phase() === Yinsh.Phase.PUT_RING &&
+                        engine.intersection_state(letter, number) === Yinsh.State.VACANT) {
+                        selected_coordinates = new Yinsh.Coordinates(letter, number);
+                        ok = true;
+                    } else if (engine.phase() === Yinsh.Phase.PUT_MARKER &&
+                        ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
+                            engine.current_color() === Yinsh.Color.BLACK) ||
+                            (engine.intersection_state(letter, number) === Yinsh.State.WHITE_RING &&
+                                engine.current_color() === Yinsh.Color.WHITE))) {
+                        selected_coordinates = new Yinsh.Coordinates(letter, number);
+                        selected_ring = selected_coordinates;
+                        ok = true;
+                    } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
+                        if (selected_ring.is_valid()) {
+                            if (engine.verify_moving(selected_ring,
+                                new Yinsh.Coordinates(letter, number))) {
+                                selected_coordinates = new Yinsh.Coordinates(letter, number);
+                                ok = true;
+                            }
+                        }
+                    } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+                        engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                        /*                 selected_coordinates = new Yinsh.Coordinates(letter, number);
+                         ok = true; */
+                    } else if ((engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+                        engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) &&
+                        ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
+                            engine.current_color() === Yinsh.Color.BLACK) ||
+                            (engine.intersection_state(letter, number) === Yinsh.State.WHITE_RING &&
+                                engine.current_color() === Yinsh.Color.WHITE))) {
+                        selected_coordinates = new Yinsh.Coordinates(letter, number);
+                        ok = true;
+                    }
+                }
+                if (ok) {
+                    manager.play();
+                }
+            }
+        }
+    };
+
+    var onMove = function (event) {
+        if (opponentPresent) {
             var pos = getClickPosition(event);
             var letter = compute_letter(pos.x, pos.y);
-            var number = compute_number(pos.x, pos.y);
-            var ok = false;
 
-            if (letter !== 'X' && number !== -1 &&
-                engine.exist_intersection(letter, number)) {
-                if (engine.phase() === Yinsh.Phase.PUT_RING &&
-                    engine.intersection_state(letter, number) === Yinsh.State.VACANT) {
-                    selected_coordinates = new Yinsh.Coordinates(letter, number);
-                    ok = true;
-                } else if (engine.phase() === Yinsh.Phase.PUT_MARKER &&
-                    ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
-                        engine.current_color() === Yinsh.Color.BLACK) ||
-                        (engine.intersection_state(letter, number) === Yinsh.State.WHITE_RING &&
-                            engine.current_color() === Yinsh.Color.WHITE))) {
-                    selected_coordinates = new Yinsh.Coordinates(letter, number);
-                    selected_ring = selected_coordinates;
-                    ok = true;
-                } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
-                    if (selected_ring.is_valid()) {
-                        if (engine.verify_moving(selected_ring,
-                            new Yinsh.Coordinates(letter, number))) {
-                            selected_coordinates = new Yinsh.Coordinates(letter, number);
-                            ok = true;
+            if (letter !== 'X') {
+                var number = compute_number(pos.x, pos.y);
+
+                if (number !== -1) {
+                    if (compute_pointer(pos.x, pos.y)) {
+                        if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+                            engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                            if ((engine.current_color() === Yinsh.Color.BLACK && engine.intersection_state(letter, number) === Yinsh.State.BLACK_MARKER) ||
+                                (engine.current_color() === Yinsh.Color.WHITE && engine.intersection_state(letter, number) === Yinsh.State.WHITE_MARKER)) {
+                                var coordinates = new Yinsh.Coordinates(letter, number);
+                                var found = false;
+                                var index, index2, index3;
+
+                                for (index = 0; index < selected_row.length && !found; ++index) {
+                                    found = selected_row[index].letter() === letter && selected_row[index].number() === number;
+                                }
+                                if (!found) {
+                                    var rows = engine.get_rows(engine.current_color());
+                                    var ok = false;
+
+                                    if (row_index === -1) {
+                                        found = false;
+                                        for (index = 0; index < rows.length && !found; ++index) {
+                                            var row = rows[index];
+
+                                            for (index2 = 0; index2 < row.length && !found; ++index2) {
+                                                found = row[index2].letter() === coordinates.letter() &&
+                                                    row[index2].number() === coordinates.number();
+                                                if (found) {
+                                                    row_index = index;
+                                                    ok = true;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        var row = rows[row_index];
+
+                                        found = false;
+                                        for (index2 = 0; index2 < row.length && !found; ++index2) {
+                                            found = row[index2].letter() === coordinates.letter() &&
+                                                row[index2].number() === coordinates.number();
+                                            if (found) {
+                                                ok = true;
+                                            }
+                                        }
+                                    }
+                                    if (ok) {
+                                        selected_row.push(coordinates);
+                                        if (selected_row.length === 5) {
+                                            manager.play();
+                                        }
+                                    } else {
+                                        selected_row = [];
+                                        row_index = -1;
+                                        manager.redraw();
+                                    }
+                                } else {
+                                    manager.redraw();
+                                }
+                            } else {
+                                selected_row = [];
+                                row_index = -1;
+                                manager.redraw();
+                            }
+                        } else {
+                            manager.redraw();
                         }
                     }
                 } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
                     engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-/*                 selected_coordinates = new Yinsh.Coordinates(letter, number);
-                 ok = true; */
-                    } else if ((engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+                    /*                 selected_coordinates = new Yinsh.Coordinates(letter, number);
+                     ok = true; */
+                } else if ((engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
                     engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) &&
                     ((engine.intersection_state(letter, number) === Yinsh.State.BLACK_RING &&
                         engine.current_color() === Yinsh.Color.BLACK) ||
@@ -458,9 +557,6 @@ Yinsh.GuiPlayer = function (color, e, local) {
                     selected_coordinates = new Yinsh.Coordinates(letter, number);
                     ok = true;
                 }
-            }
-            if (ok) {
-                manager.play();
             }
         }
     };
@@ -582,8 +678,7 @@ Yinsh.GuiPlayer = function (color, e, local) {
         }
     };
 
-    var show_opponent_status = function (x, y)
-    {
+    var show_opponent_status = function (x, y) {
         var text;
         var _height = 25;
         var _width = 100;

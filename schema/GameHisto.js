@@ -3,9 +3,12 @@
 exports = module.exports = function (app, mongoose) {
 	var gameHistoSchema = new mongoose.Schema({
 		name: { type: String, default: '' },
+		gameId: { type: mongoose.Schema.Types.ObjectId, ref: 'Game' },
 		game: { type: mongoose.Schema.Types.ObjectId, ref: 'GameType' },
 		endtime: { type: Date, default: Date.now },
 		score : { type: Number, default: '' },
+		status: { type: String, default: 'started'},
+		moves: { type: String, default: ''},
 		winner : {
  			id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 		},        

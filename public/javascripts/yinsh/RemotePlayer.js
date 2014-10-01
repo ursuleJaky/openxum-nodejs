@@ -20,6 +20,19 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
         return true;
     };
 
+    this.replayGame = function () {
+
+        var msg = {
+            type: 'replay',
+            game_id: game_id,
+            user_id: uid
+        };
+        setTimeout(function () {
+            connection.send(JSON.stringify(msg));
+        }, 500);
+
+    };
+
     this.move_ring = function (ring, coordinates) {
         if (coordinates === undefined) {
             engine.move_ring(selected_ring, selected_coordinates);
@@ -28,6 +41,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                 game_id: game_id,
                 type: 'turn',
                 user_id: uid,
+                game_id: game_id,
                 move: 'move_ring',
                 ring: {
                     letter: ring.letter(),
@@ -50,6 +64,7 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                 game_id: game_id,
                 type: 'turn',
                 user_id: uid,
+                game_id: game_id,
                 move: 'put_marker',
                 coordinates: {
                     letter: coordinates.letter(),

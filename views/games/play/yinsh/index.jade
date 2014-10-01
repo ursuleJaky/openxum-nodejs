@@ -56,10 +56,19 @@ block body
                 if (engine.current_color() === other.color() && !other.is_remote()) {
                     manager.play_other();
                 }
+                if ('#{replay}' === 'true') {
+                   other.replayGame();
+                }
+                $( "#target" ).click(function() {
+                   other.replayGame();
+                });
             });
         });
 
     br
+    
+    div
+       a#target Replay
     div.modal.fade#winnerModal(tabindex='-1',role='dialog',aria-labelledby='winnerModelLabel',aria-hidden='true')
         div.modal-dialog
             div.modal-content

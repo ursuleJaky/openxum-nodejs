@@ -21,7 +21,7 @@ exports.init = function (req, res, next) {
     queries.push(function (done) {
         req.app.db.models.GameHisto.find({ }, null,
             { safe: true }, function (err, gamehisto) {
-                if (gamehisto != "") {
+                if (gamehisto !== "") {
                     for (var key in gamehisto) {
                         var itemdata = {};
                         var item = gamehisto[key];

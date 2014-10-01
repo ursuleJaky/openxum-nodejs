@@ -53,8 +53,8 @@ exports = module.exports = function (app, passport) {
     app.get('/tournaments/', require('./views/tournaments/index').init);
     app.get('/players/', require('./views/players/index').init);
     app.get('/ranking/', require('./views/ranking/index').init);
-    app.get('/mygames/', require('./views/mygames/index').init);
     app.get('/faq/', require('./views/faq/index').init);
+	 app.get('/mygames/', require('./views/mygames/index').init);
 
     //social sign up
     app.post('/signup/social/', require('./views/signup/index').signupSocial);
