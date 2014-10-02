@@ -41,7 +41,6 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                 game_id: game_id,
                 type: 'turn',
                 user_id: uid,
-                game_id: game_id,
                 move: 'move_ring',
                 ring: {
                     letter: ring.letter(),
@@ -64,7 +63,6 @@ Yinsh.RemotePlayer = function (color, e, u, o, g) {
                 game_id: game_id,
                 type: 'turn',
                 user_id: uid,
-                game_id: game_id,
                 move: 'put_marker',
                 coordinates: {
                     letter: coordinates.letter(),

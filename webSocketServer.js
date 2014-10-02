@@ -156,7 +156,6 @@ exports.Server = function (app) {
                                         }
                                     });
                             }
-                            ;
                         });
                 });
         });
@@ -217,11 +216,11 @@ exports.Server = function (app) {
 
             //TODO généraliser à toutes les actions possibles
             move_str = "";
-            if (response.move == 'put_ring') {
+            if (response.move === 'put_ring') {
                 move_str = "Pr" + response.coordinates.letter + response.coordinates.number + ';';
-            } else if (response.move == 'move_ring') {
+            } else if (response.move === 'move_ring') {
                 move_str = "Mr" + response.coordinates.letter + response.coordinates.number + response.ring.letter + response.ring.number + ';';
-            } else if (response.move == 'put_marker') {
+            } else if (response.move === 'put_marker') {
                 move_str = "Pm" + response.coordinates.letter + response.coordinates.number + ';';
             }
 
@@ -235,15 +234,6 @@ exports.Server = function (app) {
         if (c_opponent) {
             c_opponent.send(JSON.stringify(response));
         }
-        app.db.models.TurnHisto.update({ gameId: msg.game_id }, { $push: { gameDetail: response  } }, function (err, numAffected) {
-        });
-    };
-
-    var onReplay = function (connection, msg) {
-        app.db.models.TurnHisto.find({ gameId: msg.game_id }, null, function (err, turns) {
-            console.log(turns);
-
-        });
     };
 
     var sendConnectedClients = function () {

@@ -10,7 +10,7 @@ exports.init = function (req, res) {
                     mode: req.param('mode') === 'blitz' ? 0 : 1,
                     color: req.param('color') === 'black' ? 0 : 1,
                     opponent_color: req.param('color') === 'black' ? 1 : 0,
-						  replay: req.param('replay'),
+                    replay: req.param('replay'),
                 });
         } else {
             res.render('games/play/yinsh/index',

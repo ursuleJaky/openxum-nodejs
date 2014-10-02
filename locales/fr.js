@@ -111,5 +111,6 @@
 	"Profile: ": "Profil: ",
 	"Email": "Email",
 	"Inscription date": "Date d'inscription",
-	"Stats": "Statistiques"
+	"Stats": "Statistiques",
+	"My offline games": "Mes jeux hors-ligne"
 }
