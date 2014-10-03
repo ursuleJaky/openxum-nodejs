@@ -1,6 +1,6 @@
 "use strict";
 
-Kamisado.Turn = function (f, t) {
+Kamisado.Move = function (f, t) {
 
 // private attributes
     var _from, _to;
@@ -114,7 +114,7 @@ Kamisado.Engine = function (t, c) {
         var turn;
 
         for (index = 0; index < list.length; ++index) {
-            turn = new Kamisado.Turn(list[index]);
+            turn = new Kamisado.Move(list[index]);
             move_tower(turn.from(), turn.to());
         }
     };
@@ -127,7 +127,7 @@ Kamisado.Engine = function (t, c) {
     };
 
     this.select_move = function (list, index) {
-        return new Kamisado.Turn(list.playable_tower, list.list[index]);
+        return new Kamisado.Move(list.playable_tower, list.list[index]);
     };
 
     this.set = function (_phase, _black_towers, _white_towers, _play_color) {

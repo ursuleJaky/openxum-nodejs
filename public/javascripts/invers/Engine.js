@@ -35,10 +35,10 @@ Invers.Move = function (c, l, n, p) {
     };
 
     this.parse = function (str) {
-        _color = str.charCodeAt(0) === 'R' ? Invers.Color.RED : Invers.Color.YELLOW;
-        _letter = str.charCodeAt(1);
+        _color = str.charAt(0) === 'R' ? Invers.Color.RED : Invers.Color.YELLOW;
+        _letter = str.charAt(1);
         _number = str.charCodeAt(2) - '1'.charCodeAt(0) + 1;
-        _position = str.charCodeAt(3) === 'b' ? Invers.Position.BOTTOM : str.charCodeAt(3) === 't' ? Invers.Position.TOP : str.charCodeAt(3) === 'r' ? Invers.Position.RIGHT: Invers.Position.LEFT;
+        _position = str.charAt(3) === 'b' ? Invers.Position.BOTTOM : str.charAt(3) === 't' ? Invers.Position.TOP : str.charAt(3) === 'r' ? Invers.Position.RIGHT: Invers.Position.LEFT;
     };
 
     this.position = function () {
@@ -301,7 +301,7 @@ Invers.Engine = function (t, c) {
             position = Invers.Position.RIGHT;
             index -= list.top.length + list.bottom.length + list.left.length;
         }
-        return { color: this.get_free_tiles()[color_index], letter: L[index].letter, number: L[index].number, position: position}
+        return new Invers.Move(this.get_free_tiles()[color_index], L[index].letter, L[index].number, position);
     };
 
     this.set = function (_phase, _state, _redTileNumber, _yellowTileNumber) {

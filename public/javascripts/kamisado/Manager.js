@@ -16,7 +16,7 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     this.play = function () {
         if (engine.current_color() === gui.color()) {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
-                turn = new Kamisado.Turn(gui.get_selected_tower(), gui.get_selected_cell());
+                turn = new Kamisado.Move(gui.get_selected_tower(), gui.get_selected_cell());
                 engine.move(turn);
                 turns += turn.get() + ';';
                 if (other.is_remote()) {

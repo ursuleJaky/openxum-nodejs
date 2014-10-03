@@ -71,7 +71,7 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
                 var move;
 
                 if (msg.move === 'move_tower' && engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-                    move = new Kamisado.Turn(msg.from, msg.to);
+                    move = new Kamisado.Move(msg.from, msg.to);
                     ok = true;
                 }
                 if (ok) {
