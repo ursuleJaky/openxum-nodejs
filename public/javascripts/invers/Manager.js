@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.Manager = function (e, gui_player, other_player) {
+Invers.Manager = function (e, g, o) {
 
 // public methods
     this.load_level = function () {
@@ -13,46 +13,44 @@ Invers.Manager = function (e, gui_player, other_player) {
         return level;
     };
 
-    this.play = function () {
-        if (engine.current_color() === gui.color()) {
-            if (engine.phase() === Invers.Phase.PUSH_TILE && gui.get_move()) {
-                move = gui.get_move();
-                apply_move(move);
-                if (other.is_remote()) {
-                    other.move(move);
-                }
-                gui.unselect();
-            }
-        }
+    this.next = function () {
         gui.draw();
         finish();
         if (!engine.is_finished() && engine.current_color() !== gui.color()) {
-            if (!other.is_remote()) {
-                this.play_other();
+            if (!opponent.is_remote()) {
+                this.play_opponent();
             }
         }
     };
 
-    this.play_other = function () {
-        if (engine.phase() === Invers.Phase.PUSH_TILE) {
-            if (other.is_remote() || (other.is_remote() && other.is_ready())) {
-                move = other.move();
-            }
-            if (!other.is_remote()) {
-                move = other.move();
+    this.play = function () {
+        move = null;
+        if (engine.current_color() === gui.color()) {
+            if (engine.phase() === Invers.Phase.PUSH_TILE && gui.get_move()) {
+                move = gui.get_move();
                 apply_move(move);
-                if (other.is_remote() && other.confirm()) {
-                    other.move(move);
+                if (opponent.is_remote()) {
+                    opponent.move(move);
                 }
                 gui.unselect();
             }
         }
-        gui.draw();
-        finish();
-        if (!engine.is_finished() && engine.current_color() !== gui.color()) {
-            if (!other.is_remote()) {
-                this.play_other();
+        if (move) {
+            this.next();
+        }
+    };
+
+    this.play_opponent = function () {
+        move = null;
+        if (!opponent.is_remote() || (opponent.is_remote() && opponent.is_ready())) {
+            move = opponent.move();
+        }
+        if (move) {
+            if (opponent.is_remote() && opponent.confirm()) {
+                opponent.move(move);
             }
+            apply_move(move);
+            this.next();
         }
     };
 
@@ -105,18 +103,18 @@ Invers.Manager = function (e, gui_player, other_player) {
     var init = function (e, g, o) {
         engine = e;
         gui = g;
-        other = o;
+        opponent = o;
     };
 
 // private attributes
     var engine;
     var gui;
-    var other;
+    var opponent;
 
     var level;
 
     var move;
     var moves;
 
-    init(e, gui_player, other_player);
+    init(e, g, o);
 };
