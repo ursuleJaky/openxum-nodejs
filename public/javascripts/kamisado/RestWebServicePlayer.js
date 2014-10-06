@@ -11,7 +11,7 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         return true;
     };
 
-    this.is_ready = function() {
+    this.is_ready = function () {
         return id !== -1;
     };
 
@@ -19,21 +19,22 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         return true;
     };
 
-    this.move_tower = function (from, to) {
+    this.move = function (move) {
         if (!start) {
             start = true;
         }
-        if (from && to) {
+        if (move) {
             $.ajax({
                 type: "PUT",
                 url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
-                data: { id: id, game: 'kamisado', from: JSON.stringify(from), to: JSON.stringify(to) },
+                data: { id: id, game: 'kamisado',
+                    from: JSON.stringify(move.from()), to: JSON.stringify(move.to()) },
                 xhrFields: { withCredentials: true },
-                success: function(data) {
+                success: function (data) {
                     var response = JSON.parse(data);
 
                     if (response.color === mycolor) {
-                        manager.play_other();
+                        manager.play_opponent();
                     }
                 }
             });
@@ -43,10 +44,10 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
                 url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
                 data: { id: id, game: 'kamisado', color: mycolor },
                 xhrFields: { withCredentials: true },
-                success: function(data) {
+                success: function (data) {
                     var move = JSON.parse(data);
 
-                    manager.play_remote(move);
+                    manager.play_remote(new Kamisado.Move(move.from, move.to));
                 }
             });
         }
@@ -74,7 +75,7 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
             url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/create",
             data: { game: 'kamisado', color: 0, login: login },
             xhrFields: { withCredentials: true },
-            success: function(data) {
+            success: function (data) {
                 var response = JSON.parse(data);
 
                 id = response.id;

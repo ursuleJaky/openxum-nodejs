@@ -1,10 +1,20 @@
 "use strict";
 
-Kamisado.RemotePlayer = function (color, e, u, o, g) {
+Kamisado.RemotePlayer = function (c, e, u, o, g) {
+
+// private attributes
+    var _color = c;
+    var _engine = e;
+    var _uid = u;
+    var _gameID = g;
+    var _opponentID = o;
+    var _manager;
+    var _gui;
+    var _connection;
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.confirm = function () {
@@ -14,10 +24,10 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
     this.finish = function(moves) {
         var msg = {
             type: 'finish',
-            user_id: uid,
+            user_id: _uid,
             moves: moves
         };
-        connection.send(JSON.stringify(msg));
+        _connection.send(JSON.stringify(msg));
     };
 
     this.is_ready = function () {
@@ -28,90 +38,67 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
         return true;
     };
 
-    this.move_tower = function (from, to) {
-        if (from && to) {
+    this.move = function (move) {
+        if (move) {
             var msg = {
                 type: 'turn',
-                user_id: uid,
-                move: 'move_tower',
-                from: from,
-                to: to
+                user_id: _uid,
+                move: move.get()
             };
-            connection.send(JSON.stringify(msg));
+            _connection.send(JSON.stringify(msg));
         }
     };
 
     this.set_manager = function (m) {
-        manager = m;
+        _manager = m;
     };
 
     this.set_gui = function (g) {
-        gui = g;
+        _gui = g;
     };
 
 // private methods
     var init = function () {
-        connection = new WebSocket('ws://127.0.0.1:3000');
+        _connection = new WebSocket('ws://127.0.0.1:3000');
 
-        connection.onopen = function () {
-
+        _connection.onopen = function () {
         };
-        connection.onerror = function (error) {
-
+        _connection.onerror = function (error) {
         };
-        connection.onmessage = function (message) {
+        _connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
 
             if (msg.type === 'start') {
-                gui.ready(true);
+                _gui.ready(true);
             } else if (msg.type === 'disconnect') {
-                gui.ready(false);
+                _gui.ready(false);
             } else if (msg.type === 'turn') {
-                var ok = false;
-                var move;
+                var move = new Kamisado.Move();
 
-                if (msg.move === 'move_tower' && engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-                    move = new Kamisado.Move(msg.from, msg.to);
-                    ok = true;
-                }
-                if (ok) {
-                    manager.play_remote(move);
-                }
+                move.parse(msg.move);
+                _manager.play_remote(move);
             }
         };
 
         var loop = setInterval(function () {
-            if (connection.readyState !== 1) {
+            if (_connection.readyState !== 1) {
                 console.log('error connection');
             } else {
-                console.log('connecting ' + uid + ' ...');
+                console.log('connecting ' + _uid + ' ...');
 
                 var msg = {
                     type: 'play',
-                    user_id: uid,
-                    opponent_id: opponent_id,
-                    game_id: game_id,
+                    user_id: _uid,
+                    opponent_id: _opponentID,
+                    game_id: _gameID,
                     game_type: 'kamisado'
                 };
 
-                connection.send(JSON.stringify(msg));
+                _connection.send(JSON.stringify(msg));
                 clearInterval(loop);
             }
         }, 1000);
     };
-
-    var parse_message = function (message) {
-    };
-
-// private attributes
-    var mycolor = color;
-    var engine = e;
-    var uid = u;
-    var game_id = g;
-    var opponent_id = o;
-    var manager;
-    var gui;
-    var connection;
 
     init();
 };

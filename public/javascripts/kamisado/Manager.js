@@ -1,6 +1,6 @@
 "use strict";
 
-Kamisado.Manager = function (e, gui_player, other_player) {
+Kamisado.Manager = function (e, g, o) {
 
 // public methods
     this.load_level = function() {
@@ -18,42 +18,42 @@ Kamisado.Manager = function (e, gui_player, other_player) {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER && gui.get_selected_tower() && gui.get_selected_cell()) {
                 move = new Kamisado.Move(gui.get_selected_tower(), gui.get_selected_cell());
                 apply_move(move);
-                if (other.is_remote()) {
-                    other.move_tower(move.from(), move.to());
+                if (opponent.is_remote()) {
+                    opponent.move(move);
                 }
                 gui.unselect();
             }
             gui.draw();
             finish();
             if (engine.current_color() !== gui.color()) {
-                if (!other.is_remote()) {
-                    this.play_other();
+                if (!opponent.is_remote()) {
+                    this.play_opponent();
                 }
             }
         } else {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
                 apply_move(move);
-                if (other.is_remote() && other.confirm()) {
-                    other.move_tower(move.from(), move.to());
+                if (opponent.is_remote() && opponent.confirm()) {
+                    opponent.move(move);
                 }
                 gui.unselect();
             }
             gui.draw();
             finish();
             if (engine.current_color() !== gui.color()) {
-                if (!other.is_remote()) {
-                    this.play_other();
+                if (!opponent.is_remote()) {
+                    this.play_opponent();
                 }
             }
         }
     };
 
-    this.play_other = function() {
+    this.play_opponent = function() {
         if (engine.phase() === Kamisado.Phase.MOVE_TOWER) {
-            if (!other.is_remote() || (other.is_remote() && other.is_ready())) {
-                move = other.move_tower();
+            if (!opponent.is_remote() || (opponent.is_remote() && opponent.is_ready())) {
+                move = opponent.move();
             }
-            if (!other.is_remote()) {
+            if (!opponent.is_remote()) {
                 gui.move_tower({
                         x: move.from().x,
                         y: move.from().y,
@@ -117,19 +117,19 @@ Kamisado.Manager = function (e, gui_player, other_player) {
     var init = function(e, g, o) {
         engine = e;
         gui = g;
-        other = o;
+        opponent = o;
         moves = '';
     };
 
 // private attributes
     var engine;
     var gui;
-    var other;
+    var opponent;
 
     var level;
 
     var move;
     var moves;
 
-    init(e, gui_player, other_player);
+    init(e, g, o);
 };
