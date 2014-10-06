@@ -6,7 +6,7 @@ exports.init = function (req, res, next) {
     var queries = [];
     var last = [];
 
-/*    collections.forEach(function (el, i, arr) {
+    collections.forEach(function (el, i, arr) {
         queries.push(function (done) {
             req.app.db.models[el].count({}, function (err, count) {
                 if (err) {
@@ -21,7 +21,7 @@ exports.init = function (req, res, next) {
     queries.push(function (done) {
         req.app.db.models.GameHisto.find({status: 'finished'}, null,
             { safe: true }, function (err, gamehisto) {
-                if (gamehisto !== "") {
+                if (gamehisto.length > 0) {
                     for (var key in gamehisto) {
                         var itemdata = {};
                         var item = gamehisto[key];
@@ -56,9 +56,9 @@ exports.init = function (req, res, next) {
     var asyncFinally = function (err, results) {
         if (err) {
             return next(err);
-        } */
+        }
         res.render('index', { count: sigma, histo: last });
-/*    };
+    };
 
-    require('async').parallel(queries, asyncFinally); */
+    require('async').parallel(queries, asyncFinally);
 };
