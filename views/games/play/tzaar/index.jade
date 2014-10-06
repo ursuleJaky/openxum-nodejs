@@ -20,7 +20,7 @@ block body
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Tzaar.Engine(0, 1);
-                var gui = new Tzaar.GuiPlayer(#{color}, engine);
+                var gui = new Tzaar.Gui(#{color}, engine);
                 var other = new Tzaar.RandomPlayer(#{other_color}, engine);
                 var manager = new Tzaar.Manager(engine, gui, other);
 

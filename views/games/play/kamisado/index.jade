@@ -20,7 +20,7 @@ block body
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Kamisado.Engine(0, 0);
-                var gui = new Kamisado.GuiPlayer(#{color}, engine, '#{game_id}' === '-1');
+                var gui = new Kamisado.Gui(#{color}, engine, '#{game_id}' === '-1');
                 var other;
 
                 if ('#{game_type}' === 'remote_ai') {

@@ -22,7 +22,7 @@ block body
                 var markerNumber = document.getElementById("markerNumber");
                 var turnList = document.getElementById("turnList");
                 var engine = new Yinsh.Engine(#{mode}, 0);
-                var gui = new Yinsh.GuiPlayer(#{color}, engine, '#{game_id}' === '-1');
+                var gui = new Yinsh.Gui(#{color}, engine, '#{game_id}' === '-1');
                 var other;
 
                 if ('#{game_type}' === 'remote_ai') {

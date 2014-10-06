@@ -1,6 +1,6 @@
 "use strict";
 
-Gipf.GuiPlayer = function (color, e) {
+Gipf.Gui = function (color, e) {
 
 // public methods
     this.color = function () {

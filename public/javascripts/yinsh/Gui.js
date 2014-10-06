@@ -1,6 +1,6 @@
 "use strict";
 
-Yinsh.GuiPlayer = function (color, e, local) {
+Yinsh.Gui = function (color, e, local) {
 
 // public methods
     this.clear_selected_ring = function () {

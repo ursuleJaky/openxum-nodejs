@@ -1,6 +1,6 @@
 "use strict";
 
-Dvonn.GuiPlayer = function (color, e) {
+Dvonn.Gui = function (color, e) {
 
 // public methods
     this.color = function () {

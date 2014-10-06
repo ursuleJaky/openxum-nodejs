@@ -20,7 +20,7 @@ block body
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Invers.Engine(0, 0);
-                var gui = new Invers.GuiPlayer(#{color}, engine, '#{game_id}' === '-1');
+                var gui = new Invers.Gui(#{color}, engine, '#{game_id}' === '-1');
                 var other;
 
                 if ('#{game_type}' === 'remote_ai') {

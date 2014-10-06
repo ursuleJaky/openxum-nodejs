@@ -1,6 +1,6 @@
 "use strict";
 
-Kamisado.GuiPlayer = function (color, engine, local) {
+Kamisado.Gui = function (color, engine, local) {
 
 // public methods
     this.color = function() {

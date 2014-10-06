@@ -20,7 +20,7 @@ block body
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Gipf.Engine(#{mode}, 0);
-                var gui = new Gipf.GuiPlayer(#{color}, engine);
+                var gui = new Gipf.Gui(#{color}, engine);
                 var other = new Gipf.RandomPlayer(#{other_color}, engine);
                 var manager = new Gipf.Manager(engine, gui, other);
 

@@ -20,7 +20,7 @@ block body
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Dvonn.Engine(0, 0);
-                var gui = new Dvonn.GuiPlayer(#{color}, engine);
+                var gui = new Dvonn.Gui(#{color}, engine);
                 var other = new Dvonn.RandomPlayer(#{other_color}, engine);
                 var manager = new Dvonn.Manager(engine, gui, other);
 

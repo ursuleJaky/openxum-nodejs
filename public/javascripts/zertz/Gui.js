@@ -1,6 +1,6 @@
 "use strict";
 
-Zertz.GuiPlayer = function (color, e) {
+Zertz.Gui = function (color, e) {
 
 // public methods
     this.color = function () {

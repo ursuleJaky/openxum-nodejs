@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.GuiPlayer = function (color, e, local) {
+Invers.Gui = function (color, e, local) {
 
 // public methods
     this.color = function () {

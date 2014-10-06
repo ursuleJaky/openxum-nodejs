@@ -1,6 +1,6 @@
 "use strict";
 
-Tzaar.GuiPlayer = function (color, e) {
+Tzaar.Gui = function (color, e) {
 
 // public methods
     this.color = function () {
