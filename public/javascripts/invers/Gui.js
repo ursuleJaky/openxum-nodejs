@@ -26,7 +26,7 @@ Invers.Gui = function (color, e, local) {
     this.get_move = function () {
         if (selected_color !== Invers.Color.NONE && selected_index !== -1 && selected_position !== Invers.Position.NONE) {
             var letter = 'X';
-            var number = -1;
+            var number = 0;
 
             if (selected_position === Invers.Position.LEFT || selected_position === Invers.Position.RIGHT) {
                 number = selected_index;

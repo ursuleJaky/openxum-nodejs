@@ -1,23 +1,33 @@
 "use strict";
 
-Invers.RemotePlayer = function (color, e, u, o, g) {
+Invers.RemotePlayer = function (c, e, u, o, g) {
+
+// private attributes
+    var _color = c;
+    var _engine = e;
+    var _uid = u;
+    var _gameID = g;
+    var _opponentID = o;
+    var _manager;
+    var _gui;
+    var _connection;
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.confirm = function () {
         return false;
     };
 
-    this.finish = function() {
+    this.finish = function(moves) {
         var msg = {
             type: 'finish',
-            user_id: uid,
+            user_id: _uid,
             moves: moves
         };
-        connection.send(JSON.stringify(msg));
+        _connection.send(JSON.stringify(msg));
     };
 
     this.is_ready = function () {
@@ -32,88 +42,63 @@ Invers.RemotePlayer = function (color, e, u, o, g) {
         if (move) {
             var msg = {
                 type: 'turn',
-                user_id: uid,
-                move: 'push_tile',
-                color: move.color(),
-                letter: move.letter(),
-                number: move.number(),
-                position: move.position()
+                user_id: _uid,
+                move: move.get()
             };
-            connection.send(JSON.stringify(msg));
+            _connection.send(JSON.stringify(msg));
         }
     };
 
     this.set_manager = function (m) {
-        manager = m;
+        _manager = m;
     };
 
     this.set_gui = function (g) {
-        gui = g;
+        _gui = g;
     };
 
 // private methods
     var init = function () {
-        connection = new WebSocket('ws://127.0.0.1:3000');
+        _connection = new WebSocket('ws://127.0.0.1:3000');
 
-        connection.onopen = function () {
-
+        _connection.onopen = function () {
         };
-        connection.onerror = function (error) {
-
+        _connection.onerror = function (error) {
         };
-        connection.onmessage = function (message) {
+        _connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
 
             if (msg.type === 'start') {
-                gui.ready(true);
+                _gui.ready(true);
             } else if (msg.type === 'disconnect') {
-                gui.ready(false);
+                _gui.ready(false);
             } else if (msg.type === 'turn') {
-                var ok = false;
-                var move;
+                var move = new Invers.Move();
 
-                if (msg.move === 'push_tile' && engine.phase() === Invers.Phase.PUSH_TILE) {
-                    move = new Invers.Move(msg.color, msg.letter, msg.number, msg.position);
-                    ok = true;
-                }
-                if (ok) {
-                    manager.play_remote(move);
-                }
+                move.parse(msg.move);
+                _manager.play_remote(move);
             }
         };
 
         var loop = setInterval(function () {
-            if (connection.readyState !== 1) {
+            if (_connection.readyState !== 1) {
                 console.log('error connection');
             } else {
-                console.log('connecting ' + uid + ' ...');
+                console.log('connecting ' + _uid + ' ...');
 
                 var msg = {
                     type: 'play',
-                    user_id: uid,
-                    opponent_id: opponent_id,
-                    game_id: game_id,
+                    user_id: _uid,
+                    opponent_id: _opponentID,
+                    game_id: _gameID,
                     game_type: 'invers'
                 };
 
-                connection.send(JSON.stringify(msg));
+                _connection.send(JSON.stringify(msg));
                 clearInterval(loop);
             }
         }, 1000);
     };
-
-    var parse_message = function (message) {
-    };
-
-// private attributes
-    var mycolor = color;
-    var engine = e;
-    var uid = u;
-    var game_id = g;
-    var opponent_id = o;
-    var manager;
-    var gui;
-    var connection;
 
     init();
 };

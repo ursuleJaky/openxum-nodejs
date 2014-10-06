@@ -11,7 +11,7 @@ Kamisado.RemotePlayer = function (color, e, u, o, g) {
         return false;
     };
 
-    this.finish = function() {
+    this.finish = function(moves) {
         var msg = {
             type: 'finish',
             user_id: uid,
