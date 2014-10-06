@@ -1,5 +1,239 @@
 "use strict";
 
+// grid constants definition
+Dvonn.begin_letter = [ 'A', 'A', 'A', 'B', 'C' ];
+Dvonn.end_letter = [ 'I', 'J', 'K', 'K', 'K' ];
+Dvonn.begin_number = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3 ];
+Dvonn.end_number = [ 3, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5 ];
+Dvonn.begin_diagonal_letter = [ 'A', 'A', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' ];
+Dvonn.end_diagonal_letter = [ 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'K', 'K' ];
+Dvonn.begin_diagonal_number = [ 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1 ];
+Dvonn.end_diagonal_number = [ 5, 5, 5, 5, 5, 5, 5, 5, 5, 4, 3 ];
+
+// enums definition
+Dvonn.GameType = { STANDARD: 0 };
+Dvonn.Color = { NONE: -1, BLACK: 0, WHITE: 1, RED: 2 };
+Dvonn.Phase = { PUT_DVONN_PIECE: 0, PUT_PIECE: 1, MOVE_STACK: 2 };
+Dvonn.State = { VACANT: 0, NO_VACANT: 1 };
+Dvonn.Direction = { NORTH_WEST: 0, NORTH_EAST: 1, EAST: 2, SOUTH_EAST: 3, SOUTH_WEST: 4, WEST: 5 };
+Dvonn.letters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K' ];
+
+Dvonn.Coordinates = function (l, n) {
+
+// public methods
+    this.distance = function (coordinates) {
+        if (coordinates.letter() === letter) {
+            return coordinates.number() - number;
+        } else {
+            return coordinates.letter().charCodeAt(0) - letter.charCodeAt(0);
+        }
+    };
+
+    this.hash = function () {
+        return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 11;
+    };
+
+    this.is_valid = function () {
+        return (number == 1 && letter >= 'A' && letter <= 'I') ||
+            (number == 2 && letter >= 'A' && letter <= 'J') ||
+            (number == 3 && letter >= 'A' && letter <= 'K') ||
+            (number == 4 && letter >= 'B' && letter <= 'K') ||
+            (number == 5 && letter >= 'C' && letter <= 'K');
+    };
+
+    this.letter = function () {
+        return letter;
+    };
+
+    this.move = function(distance, direction) {
+        switch (direction) {
+            case Dvonn.Direction.NORTH_WEST: return new Dvonn.Coordinates(compute_letter(letter, -distance), number - distance);
+            case Dvonn.Direction.NORTH_EAST: return new Dvonn.Coordinates(letter, number - distance);
+            case Dvonn.Direction.EAST: return new Dvonn.Coordinates(compute_letter(letter, distance), number);
+            case Dvonn.Direction.SOUTH_EAST: return new Dvonn.Coordinates(compute_letter(letter, distance), number + distance);
+            case Dvonn.Direction.SOUTH_WEST: return new Dvonn.Coordinates(letter, number + distance);
+            case Dvonn.Direction.WEST: return new Dvonn.Coordinates(compute_letter(letter, -distance), number);
+        }
+    };
+
+    this.number = function () {
+        return number;
+    };
+
+    this.to_string = function() {
+        return letter + number;
+    };
+
+// private attributes
+    var compute_letter = function(l, d) {
+        var index = letter.charCodeAt(0) - 'A'.charCodeAt(0) + d;
+
+        if (index >= 0 && index <= 11) {
+            return Dvonn.letters[index];
+        } else {
+            return 'X';
+        }
+    };
+
+    var letter = l;
+    var number = n;
+};
+
+Dvonn.Intersection = function (c) {
+// public methods
+    this.hash = function () {
+        return coordinates.hash();
+    };
+
+    this.color = function () {
+        if (state === Dvonn.State.VACANT) {
+            return -1;
+        }
+        return stack.color();
+    };
+
+    this.coordinates = function () {
+        return coordinates;
+    };
+
+    this.dvonn = function() {
+        return stack.dvonn();
+    };
+
+    this.letter = function () {
+        return coordinates.letter();
+    };
+
+    this.move_stack_to = function(destination) {
+        var _stack = new Dvonn.Stack();
+
+        while (!stack.empty()) {
+            _stack.put_piece(stack.remove_top());
+        }
+        state = Dvonn.State.VACANT;
+        while (!_stack.empty()) {
+            destination.put_piece(_stack.remove_top().color());
+        }
+    };
+
+    this.number = function () {
+        return coordinates.number();
+    };
+
+    this.put_piece = function(color) {
+        state = Dvonn.State.NO_VACANT;
+        stack.put_piece(new Dvonn.Piece(color));
+    };
+
+    this.remove_stack = function() {
+        state = Dvonn.State.VACANT;
+        stack.clear();
+    };
+
+    this.state = function () {
+        return state;
+    };
+
+    this.size = function() {
+        return stack.size();
+    };
+
+// private methods
+    var init = function(c) {
+        coordinates = c;
+        state = Dvonn.State.VACANT;
+        stack = new Dvonn.Stack();
+    };
+
+// private attributes
+    var coordinates;
+    var state;
+    var stack;
+
+    init(c);
+};
+
+Dvonn.Piece = function (c) {
+
+// public methods
+    this.color = function() {
+        return _color;
+    };
+
+    this.dvonn = function() {
+        return _dvonn;
+    };
+
+// private attributes
+    var init = function(c) {
+        _color = c;
+        _dvonn = c == Dvonn.Color.RED;
+    };
+
+    var _color;
+    var _dvonn;
+
+    init(c);
+};
+
+Dvonn.Stack = function () {
+
+// public methods
+    this.color = function() {
+        return top().color();
+    };
+
+    this.clear = function() {
+        while (!this.empty()) {
+            _pieces.pop();
+        }
+    };
+
+    this.dvonn = function() {
+        return _dvonn;
+    };
+
+    this.empty = function() {
+        return _pieces.length == 0;
+    };
+
+    this.put_piece = function(piece) {
+        if (!_dvonn) {
+            _dvonn = piece.dvonn();
+        }
+        _pieces.push(piece);
+    };
+
+    this.remove_top = function() {
+        var _top = top();
+
+        _pieces.pop();
+        if (this.empty()) {
+            _dvonn = false;
+        }
+        return _top;
+    };
+
+    this.size = function() {
+        return _pieces.length;
+    };
+
+// private attributes
+    var init = function() {
+        _pieces = [];
+        _dvonn = false;
+    };
+
+    var top = function() {
+        return _pieces[_pieces.length - 1];
+    };
+
+    var _pieces;
+    var _dvonn;
+
+    init();
+};
+
 Dvonn.Engine = function (t, c) {
 
 // public methods

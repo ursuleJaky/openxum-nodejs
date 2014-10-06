@@ -1,5 +1,117 @@
 "use strict";
 
+// grid constants definition
+Zertz.begin_number = [ 1, 1, 1, 1, 2, 3, 4 ];
+Zertz.end_number = [ 4, 5, 6, 7, 7, 7, 7 ];
+
+// enums definition
+Zertz.GameType = { BLITZ: 0, REGULAR: 1 };
+Zertz.Color = { NONE: -1, ONE: 0, TWO: 1 };
+Zertz.MarbleColor = { NONE: -1, BLACK: 0, WHITE: 1, GREY: 2 };
+Zertz.Phase = { SELECT_MARBLE_IN_POOL: 0, PUT_MARBLE: 1, REMOVE_RING: 2, CAPTURE: 3 };
+Zertz.State = { VACANT: 0, BLACK_MARBLE: 1, WHITE_MARBLE: 2, GREY_MARBLE: 3, EMPTY: 4 };
+Zertz.Direction = { NORTH_WEST: 0, NORTH: 1, NORTH_EAST: 2, SOUTH_EAST: 3, SOUTH: 4, SOUTH_WEST: 5 };
+Zertz.letters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G' ];
+
+Zertz.Coordinates = function (l, n) {
+
+// public methods
+    this.hash = function () {
+        return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 7;
+    };
+
+    this.is_valid = function () {
+        return (letter === 'A' && number >= 1 && number <= 4) ||
+            (letter === 'B' && number >= 1 && number <= 5) ||
+            (letter === 'C' && number >= 1 && number <= 6) ||
+            (letter === 'D' && number >= 1 && number <= 7) ||
+            (letter === 'E' && number >= 2 && number <= 7) ||
+            (letter === 'F' && number >= 3 && number <= 7) ||
+            (letter === 'G' && number >= 4 && number <= 7);
+    };
+
+    this.letter = function () {
+        return letter;
+    };
+
+    this.number = function () {
+        return number;
+    };
+
+// private attributes
+    var letter = l;
+    var number = n;
+};
+
+Zertz.Intersection = function (c) {
+// public methods
+    this.color = function () {
+        if (state === Zertz.State.VACANT || state === Zertz.State.EMPTY) {
+            return Zertz.MarbleColor.NONE;
+        } else if (state === Zertz.State.BLACK_MARBLE) {
+            return Zertz.MarbleColor.BLACK;
+        } else if (state === Zertz.State.GREY_MARBLE) {
+            return Zertz.MarbleColor.GREY;
+        } else {
+            return Zertz.MarbleColor.WHITE;
+        }
+    };
+
+    this.coordinates = function () {
+        return coordinates;
+    };
+
+    this.hash = function () {
+        return coordinates.hash();
+    };
+
+    this.letter = function () {
+        return coordinates.letter();
+    };
+
+    this.marble_is_present = function() {
+        return state === Zertz.State.BLACK_MARBLE || state === Zertz.State.WHITE_MARBLE || state === Zertz.State.GREY_MARBLE;
+    };
+
+    this.number = function () {
+        return coordinates.number();
+    };
+
+    this.put_marble = function(color) {
+        if (color === Zertz.MarbleColor.BLACK) {
+            state = Zertz.State.BLACK_MARBLE;
+        } else if (color === Zertz.MarbleColor.WHITE) {
+            state = Zertz.State.WHITE_MARBLE;
+        } else if (color === Zertz.MarbleColor.GREY) {
+            state = Zertz.State.GREY_MARBLE;
+        }
+    };
+
+    this.remove_marble = function() {
+        state = Zertz.State.VACANT;
+    };
+
+    this.remove_ring = function() {
+        state = Zertz.State.EMPTY;
+    };
+
+    this.state = function () {
+        return state;
+    };
+
+// private methods
+    var init = function (c) {
+        coordinates = c;
+        state = Zertz.State.VACANT;
+    };
+
+// private attributes
+    var coordinates;
+    var state;
+
+    init(c);
+};
+
 Zertz.Engine = function (t, c) {
 
 // public methods

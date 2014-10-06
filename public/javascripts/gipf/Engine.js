@@ -1,5 +1,138 @@
 "use strict";
 
+// grid constants definition
+Gipf.begin_letter = [ 'A', 'A', 'A', 'A', 'A', 'B', 'C', 'D', 'E' ];
+Gipf.end_letter = [ 'E', 'F', 'G', 'H', 'I', 'I', 'I', 'I', 'I' ];
+Gipf.begin_number = [ 1, 1, 1, 1, 1, 2, 3, 4, 5 ];
+Gipf.end_number = [ 5, 6, 7, 8, 9, 9, 9, 9, 9 ];
+Gipf.begin_diagonal_letter = [ 'A', 'A', 'A', 'A', 'A', 'B', 'C', 'D', 'E' ];
+Gipf.end_diagonal_letter = [ 'E', 'F', 'G', 'H', 'I', 'I', 'I', 'I', 'I' ];
+Gipf.begin_diagonal_number = [ 5, 4, 3, 2, 1, 1, 1, 1, 1 ];
+Gipf.end_diagonal_number = [ 9, 9, 9, 9, 9, 8, 7, 6, 5 ];
+
+// enums definition
+Gipf.GameType = { BASIC: 0, STANDARD: 1, TOURNAMENT: 2 };
+Gipf.Color = { NONE: -1, BLACK: 0, WHITE: 1 };
+Gipf.Phase = { PUT_FIRST_PIECE: 0, PUT_PIECE: 1, PUSH_PIECE: 2, CAPTURE_PIECE: 3, REMOVE_ROWS: 4 };
+Gipf.State = { VACANT: 0, WHITE_PIECE: 1, WHITE_GIPF: 2, BLACK_PIECE: 3, BLACK_GIPF: 4 };
+Gipf.Direction = { NORTH_WEST: 0, NORTH: 1, NORTH_EAST: 2, SOUTH_EAST: 3, SOUTH: 4, SOUTH_WEST: 5 };
+Gipf.letters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' ];
+
+Gipf.Coordinates = function (l, n) {
+
+// public methods
+    this.hash = function () {
+        return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 9;
+    };
+
+    this.is_valid = function () {
+        return (letter == 'A' && number >= 1 && number <= 5) ||
+            (letter == 'B' && number >= 1 && number <= 6) ||
+            (letter == 'C' && number >= 1 && number <= 7) ||
+            (letter == 'D' && number >= 1 && number <= 8) ||
+            (letter == 'E' && number >= 1 && number <= 9) ||
+            (letter == 'F' && number >= 2 && number <= 9) ||
+            (letter == 'G' && number >= 3 && number <= 9) ||
+            (letter == 'H' && number >= 4 && number <= 9) ||
+            (letter == 'I' && number >= 5 && number <= 9);
+    };
+
+    this.letter = function () {
+        return letter;
+    };
+
+    this.move = function (letter_distance, number_distance) {
+        return new Gipf.Coordinates(String.fromCharCode(letter.charCodeAt(0) + letter_distance), number + number_distance);
+    };
+
+    this.number = function () {
+        return number;
+    };
+
+    this.to_string = function () {
+        return letter + number;
+    };
+
+// private attributes
+    var compute_letter = function (l, d) {
+        var index = letter.charCodeAt(0) - 'A'.charCodeAt(0) + d;
+
+        if (index >= 0 && index <= 11) {
+            return Gipf.letters[index];
+        } else {
+            return 'X';
+        }
+    };
+
+    var letter = l;
+    var number = n;
+};
+
+Gipf.Intersection = function (c) {
+// public methods
+    this.color = function () {
+        if (state === Gipf.State.VACANT) {
+            return -1;
+        } else if (state === Gipf.State.WHITE_GIPF || state === Gipf.State.WHITE_PIECE) {
+            return Gipf.Color.WHITE;
+        } else {
+            return Gipf.Color.BLACK;
+        }
+    };
+
+    this.coordinates = function () {
+        return coordinates;
+    };
+
+    this.gipf = function() {
+        return state === Gipf.State.WHITE_GIPF || state === Gipf.State.BLACK_GIPF;
+    };
+
+    this.hash = function () {
+        return coordinates.hash();
+    };
+
+    this.letter = function () {
+        return coordinates.letter();
+    };
+
+    this.number = function () {
+        return coordinates.number();
+    };
+
+    this.put_piece = function (color, gipf) {
+        if (gipf) {
+            state = color === Gipf.Color.WHITE ? Gipf.State.WHITE_GIPF : Gipf.State.BLACK_GIPF;
+        } else {
+            state = color === Gipf.Color.WHITE ? Gipf.State.WHITE_PIECE : Gipf.State.BLACK_PIECE;
+        }
+    };
+
+    this.remove_piece = function () {
+        var color = (state === Gipf.State.WHITE_GIPF || state === Gipf.State.WHITE_PIECE) ? Gipf.Color.WHITE : Gipf.Color.BLACK;
+        var gipf = (state === Gipf.State.WHITE_GIPF || state === Gipf.State.BLACK_GIPF);
+
+        state = Gipf.State.VACANT;
+        return { color: color, gipf: gipf };
+    };
+
+    this.state = function () {
+        return state;
+    };
+
+// private methods
+    var init = function (c) {
+        coordinates = c;
+        state = Gipf.State.VACANT;
+    };
+
+// private attributes
+    var coordinates;
+    var state;
+
+    init(c);
+};
+
 Gipf.Engine = function (t, c) {
 
 // public methods

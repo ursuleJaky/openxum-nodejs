@@ -1,6 +1,151 @@
 "use strict";
 
+// grid constants definition
+Yinsh.begin_letter = [ 'B', 'A', 'A', 'A', 'A', 'B', 'B', 'C',
+    'D', 'E', 'G' ];
+Yinsh.end_letter = [ 'E', 'G', 'H', 'I', 'J', 'J', 'K', 'K', 'K',
+    'K', 'J' ];
+Yinsh.begin_number = [ 2, 1, 1, 1, 1, 2, 2, 3, 4, 5, 7 ];
+Yinsh.end_number = [ 5, 7, 8, 9, 10, 10, 11, 11, 11, 11, 10 ];
+Yinsh.begin_diagonal_letter = [ 'B', 'A', 'A', 'A', 'A', 'B',
+    'B', 'C', 'D', 'E', 'G'];
+Yinsh.end_diagonal_letter = [ 'E', 'G', 'H', 'I', 'J', 'J',
+    'K', 'K', 'K', 'K', 'J' ];
+Yinsh.begin_diagonal_number = [ 7, 5, 4, 3, 2, 2, 1, 1, 1, 1, 2 ];
+Yinsh.end_diagonal_number = [ 10, 11, 11, 11, 11, 10, 10, 9, 8,
+    7, 5 ];
+
+// enums definition
+Yinsh.GameType = { BLITZ: 0, REGULAR: 1 };
+Yinsh.Color = { BLACK: 0, WHITE: 1, NONE: 2 };
+Yinsh.Phase = { PUT_RING: 0, PUT_MARKER: 1, MOVE_RING: 2, REMOVE_ROWS_AFTER: 3,
+    REMOVE_RING_AFTER: 4, REMOVE_ROWS_BEFORE: 5, REMOVE_RING_BEFORE: 6, FINISH: 7 };
+Yinsh.State = { VACANT: 0, BLACK_MARKER: 1, WHITE_MARKER: 2, BLACK_RING: 3, WHITE_RING: 4,
+    BLACK_MARKER_RING: 5, WHITE_MARKER_RING: 6 };
 Yinsh.MoveType = { PUT_RING: 0, PUT_MARKER: 1, MOVE_RING: 2, REMOVE_ROW: 3, REMOVE_RING: 4 };
+
+Yinsh.Coordinates = function (l, n) {
+
+// public methods
+    this.distance = function (coordinates) {
+        if (coordinates.letter() === letter) {
+            return coordinates.number() - number;
+        } else {
+            return coordinates.letter().charCodeAt(0) - letter.charCodeAt(0);
+        }
+    };
+
+    this.hash = function () {
+        return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 11;
+    };
+
+    this.is_valid = function () {
+        return letter >= 'A' && letter <= 'K' && number >= 1 && number <= 11;
+    };
+
+    this.letter = function () {
+        return letter;
+    };
+
+    this.number = function () {
+        return number;
+    };
+
+    this.to_string = function () {
+        return letter + number;
+    };
+
+// private attributes
+    var letter = l;
+    var number = n;
+};
+
+Yinsh.Intersection = function (c) {
+// public methods
+    this.hash = function () {
+        return coordinates.hash();
+    };
+
+    this.color = function () {
+        if (state === Yinsh.State.VACANT) {
+            return -1;
+        }
+
+        if (state === Yinsh.State.BLACK_RING ||
+            state === Yinsh.State.BLACK_MARKER ||
+            state === Yinsh.State.BLACK_MARKER_RING) {
+            return Yinsh.Color.BLACK;
+        } else {
+            return Yinsh.Color.WHITE;
+        }
+    };
+
+    this.flip = function () {
+        if (state === Yinsh.State.BLACK_MARKER) {
+            state = Yinsh.State.WHITE_MARKER;
+        } else if (state === Yinsh.State.WHITE_MARKER) {
+            state = Yinsh.State.BLACK_MARKER;
+        }
+    };
+
+    this.coordinates = function () {
+        return coordinates;
+    };
+
+    this.letter = function () {
+        return coordinates.letter();
+    };
+
+    this.number = function () {
+        return coordinates.number();
+    };
+
+    this.put_marker = function (color) {
+        if (color === Yinsh.Color.BLACK) {
+            if (state === Yinsh.State.BLACK_RING) {
+                state = Yinsh.State.BLACK_MARKER_RING;
+            }
+        } else {
+            if (state === Yinsh.State.WHITE_RING) {
+                state = Yinsh.State.WHITE_MARKER_RING;
+            }
+        }
+    };
+
+    this.put_ring = function (color) {
+        if (color === Yinsh.Color.BLACK) {
+            state = Yinsh.State.BLACK_RING;
+        } else {
+            state = Yinsh.State.WHITE_RING;
+        }
+    };
+
+    this.remove_marker = function () {
+        state = Yinsh.State.VACANT;
+    };
+
+    this.remove_ring = function () {
+        if (state === Yinsh.State.BLACK_MARKER_RING || state === Yinsh.State.WHITE_MARKER_RING) {
+            if (state === Yinsh.State.BLACK_MARKER_RING) {
+                state = Yinsh.State.BLACK_MARKER;
+            } else {
+                state = Yinsh.State.WHITE_MARKER;
+            }
+        }
+    };
+
+    this.remove_ring_board = function () {
+        state = Yinsh.State.VACANT;
+    };
+
+    this.state = function () {
+        return state;
+    };
+
+// private attributes
+    var coordinates = c;
+    var state = Yinsh.State.VACANT;
+};
 
 Yinsh.Move = function (t, c1, c2) {
 
