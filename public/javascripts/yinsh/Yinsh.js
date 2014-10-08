@@ -1,7 +1,7 @@
 // namespace Yinsh
 var Yinsh = { };
 
-Yinsh.load = function (callback) {
+/*Yinsh.load = function (callback) {
     $.getScript('/javascripts/yinsh/Engine.js', function () {
         $.getScript('/javascripts/yinsh/Manager.js', function () {
             $.getScript('/javascripts/yinsh/Gui.js', function () {
@@ -13,4 +13,4 @@ Yinsh.load = function (callback) {
             });
         });
     });
-};
+};*/

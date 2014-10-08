@@ -171,13 +171,13 @@ Yinsh.Move = function (t, c1, c2) {
 
 // public methods
     this.get = function () {
-        if (t === Yinsh.MoveType.PUT_RING) {
+        if (_type === Yinsh.MoveType.PUT_RING) {
             return 'Pr' + _coordinates.to_string();
-        } else if (t === Yinsh.MoveType.PUT_MARKER) {
+        } else if (_type === Yinsh.MoveType.PUT_MARKER) {
             return 'Pm' + _coordinates.to_string();
-        } else if (t === Yinsh.MoveType.REMOVE_RING) {
+        } else if (_type === Yinsh.MoveType.REMOVE_RING) {
             return 'Rr' + _coordinates.to_string();
-        } else if (t === Yinsh.MoveType.MOVE_RING) {
+        } else if (_type === Yinsh.MoveType.MOVE_RING) {
             return 'Mr' + _from.to_string() + _to.to_string();
         } else {
             var str = 'RR';
@@ -222,16 +222,16 @@ Yinsh.Move = function (t, c1, c2) {
         } else if (type === 'RR') {
             _type = Yinsh.MoveType.REMOVE_ROW;
         }
-        if (_type === Yinsh.MoveType.PUT_RING || t === Yinsh.MoveType.PUT_MARKER || t === Yinsh.MoveType.REMOVE_RING) {
-            _coordinates = new Yinsh.Coordinates(str.charCodeAt(2), parseInt(str.charCodeAt(3)));
+        if (_type === Yinsh.MoveType.PUT_RING || _type === Yinsh.MoveType.PUT_MARKER || _type === Yinsh.MoveType.REMOVE_RING) {
+            _coordinates = new Yinsh.Coordinates(str.charAt(2), parseInt(str.charAt(3)));
         } else if (_type === Yinsh.MoveType.MOVE_RING) {
-            _from = new Yinsh.Coordinates(str.charCodeAt(2), parseInt(str.charCodeAt(3)));
-            _to = new Yinsh.Coordinates(str.charCodeAt(4), parseInt(str.charCodeAt(5)));
+            _from = new Yinsh.Coordinates(str.charAt(2), parseInt(str.charAt(3)));
+            _to = new Yinsh.Coordinates(str.charAt(4), parseInt(str.charAt(5)));
         } else {
             _row = [];
             for (var index = 0; index < 5; ++index) {
-                _row.push(new Yinsh.Coordinates(str.charCodeAt(2 + 2 * index),
-                    parseInt(str.charCodeAt(3 + 2 * index))));
+                _row.push(new Yinsh.Coordinates(str.charAt(2 + 2 * index),
+                    parseInt(str.charAt(3 + 2 * index))));
             }
         }
     };
