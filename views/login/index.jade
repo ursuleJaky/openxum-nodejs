@@ -62,6 +62,6 @@ block body
         input.form-control(type='password', name='password', value!='<%= password %>')
         span.help-block <%- errfor.password %>
       div.form-actions
-        button.btn.btn-primary.btn-login(type='button') Sign In
+        button.btn.btn-primary.btn-login(type='button', name='submit') Sign In
         |&nbsp;
         a.btn.btn-link(href='/login/forgot/') Forget your password?

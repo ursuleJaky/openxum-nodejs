@@ -17,6 +17,8 @@ Technology
 | WebSocket     |                |             |
 | Easy-captcha  |                |             |
 | I18n-2        |                |             |
+| Zombie        |                |             |
+| Cucumber      |                |             |
 
 Requirements
 ------------
