@@ -16,7 +16,6 @@ block body
 
     script(language='javascript').
         $(document).ready(function() {
-            Yinsh.load(function() {
                 $('#winnerModal .new-game-button').click(function() {
                     $('#winnerModal').modal('hide');
                     window.location.href = '/games/create/?game=yinsh';
@@ -67,7 +66,6 @@ block body
                 $( "#target" ).click(function() {
                    other.replayGame();
                 });
-            });
         });
 
     br
