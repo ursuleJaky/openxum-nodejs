@@ -21,8 +21,17 @@ block body
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Zertz.Engine(#{mode}, 0);
                 var gui = new Zertz.Gui(#{color}, engine);
-                var other = new Zertz.RandomPlayer(#{other_color}, engine);
-                var manager = new Zertz.Manager(engine, gui, other);
+                var opponent;
+
+                if ('#{game_type}' === 'remote_ai') {
+                    // opponent = new Zertz.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                } else if ('#{game_id}' === '-1') {
+                    opponent = new Zertz.RandomPlayer(#{opponent_color}, engine);
+                } else {
+                    opponent = new Zertz.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
+                }
+
+                var manager = new Zertz.Manager(engine, gui, opponent);
 
                 if (canvas_div.clientHeight < canvas_div.clientWidth) {
                     canvas.height = canvas_div.clientHeight * 0.95;
@@ -33,9 +42,17 @@ block body
                 }
                 gui.set_canvas(canvas);
                 gui.set_manager(manager);
-                other.set_level(manager.load_level());
-                if (engine.current_color() == other.color()) {
-                    manager.play_other();
+                if ('#{game_id}' != '-1') {
+                    opponent.set_manager(manager);
+                    opponent.set_gui(gui);
+                } else {
+                    opponent.set_level(manager.load_level());
+                    if (opponent.is_remote()) {
+                        opponent.set_manager(manager);
+                    }
+                }
+                if (engine.current_color() === opponent.color() && !opponent.is_remote()) {
+                    manager.play_opponent();
                 }
             });
         });

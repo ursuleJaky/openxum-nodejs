@@ -228,6 +228,7 @@ exports.Server = function (app) {
                 });
             });
         } else if (game_type === 'zertz') {
+            response = msg;
         }
         if (c_opponent) {
             c_opponent.send(JSON.stringify(response));

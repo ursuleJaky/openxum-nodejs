@@ -2,6 +2,35 @@
 
 Zertz.Gui = function (color, e) {
 
+// private attributes
+    var engine = e;
+    var mycolor = color;
+    var that = this;
+
+    var canvas;
+    var context;
+    var manager;
+    var height;
+    var width;
+
+    var tolerance = 15;
+
+    var delta_x;
+    var delta_y;
+    var delta_xy;
+    var offset;
+
+    var scaleX;
+    var scaleY;
+
+    var pointerX = -1;
+    var pointerY = -1;
+
+    var selected_coordinates;
+    var selected_marble;
+    var selected_marble_in_pool;
+    var selected_color;
+
 // public methods
     this.color = function () {
         return mycolor;
@@ -49,6 +78,25 @@ Zertz.Gui = function (color, e) {
 
     this.engine = function () {
         return engine;
+    };
+
+    this.get_move = function () {
+        var move = null;
+
+        if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
+            move = new Zertz.Move(Zertz.MoveType.PUT_MARBLE, this.color(), this.get_selected_coordinates(),
+                this.get_selected_color(), null);
+            this.unselect();
+        } else if (engine.phase() === Zertz.Phase.REMOVE_RING) {
+            move = new Zertz.Move(Zertz.MoveType.REMOVE_RING, this.color(), this.get_selected_coordinates(),
+                null, null);
+            this.unselect();
+        } else if (engine.phase() === Zertz.Phase.CAPTURE) {
+            move = new Zertz.Move(Zertz.MoveType.CAPTURE, this.color(), this.get_selected_coordinates(),
+                null, this.get_selected_marble());
+            this.unselect();
+        }
+        return move;
     };
 
     this.get_selected_color = function () {
@@ -406,10 +454,10 @@ Zertz.Gui = function (color, e) {
         } else {
             var letter = compute_letter(pos.x, pos.y);
 
-            if (letter != 'X') {
+            if (letter !== 'X') {
                 var number = compute_number(pos.x, pos.y);
 
-                if (number != -1) {
+                if (number !== -1) {
                     var ok = false;
 
                     if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
@@ -671,34 +719,6 @@ Zertz.Gui = function (color, e) {
             context.stroke();
         }
     };
-
-// private attributes
-    var engine = e;
-    var mycolor = color;
-
-    var canvas;
-    var context;
-    var manager;
-    var height;
-    var width;
-
-    var tolerance = 15;
-
-    var delta_x;
-    var delta_y;
-    var delta_xy;
-    var offset;
-
-    var scaleX;
-    var scaleY;
-
-    var pointerX = -1;
-    var pointerY = -1;
-
-    var selected_coordinates;
-    var selected_marble;
-    var selected_marble_in_pool;
-    var selected_color;
 
     init();
 };

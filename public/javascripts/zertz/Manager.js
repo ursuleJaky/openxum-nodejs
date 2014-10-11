@@ -1,68 +1,33 @@
 "use strict";
 
-Zertz.Manager = function (e, gui_player, other_player) {
+Zertz.Manager = function (e, g, o) {
 
-// public methods
-    this.load_level = function () {
-        var key = 'openxum:zertz:level';
+// private attributes
+    var engine;
+    var gui;
+    var opponent;
 
-        level = 10;
-        if (localStorage[key]) {
-            level = JSON.parse(localStorage[key]);
-        }
-        return level;
-    };
+    var level;
 
-    this.play = function () {
-        if (engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
-            engine.select_marble_in_pool(gui.get_selected_color());
-        } else if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
-            engine.put_marble(gui.get_selected_coordinates(), gui.get_selected_color(), gui.color());
-            gui.unselect();
-        } else if (engine.phase() === Zertz.Phase.REMOVE_RING) {
-            engine.remove_ring(gui.get_selected_coordinates(), gui.color());
-            gui.unselect();
-        } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-            engine.capture(gui.get_selected_marble(), gui.get_selected_coordinates(), gui.color());
-            gui.unselect();
-        }
-        gui.draw();
-        finish();
-        if (engine.current_color() !== gui.color()) {
-            if (!other.is_remote()) {
-                this.play_other();
-            }
-        }
-    };
-
-    this.play_other = function () {
-        if (engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
-            var marble_color = other.select_marble_in_pool();
-
-            engine.select_marble_in_pool(marble_color);
-            engine.put_marble(other.put_marble(), marble_color, other.color());
-            engine.remove_ring(other.remove_ring(), other.color());
-        } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-            while (engine.current_color() === other.color()) {
-                var result = other.capture();
-
-                engine.capture(result.origin, result.captured, other.color());
-            }
-        }
-
-        if (engine.current_color() !== gui.color()) {
-            console.log('oups');
-        }
-
-        gui.draw();
-        finish();
-    };
-
-    this.redraw = function () {
-        gui.draw();
-    };
+    var move;
+    var moves;
 
 // private methods
+    var apply_move = function (move) {
+        engine.move(move);
+        moves += move.get() + ';';
+    };
+
+    var load_win = function () {
+        var key = 'openxum:zertz:win';
+        var win = 0;
+
+        if (localStorage[key]) {
+            win = JSON.parse(localStorage[key]);
+        }
+        return win;
+    };
+
     var finish = function () {
         if (engine.is_finished()) {
             var popup = document.getElementById("winnerModalText");
@@ -83,33 +48,74 @@ Zertz.Manager = function (e, gui_player, other_player) {
         }
     };
 
-    var load_win = function () {
-        var key = 'openxum:zertz:win';
-        var win = 0;
-
-        if (localStorage[key]) {
-            win = JSON.parse(localStorage[key]);
-        }
-        return win;
-    };
-
     var init = function (e, g, o) {
         engine = e;
         gui = g;
-        other = o;
-        remove_row = false;
+        opponent = o;
     };
 
-// private attributes
-    var engine;
-    var gui;
-    var other;
+// public methods
+    this.load_level = function () {
+        var key = 'openxum:zertz:level';
 
-    var level;
+        level = 10;
+        if (localStorage[key]) {
+            level = JSON.parse(localStorage[key]);
+        }
+        return level;
+    };
 
-    var turn;
+    this.next = function () {
+        gui.draw();
+        finish();
+        if (!engine.is_finished() && engine.current_color() !== gui.color()) {
+            if (!opponent.is_remote()) {
+                this.play_opponent();
+            }
+        }
+    };
 
-    var remove_row;
+    this.play = function () {
+        move = null;
+        if (engine.current_color() === gui.color()) {
+            move = gui.get_move();
+            if (move) {
+                apply_move(move);
+                if (opponent.is_remote()) {
+                    opponent.move(move);
+                }
+            } else if (engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
+                engine.select_marble_in_pool(gui.get_selected_color());
+            }
+        }
+        if (move) {
+            this.next();
+        }
+    };
 
-    init(e, gui_player, other_player);
+    this.play_opponent = function () {
+        move = null;
+        if (!opponent.is_remote() || (opponent.is_remote() && opponent.is_ready())) {
+            move = opponent.move();
+        }
+        if (move) {
+            if (opponent.is_remote() && opponent.confirm()) {
+                opponent.move(move);
+            }
+            apply_move(move);
+            this.next();
+        }
+    };
+
+    this.play_remote = function(move) {
+        apply_move(move);
+        gui.draw();
+        finish();
+    };
+
+    this.redraw = function () {
+        gui.draw();
+    };
+
+    init(e, g, o);
 };
