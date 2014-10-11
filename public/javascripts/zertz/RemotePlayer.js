@@ -18,7 +18,7 @@ Zertz.RemotePlayer = function (c, e, u, o, g) {
 
         _connection.onopen = function () {
         };
-        _connection.onerror = function (error) {
+        _connection.onerror = function () {
         };
         _connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
