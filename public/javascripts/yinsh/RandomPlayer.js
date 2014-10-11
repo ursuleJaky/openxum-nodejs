@@ -2,6 +2,11 @@
 
 Yinsh.RandomPlayer = function (color, e) {
 
+// private attributes
+    var mycolor = color;
+    var engine = e;
+
+    var level;
 // public methods
     this.color = function() {
         return mycolor;
@@ -66,12 +71,4 @@ Yinsh.RandomPlayer = function (color, e) {
     this.set_level = function (l) {
         level = l;
     };
-
-// private methods
-
-// private attributes
-    var mycolor = color;
-    var engine = e;
-
-    var level;
 };

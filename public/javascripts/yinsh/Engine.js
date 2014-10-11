@@ -26,6 +26,10 @@ Yinsh.MoveType = { PUT_RING: 0, PUT_MARKER: 1, MOVE_RING: 2, REMOVE_ROW: 3, REMO
 
 Yinsh.Coordinates = function (l, n) {
 
+// private attributes
+    var letter = l;
+    var number = n;
+
 // public methods
     this.distance = function (coordinates) {
         if (coordinates.letter() === letter) {
@@ -54,13 +58,14 @@ Yinsh.Coordinates = function (l, n) {
     this.to_string = function () {
         return letter + number;
     };
-
-// private attributes
-    var letter = l;
-    var number = n;
 };
 
 Yinsh.Intersection = function (c) {
+
+// private attributes
+    var coordinates = c;
+    var state = Yinsh.State.VACANT;
+
 // public methods
     this.hash = function () {
         return coordinates.hash();
@@ -141,10 +146,6 @@ Yinsh.Intersection = function (c) {
     this.state = function () {
         return state;
     };
-
-// private attributes
-    var coordinates = c;
-    var state = Yinsh.State.VACANT;
 };
 
 Yinsh.Move = function (t, c1, c2) {
@@ -239,7 +240,256 @@ Yinsh.Move = function (t, c1, c2) {
     init(t, c1, c2);
 };
 
-Yinsh.Engine = function (type, color) {
+Yinsh.Engine = function (t, c) {
+
+// private attributes
+    var type = t;
+    var current_color = c;
+    var marker_number = 51;
+    var placed_black_ring_coordinates = [];
+    var placed_white_ring_coordinates = [];
+    var removed_black_ring_number = 0;
+    var removed_white_ring_number = 0;
+    var intersections = {};
+    var turn_list = [];
+    var phase = Yinsh.Phase.PUT_RING;
+    var letters = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K" ];
+
+    for (var i = 0; i < letters.length; ++i) {
+        var l = letters[i];
+
+        for (var n = Yinsh.begin_number[l.charCodeAt(0) - 'A'.charCodeAt(0)];
+             n <= Yinsh.end_number[l.charCodeAt(0) - 'A'.charCodeAt(0)]; ++n) {
+            var coordinates = new Yinsh.Coordinates(l, n);
+
+            intersections[coordinates.hash()] = new Yinsh.Intersection(coordinates);
+        }
+    }
+
+// private methods
+    var build_row = function (letter, number, state, previous) {
+        var result = previous;
+        var coordinates = new Yinsh.Coordinates(letter, number);
+        var intersection = intersections[coordinates.hash()];
+
+        if (!result.start && intersection.state() === state) {
+            result.start = true;
+            result.row.push(coordinates);
+        } else if (result.start && intersection.state() === state) {
+            result.row.push(coordinates);
+        } else if (result.start && intersection.state() !== state) {
+            if (result.row.length >= 5) {
+                result.rows.push(result.row);
+            }
+            result.start = false;
+            result.row = [];
+        }
+        return result;
+    };
+
+    var change_color = function () {
+        if (current_color === Yinsh.Color.WHITE) {
+            current_color = Yinsh.Color.BLACK;
+        } else {
+            current_color = Yinsh.Color.WHITE;
+        }
+    };
+
+    var flip = function (letter, number) {
+        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
+
+        if (coordinates in intersections) {
+            intersections[coordinates].flip();
+        }
+    };
+
+    var flip_row = function (origin, destination) {
+        var n;
+        var l;
+
+        if (origin.letter() === destination.letter()) {
+            if (origin.number() < destination.number()) {
+                n = origin.number() + 1;
+                while (n < destination.number()) {
+                    flip(origin.letter(), n);
+                    ++n;
+                }
+            } else {
+                n = origin.number() - 1;
+                while (n > destination.number()) {
+                    flip(origin.letter(), n);
+                    --n;
+                }
+            }
+        } else if (origin.number() === destination.number()) {
+            if (origin.letter() < destination.letter()) {
+                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
+                while (l < destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
+                    flip(letters[l], origin.number());
+                    ++l;
+                }
+            } else {
+                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) - 1;
+                while (l > destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
+                    flip(letters[l], origin.number());
+                    --l;
+                }
+            }
+        } else {
+            if (origin.letter() < destination.letter()) {
+                n = origin.number() + 1;
+                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
+                while (l < destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
+                    flip(letters[l], n);
+                    ++l;
+                    ++n;
+                }
+            } else {
+                n = origin.number() - 1;
+                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) - 1;
+                while (l > destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
+                    flip(letters[l], n);
+                    --l;
+                    --n;
+                }
+            }
+        }
+    };
+
+    var get_intersection = function (letter, number) {
+        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
+
+        if (coordinates in intersections) {
+            return intersections[coordinates];
+        } else {
+            return false;
+        }
+    };
+
+    var remove_black_ring = function (coordinates) {
+        var list = [];
+        var i = 0;
+
+        while (i < placed_black_ring_coordinates.length) {
+            if (placed_black_ring_coordinates[i].hash() !== coordinates.hash()) {
+                list.push(placed_black_ring_coordinates[i]);
+            }
+            ++i;
+        }
+        placed_black_ring_coordinates = list;
+    };
+
+    var remove_white_ring = function (coordinates) {
+        var list = [];
+        var i = 0;
+
+        while (i < placed_white_ring_coordinates.length) {
+            if (placed_white_ring_coordinates[i].hash() !== coordinates.hash()) {
+                list.push(placed_white_ring_coordinates[i]);
+            }
+            ++i;
+        }
+        placed_white_ring_coordinates = list;
+    };
+
+    var remove_marker = function (letter, number) {
+        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
+
+        if (coordinates in intersections) {
+            intersections[coordinates].remove_marker();
+            ++marker_number;
+        }
+    };
+
+    var verify_intersection = function (letter, number, result) {
+        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
+
+        if (coordinates in intersections) {
+            var state = intersections[coordinates].state();
+
+            if (state === Yinsh.State.BLACK_RING || state === Yinsh.State.WHITE_RING) {
+                result.no_vacant = false; // if ring is presenter after row of markers
+                result.ok = false;
+            } else if (state === Yinsh.State.BLACK_MARKER || state === Yinsh.State.WHITE_MARKER) {
+                result.no_vacant = true;
+            } else if (state === Yinsh.State.VACANT && result.no_vacant) {
+                result.ok = false;
+            }
+        }
+        return result;
+    };
+
+/*    var verify_intersection_in_row = function (letter, number, color, ok) {
+        var _ok = ok;
+        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
+
+        if (coordinates in intersections) {
+            if (intersections[coordinates].color() !== color) {
+                _ok = false;
+            }
+        }
+        return _ok;
+    };
+
+    var verify_row = function (begin, end, color) {
+        var ok = true;
+        var n;
+        var l;
+
+        if (begin.letter() === end.letter()) {
+            if (begin.number() < end.number()) {
+                n = begin.number() + 1;
+                while (n < end.number() && ok) {
+                    verify_intersection_in_row(begin.letter(), n, color, ok);
+                    ++n;
+                }
+            } else {
+                n = begin.number() - 1;
+                while (n > end.number() && ok) {
+                    verify_intersection_in_row(begin.letter(), n, color, ok);
+                    --n;
+                }
+            }
+        } else if (begin.number() === end.number()) {
+            if (begin.letter() < end.letter()) {
+                l = begin.letter() + 1;
+                while (l < end.letter() && ok) {
+                    verify_intersection_in_row(l, begin.number(), color, ok);
+                    ++l;
+                }
+            } else {
+                l = begin.letter() - 1;
+                while (l > end.letter() && ok) {
+                    verify_intersection_in_row(l, begin.number(), color, ok);
+                    --l;
+                }
+            }
+        } else {
+            if (begin.letter() - end.letter() ===
+                begin.number() - end.number()) {
+                if (begin.letter() < end.letter()) {
+                    n = begin.number() + 1;
+                    l = begin.letter() + 1;
+                    while (l < end.letter() && ok) {
+                        verify_intersection_in_row(l, n, color, ok);
+                        ++l;
+                        ++n;
+                    }
+                } else {
+                    n = begin.number() - 1;
+                    l = begin.letter() - 1;
+                    while (l > end.letter() && ok) {
+                        verify_intersection_in_row(l, n, color, ok);
+                        --l;
+                        --n;
+                    }
+                }
+            } else {
+                ok = false;
+            }
+        }
+        return ok;
+    }; */
 
 // public methods
     this.available_marker_number = function () {
@@ -479,7 +729,7 @@ Yinsh.Engine = function (type, color) {
         } else if (move.type() === Yinsh.MoveType.MOVE_RING) {
             this.move_ring(move.from(), move.to());
         } else if (move.type() === Yinsh.MoveType.REMOVE_ROW) {
-            this.remove_row(move.row(), current_color)
+            this.remove_row(move.row(), current_color);
         }
     };
 
@@ -576,10 +826,12 @@ Yinsh.Engine = function (type, color) {
     };
 
     this.remove_row = function (row, color) {
+        var j;
+
         if (row.length !== 5) {
             return false;
         }
-        for (var j = 0; j < row.length; ++j) {
+        for (j = 0; j < row.length; ++j) {
             remove_marker(row[j].letter(), row[j].number());
         }
         if (phase === Yinsh.Phase.REMOVE_ROWS_AFTER) {
@@ -589,7 +841,7 @@ Yinsh.Engine = function (type, color) {
         }
 
         var turn = "remove " + (color === Yinsh.Color.BLACK ? "black" : "white") + " row [ ";
-        for (var j = 0; j < row.length; ++j) {
+        for (j = 0; j < row.length; ++j) {
             turn += row[j].to_string() + " ";
         }
         turn += "]";
@@ -761,253 +1013,4 @@ Yinsh.Engine = function (type, color) {
         }
         return false;
     };
-
-// private methods
-    var build_row = function (letter, number, state, previous) {
-        var result = previous;
-        var coordinates = new Yinsh.Coordinates(letter, number);
-        var intersection = intersections[coordinates.hash()];
-
-        if (!result.start && intersection.state() === state) {
-            result.start = true;
-            result.row.push(coordinates);
-        } else if (result.start && intersection.state() === state) {
-            result.row.push(coordinates);
-        } else if (result.start && intersection.state() !== state) {
-            if (result.row.length >= 5) {
-                result.rows.push(result.row);
-            }
-            result.start = false;
-            result.row = [];
-        }
-        return result;
-    };
-
-    var change_color = function () {
-        if (current_color === Yinsh.Color.WHITE) {
-            current_color = Yinsh.Color.BLACK;
-        } else {
-            current_color = Yinsh.Color.WHITE;
-        }
-    };
-
-    var flip = function (letter, number) {
-        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
-
-        if (coordinates in intersections) {
-            intersections[coordinates].flip();
-        }
-    };
-
-    var flip_row = function (origin, destination) {
-        var n;
-        var l;
-
-        if (origin.letter() === destination.letter()) {
-            if (origin.number() < destination.number()) {
-                n = origin.number() + 1;
-                while (n < destination.number()) {
-                    flip(origin.letter(), n);
-                    ++n;
-                }
-            } else {
-                n = origin.number() - 1;
-                while (n > destination.number()) {
-                    flip(origin.letter(), n);
-                    --n;
-                }
-            }
-        } else if (origin.number() === destination.number()) {
-            if (origin.letter() < destination.letter()) {
-                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
-                while (l < destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
-                    flip(letters[l], origin.number());
-                    ++l;
-                }
-            } else {
-                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) - 1;
-                while (l > destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
-                    flip(letters[l], origin.number());
-                    --l;
-                }
-            }
-        } else {
-            if (origin.letter() < destination.letter()) {
-                n = origin.number() + 1;
-                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) + 1;
-                while (l < destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
-                    flip(letters[l], n);
-                    ++l;
-                    ++n;
-                }
-            } else {
-                n = origin.number() - 1;
-                l = (origin.letter().charCodeAt(0) - 'A'.charCodeAt(0)) - 1;
-                while (l > destination.letter().charCodeAt(0) - 'A'.charCodeAt(0)) {
-                    flip(letters[l], n);
-                    --l;
-                    --n;
-                }
-            }
-        }
-    };
-
-    var get_intersection = function (letter, number) {
-        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
-
-        if (coordinates in intersections) {
-            return intersections[coordinates];
-        } else {
-            return false;
-        }
-    };
-
-    var remove_black_ring = function (coordinates) {
-        var list = [];
-        var i = 0;
-
-        while (i < placed_black_ring_coordinates.length) {
-            if (placed_black_ring_coordinates[i].hash() !== coordinates.hash()) {
-                list.push(placed_black_ring_coordinates[i]);
-            }
-            ++i;
-        }
-        placed_black_ring_coordinates = list;
-    };
-
-    var remove_white_ring = function (coordinates) {
-        var list = [];
-        var i = 0;
-
-        while (i < placed_white_ring_coordinates.length) {
-            if (placed_white_ring_coordinates[i].hash() !== coordinates.hash()) {
-                list.push(placed_white_ring_coordinates[i]);
-            }
-            ++i;
-        }
-        placed_white_ring_coordinates = list;
-    };
-
-    var remove_marker = function (letter, number) {
-        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
-
-        if (coordinates in intersections) {
-            intersections[coordinates].remove_marker();
-            ++marker_number;
-        }
-    };
-
-    var verify_intersection = function (letter, number, result) {
-        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
-
-        if (coordinates in intersections) {
-            var state = intersections[coordinates].state();
-
-            if (state === Yinsh.State.BLACK_RING || state === Yinsh.State.WHITE_RING) {
-                result.no_vacant = false; // if ring is presenter after row of markers
-                result.ok = false;
-            } else if (state === Yinsh.State.BLACK_MARKER || state === Yinsh.State.WHITE_MARKER) {
-                result.no_vacant = true;
-            } else if (state === Yinsh.State.VACANT && result.no_vacant) {
-                result.ok = false;
-            }
-        }
-        return result;
-    };
-
-    var verify_intersection_in_row = function (letter, number, color, ok) {
-        var _ok = ok;
-        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
-
-        if (coordinates in intersections) {
-            if (intersections[coordinates].color() !== color) {
-                _ok = false;
-            }
-        }
-        return _ok;
-    };
-
-    var verify_row = function (begin, end, color) {
-        var ok = true;
-        var n;
-        var l;
-
-        if (begin.letter() === end.letter()) {
-            if (begin.number() < end.number()) {
-                n = begin.number() + 1;
-                while (n < end.number() && ok) {
-                    verify_intersection_in_row(begin.letter(), n, color, ok);
-                    ++n;
-                }
-            } else {
-                n = begin.number() - 1;
-                while (n > end.number() && ok) {
-                    verify_intersection_in_row(begin.letter(), n, color, ok);
-                    --n;
-                }
-            }
-        } else if (begin.number() === end.number()) {
-            if (begin.letter() < end.letter()) {
-                l = begin.letter() + 1;
-                while (l < end.letter() && ok) {
-                    verify_intersection_in_row(l, begin.number(), color, ok);
-                    ++l;
-                }
-            } else {
-                l = begin.letter() - 1;
-                while (l > end.letter() && ok) {
-                    verify_intersection_in_row(l, begin.number(), color, ok);
-                    --l;
-                }
-            }
-        } else {
-            if (begin.letter() - end.letter() ===
-                begin.number() - end.number()) {
-                if (begin.letter() < end.letter()) {
-                    n = begin.number() + 1;
-                    l = begin.letter() + 1;
-                    while (l < end.letter() && ok) {
-                        verify_intersection_in_row(l, n, color, ok);
-                        ++l;
-                        ++n;
-                    }
-                } else {
-                    n = begin.number() - 1;
-                    l = begin.letter() - 1;
-                    while (l > end.letter() && ok) {
-                        verify_intersection_in_row(l, n, color, ok);
-                        --l;
-                        --n;
-                    }
-                }
-            } else {
-                ok = false;
-            }
-        }
-        return ok;
-    };
-
-// private attributes
-    var type = type;
-    var current_color = color;
-    var marker_number = 51;
-    var placed_black_ring_coordinates = [];
-    var placed_white_ring_coordinates = [];
-    var removed_black_ring_number = 0;
-    var removed_white_ring_number = 0;
-    var intersections = {};
-    var turn_list = [];
-    var phase = Yinsh.Phase.PUT_RING;
-    var letters = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K" ];
-
-    for (var i = 0; i < letters.length; ++i) {
-        var l = letters[i];
-
-        for (var n = Yinsh.begin_number[l.charCodeAt(0) - 'A'.charCodeAt(0)];
-             n <= Yinsh.end_number[l.charCodeAt(0) - 'A'.charCodeAt(0)]; ++n) {
-            var coordinates = new Yinsh.Coordinates(l, n);
-
-            intersections[coordinates.hash()] = new Yinsh.Intersection(coordinates);
-        }
-    }
 };
