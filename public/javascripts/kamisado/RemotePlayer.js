@@ -4,7 +4,7 @@ Kamisado.RemotePlayer = function (c, e, u, o, g) {
 
 // private attributes
     var _color = c;
-    var _engine = e;
+//    var _engine = e;
     var _uid = u;
     var _gameID = g;
     var _opponentID = o;
@@ -63,7 +63,7 @@ Kamisado.RemotePlayer = function (c, e, u, o, g) {
 
         _connection.onopen = function () {
         };
-        _connection.onerror = function (error) {
+        _connection.onerror = function () {
         };
         _connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);

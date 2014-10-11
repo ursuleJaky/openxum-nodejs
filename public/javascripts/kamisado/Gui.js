@@ -1,88 +1,39 @@
 "use strict";
 
-Kamisado.Gui = function (color, engine, local) {
+Kamisado.Gui = function (c, e, l) {
 
-// public methods
-    this.color = function() {
-        return mycolor;
-    };
+// private attributes
+    var engine = e;
+    var mycolor = c;
 
-    this.draw = function () {
-        draw2();
-    };
+    var canvas;
+    var context;
+    var manager;
+    var height;
+    var width;
 
-    this.engine = function () {
-        return engine;
-    };
+    var deltaX;
+    var deltaY;
+    var offsetX;
+    var offsetY;
 
-    this.get_selected_cell = function() {
-        return selected_cell;
-    };
+    var scaleX;
+    var scaleY;
 
-    this.get_selected_tower = function() {
-        return selected_tower;
-    };
+    var opponentPresent = l;
 
-    this.move_tower = function(from, to) {
-        selected_tower = from;
-        selected_cell = to;
-        move_tower2();
-    };
+    var selected_cell;
+    var selected_tower;
+    var possible_move_list;
 
-    this.ready = function (r) {
-        opponentPresent = r;
-        manager.redraw();
-    };
-
-    this.set_canvas = function (c) {
-        canvas = c;
-        context = c.getContext("2d");
-        height = canvas.height;
-        width = canvas.width;
-        canvas.addEventListener("click", onClick, true);
-        deltaX = (width * 0.95 - 10) / 8;
-        deltaY = (height * 0.95 - 10) / 8;
-        offsetX = width / 2 - deltaX * 4;
-        offsetY = height / 2 - deltaY * 4;
-
-        scaleX = height / canvas.offsetHeight;
-        scaleY = width / canvas.offsetWidth;
-
-        this.draw();
-    };
-
-    this.set_manager = function (m) {
-        manager = m;
-    };
-
-    this.unselect = function() {
-        selected_cell = null;
-        selected_tower = null;
-    };
+    var moving_tower;
+    var target;
+    var delta;
+    var id;
 
 // private methods
-    var compute_coordinates = function(x, y) {
+    var compute_coordinates = function (x, y) {
         return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
-    };
-
-    var draw2 = function() {
-        context.lineWidth = 1;
-
-        // background
-        context.fillStyle = "#000000";
-        roundRect(0, 0, canvas.width, canvas.height, 17, true, false);
-
-        draw_grid();
-        draw_state();
-        if (!(selected_tower && selected_cell)) {
-            show_selectable_tower();
-        }
-        if (possible_move_list) {
-            draw_possible_move();
-        }
-
-        // opponent status
-        show_opponent_status(0, 0);
     };
 
     var draw_grid = function () {
@@ -103,7 +54,7 @@ Kamisado.Gui = function (color, engine, local) {
         }
     };
 
-    var draw_possible_move = function() {
+    var draw_possible_move = function () {
         for (var i = 0; i < possible_move_list.length; ++i) {
             var x = offsetX + deltaX / 2 + possible_move_list[i].x * deltaX;
             var y = offsetY + deltaY / 2 + possible_move_list[i].y * deltaY;
@@ -147,15 +98,15 @@ Kamisado.Gui = function (color, engine, local) {
         for (i = 0; i < 8; ++i) {
             tower = engine.get_white_towers()[i];
             if (!hidden || (hidden && (selected_tower.x !== tower.x || selected_tower.y !== tower.y))) {
-                draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY  + 4,
-                    deltaX - 10, deltaY - 10, "#ffffff", tower.color);
+                draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY + 4,
+                        deltaX - 10, deltaY - 10, "#ffffff", tower.color);
             }
         }
         for (i = 0; i < 8; ++i) {
             tower = engine.get_black_towers()[i];
             if (!hidden || (hidden && (selected_tower.x !== tower.x || selected_tower.y !== tower.y))) {
-                draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY  + 4,
-                    deltaX - 10, deltaY - 10, "#000000", tower.color);
+                draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY + 4,
+                        deltaX - 10, deltaY - 10, "#000000", tower.color);
             }
         }
     };
@@ -164,107 +115,8 @@ Kamisado.Gui = function (color, engine, local) {
         draw_towers();
     };
 
-    var getClickPosition = function (e) {
-        var rect = canvas.getBoundingClientRect();
-
-        return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
-    };
-
-    var find_tower = function(x, y) {
-        var coordinates = compute_coordinates(x, y);
-        var k = 0;
-        var found = false;
-        var towers;
-
-        if (engine.current_color() === Kamisado.Color.BLACK) {
-            towers = engine.get_black_towers();
-        } else {
-            towers = engine.get_white_towers();
-        }
-        while (!found && k < 8) {
-            if (towers[k].x === coordinates.x && towers[k].y === coordinates.y) {
-                found = true;
-            } else {
-                ++k;
-            }
-        }
-        if (found) {
-            return { x: towers[k].x, y: towers[k].y, color: engine.current_color(), tower_color: towers[k].color };
-        } else {
-            return null;
-        }
-    };
-
-    var init = function() {
-        selected_cell = null;
-        selected_tower = null;
-        possible_move_list = null;
-    };
-
-    var animate_tower = function() {
-        draw2();
-        draw_tower(moving_tower.x, moving_tower.y, moving_tower.w, moving_tower.h,
-            moving_tower.color, moving_tower.selected_color);
-        moving_tower.x += delta.x;
-        moving_tower.y += delta.y;
-        if (((delta.x >= 0 && moving_tower.x >= target.x) ||
-            (delta.x < 0 && moving_tower.x <= target.x)) &&
-            ((delta.y >= 0 && moving_tower.y >= target.y) ||
-                (delta.y < 0 && moving_tower.y <= target.y))) {
-            clearInterval(id);
-            manager.play();
-        }
-    };
-
-    var move_tower2 = function() {
-        var dx = selected_cell.x - selected_tower.x;
-        var dy = selected_cell.y - selected_tower.y;
-
-        moving_tower = {
-            x: offsetX + selected_tower.x * deltaX + 4,
-            y: offsetY + selected_tower.y * deltaY  + 4,
-            w: deltaX - 10,
-            h: deltaY - 10,
-            color: engine.current_color(),
-            selected_color: selected_tower.tower_color
-        };
-        target = {
-            x: offsetX + selected_cell.x * deltaX + 4,
-            y: offsetY + selected_cell.y * deltaY  + 4
-        };
-        delta = {
-            x: (dx === 0 ? 0 : dx > 0 ? 1 : -1) * deltaX / 20,
-            y: (dy === 0 ? 0 : dy > 0 ? 1 : -1) * deltaY / 20
-        };
-        id = setInterval(animate_tower, 10);
-    };
-
-    var onClick = function (event) {
-        var pos = getClickPosition(event);
-        var select = find_tower(pos.x, pos.y);
-
-        if (select) {
-            if (select.color === engine.current_color()) {
-                if (engine.phase() === Kamisado.Phase.MOVE_TOWER &&
-                    (!engine.get_play_color() || select.tower_color === engine.get_play_color())) {
-                    selected_tower = select;
-                    possible_move_list = engine.get_possible_moving_list(selected_tower);
-                    manager.play();
-                }
-            }
-        } else {
-            var coordinates = compute_coordinates(pos.x, pos.y);
-
-            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list && engine.is_possible_move(coordinates, possible_move_list)) {
-                selected_cell = coordinates;
-                possible_move_list = null;
-                move_tower2();
-            }
-        }
-    };
-
     var roundRect = function (x, y, width, height, radius, fill, stroke) {
-        if (typeof stroke === "undefined" ) {
+        if (typeof stroke === "undefined") {
             stroke = true;
         }
         if (typeof radius === "undefined") {
@@ -289,8 +141,7 @@ Kamisado.Gui = function (color, engine, local) {
         }
     };
 
-    var show_opponent_status = function (x, y)
-    {
+    var show_opponent_status = function (x, y) {
         var text;
         var _height = 20;
         var _width = 100;
@@ -331,7 +182,7 @@ Kamisado.Gui = function (color, engine, local) {
         context.closePath();
     };
 
-    var show_selectable_tower = function() {
+    var show_selectable_tower = function () {
         if (engine.get_play_color()) {
             var selectable_tower = engine.find_playable_tower(engine.current_color());
             var x = offsetX + deltaX / 2 + selectable_tower.x * deltaX;
@@ -348,34 +199,182 @@ Kamisado.Gui = function (color, engine, local) {
         }
     };
 
-// private attributes
-    var engine = engine;
-    var mycolor = color;
+    var draw2 = function () {
+        context.lineWidth = 1;
 
-    var canvas;
-    var context;
-    var manager;
-    var height;
-    var width;
+        // background
+        context.fillStyle = "#000000";
+        roundRect(0, 0, canvas.width, canvas.height, 17, true, false);
 
-    var deltaX;
-    var deltaY;
-    var offsetX;
-    var offsetY;
+        draw_grid();
+        draw_state();
+        if (!(selected_tower && selected_cell)) {
+            show_selectable_tower();
+        }
+        if (possible_move_list) {
+            draw_possible_move();
+        }
 
-    var scaleX;
-    var scaleY;
+        // opponent status
+        show_opponent_status(0, 0);
+    };
 
-    var opponentPresent = local;
+    var getClickPosition = function (e) {
+        var rect = canvas.getBoundingClientRect();
 
-    var selected_cell;
-    var selected_tower;
-    var possible_move_list;
+        return { x: (e.clientX - rect.left) * scaleX, y: (e.clientY - rect.top) * scaleY };
+    };
 
-    var moving_tower;
-    var target;
-    var delta;
-    var id;
+    var find_tower = function (x, y) {
+        var coordinates = compute_coordinates(x, y);
+        var k = 0;
+        var found = false;
+        var towers;
+
+        if (engine.current_color() === Kamisado.Color.BLACK) {
+            towers = engine.get_black_towers();
+        } else {
+            towers = engine.get_white_towers();
+        }
+        while (!found && k < 8) {
+            if (towers[k].x === coordinates.x && towers[k].y === coordinates.y) {
+                found = true;
+            } else {
+                ++k;
+            }
+        }
+        if (found) {
+            return { x: towers[k].x, y: towers[k].y, color: engine.current_color(), tower_color: towers[k].color };
+        } else {
+            return null;
+        }
+    };
+
+    var init = function () {
+        selected_cell = null;
+        selected_tower = null;
+        possible_move_list = null;
+    };
+
+    var animate_tower = function () {
+        draw2();
+        draw_tower(moving_tower.x, moving_tower.y, moving_tower.w, moving_tower.h,
+            moving_tower.color, moving_tower.selected_color);
+        moving_tower.x += delta.x;
+        moving_tower.y += delta.y;
+        if (((delta.x >= 0 && moving_tower.x >= target.x) ||
+            (delta.x < 0 && moving_tower.x <= target.x)) &&
+            ((delta.y >= 0 && moving_tower.y >= target.y) ||
+                (delta.y < 0 && moving_tower.y <= target.y))) {
+            clearInterval(id);
+            manager.play();
+        }
+    };
+
+    var move_tower2 = function () {
+        var dx = selected_cell.x - selected_tower.x;
+        var dy = selected_cell.y - selected_tower.y;
+
+        moving_tower = {
+            x: offsetX + selected_tower.x * deltaX + 4,
+            y: offsetY + selected_tower.y * deltaY + 4,
+            w: deltaX - 10,
+            h: deltaY - 10,
+            color: engine.current_color(),
+            selected_color: selected_tower.tower_color
+        };
+        target = {
+            x: offsetX + selected_cell.x * deltaX + 4,
+            y: offsetY + selected_cell.y * deltaY + 4
+        };
+        delta = {
+            x: (dx === 0 ? 0 : dx > 0 ? 1 : -1) * deltaX / 20,
+            y: (dy === 0 ? 0 : dy > 0 ? 1 : -1) * deltaY / 20
+        };
+        id = setInterval(animate_tower, 10);
+    };
+
+    var onClick = function (event) {
+        var pos = getClickPosition(event);
+        var select = find_tower(pos.x, pos.y);
+
+        if (select) {
+            if (select.color === engine.current_color()) {
+                if (engine.phase() === Kamisado.Phase.MOVE_TOWER &&
+                    (!engine.get_play_color() || select.tower_color === engine.get_play_color())) {
+                    selected_tower = select;
+                    possible_move_list = engine.get_possible_moving_list(selected_tower);
+                    manager.play();
+                }
+            }
+        } else {
+            var coordinates = compute_coordinates(pos.x, pos.y);
+
+            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list && engine.is_possible_move(coordinates, possible_move_list)) {
+                selected_cell = coordinates;
+                possible_move_list = null;
+                move_tower2();
+            }
+        }
+    };
+
+// public methods
+    this.color = function () {
+        return mycolor;
+    };
+
+    this.draw = function () {
+        draw2();
+    };
+
+    this.engine = function () {
+        return engine;
+    };
+
+    this.get_selected_cell = function () {
+        return selected_cell;
+    };
+
+    this.get_selected_tower = function () {
+        return selected_tower;
+    };
+
+    this.move_tower = function (from, to) {
+        selected_tower = from;
+        selected_cell = to;
+        move_tower2();
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        manager.redraw();
+    };
+
+    this.set_canvas = function (c) {
+        canvas = c;
+        context = c.getContext("2d");
+        height = canvas.height;
+        width = canvas.width;
+        canvas.addEventListener("click", onClick, true);
+        deltaX = (width * 0.95 - 10) / 8;
+        deltaY = (height * 0.95 - 10) / 8;
+        offsetX = width / 2 - deltaX * 4;
+        offsetY = height / 2 - deltaY * 4;
+
+        scaleX = height / canvas.offsetHeight;
+        scaleY = width / canvas.offsetWidth;
+
+        this.draw();
+    };
+
+    this.set_manager = function (m) {
+        manager = m;
+    };
+
+    this.unselect = function () {
+        selected_cell = null;
+        selected_tower = null;
+    };
 
     init();
 };

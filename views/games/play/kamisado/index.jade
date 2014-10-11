@@ -21,17 +21,17 @@ block body
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Kamisado.Engine(0, 0);
                 var gui = new Kamisado.Gui(#{color}, engine, '#{game_id}' === '-1');
-                var other;
+                var opponent;
 
                 if ('#{game_type}' === 'remote_ai') {
-                    other = new Kamisado.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                    opponent = new Kamisado.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
                 } else if ('#{game_id}' === '-1') {
-                    other = new Kamisado.MCTSPlayer(#{opponent_color}, engine);
+                    opponent = new Kamisado.MCTSPlayer(#{opponent_color}, engine);
                 } else {
-                    other = new Kamisado.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
+                    opponent = new Kamisado.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
                 }
 
-                var manager = new Kamisado.Manager(engine, gui, other);
+                var manager = new Kamisado.Manager(engine, gui, opponent);
 
                 if (canvas_div.clientHeight < canvas_div.clientWidth) {
                     canvas.height = canvas_div.clientHeight * 0.95;
@@ -43,16 +43,16 @@ block body
                 gui.set_canvas(canvas);
                 gui.set_manager(manager);
                 if ('#{game_id}' !== '-1') {
-                    other.set_manager(manager);
-                    other.set_gui(gui);
+                    opponent.set_manager(manager);
+                    opponent.set_gui(gui);
                 } else {
-                    other.set_level(manager.load_level());
-                    if (other.is_remote()) {
-                        other.set_manager(manager);
+                    opponent.set_level(manager.load_level());
+                    if (opponent.is_remote()) {
+                        opponent.set_manager(manager);
                     }
                 }
-                if (engine.current_color() === other.color() && !other.is_remote()) {
-                    manager.play_other();
+                if (engine.current_color() === opponent.color() && !opponent.is_remote()) {
+                    manager.play_opponent();
                 }
             });
         });
