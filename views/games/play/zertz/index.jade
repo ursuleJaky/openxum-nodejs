@@ -25,6 +25,8 @@ block body
 
                 if ('#{game_type}' === 'remote_ai') {
                     // opponent = new Zertz.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                } else if ('#{game_type}' === 'gui') {
+                    opponent = gui;
                 } else if ('#{game_id}' === '-1') {
                     opponent = new Zertz.RandomPlayer(#{opponent_color}, engine);
                 } else {
@@ -46,12 +48,14 @@ block body
                     opponent.set_manager(manager);
                     opponent.set_gui(gui);
                 } else {
-                    opponent.set_level(manager.load_level());
+                    if (opponent !== gui) {
+                        opponent.set_level(manager.load_level())
+                    }
                     if (opponent.is_remote()) {
                         opponent.set_manager(manager);
                     }
                 }
-                if (engine.current_color() === opponent.color() && !opponent.is_remote()) {
+                if (opponent !== gui && engine.current_color() === opponent.color() && !opponent.is_remote()) {
                     manager.play_opponent();
                 }
             });

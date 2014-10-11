@@ -9,7 +9,9 @@ exports.init = function (req, res) {
 };
 
 exports.create = function (req, res) {
-    if (req.param('game_type') === 'ai' || req.param('game_type') === 'remote_ai') {
+    if (req.param('game_type') === 'ai' ||
+        req.param('game_type') === 'remote_ai' ||
+        req.param('game_type') === 'gui') {
         res.redirect('/games/play/?game=' + req.param('game') +
             '&color=' + req.param('color') + '&mode=' + req.param('mode') + '&game_type=' + req.param('game_type') + '&game_id=-1');
     } else {

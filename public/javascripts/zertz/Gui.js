@@ -662,15 +662,15 @@ Zertz.Gui = function (color, e) {
         var move = null;
 
         if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
-            move = new Zertz.Move(Zertz.MoveType.PUT_MARBLE, this.color(), this.get_selected_coordinates(),
+            move = new Zertz.Move(Zertz.MoveType.PUT_MARBLE, engine.current_color(), this.get_selected_coordinates(),
                 this.get_selected_color(), null);
             this.unselect();
         } else if (engine.phase() === Zertz.Phase.REMOVE_RING) {
-            move = new Zertz.Move(Zertz.MoveType.REMOVE_RING, this.color(), this.get_selected_coordinates(),
+            move = new Zertz.Move(Zertz.MoveType.REMOVE_RING, engine.current_color(), this.get_selected_coordinates(),
                 null, null);
             this.unselect();
         } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-            move = new Zertz.Move(Zertz.MoveType.CAPTURE, this.color(), this.get_selected_coordinates(),
+            move = new Zertz.Move(Zertz.MoveType.CAPTURE, engine.current_color(), this.get_selected_coordinates(),
                 null, this.get_selected_marble());
             this.unselect();
         }
@@ -687,6 +687,10 @@ Zertz.Gui = function (color, e) {
 
     this.get_selected_marble = function () {
         return selected_marble;
+    };
+
+    this.is_remote = function () {
+        return false;
     };
 
     this.set_canvas = function (c) {

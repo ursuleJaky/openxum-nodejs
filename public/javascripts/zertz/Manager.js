@@ -69,7 +69,7 @@ Zertz.Manager = function (e, g, o) {
         gui.draw();
         finish();
         if (!engine.is_finished() && engine.current_color() !== gui.color()) {
-            if (!opponent.is_remote()) {
+            if (!opponent.is_remote() && opponent !== gui) {
                 this.play_opponent();
             }
         }
@@ -77,7 +77,7 @@ Zertz.Manager = function (e, g, o) {
 
     this.play = function () {
         move = null;
-        if (engine.current_color() === gui.color()) {
+        if (engine.current_color() === gui.color() || opponent === gui) {
             move = gui.get_move();
             if (move) {
                 apply_move(move);

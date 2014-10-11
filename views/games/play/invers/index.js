@@ -18,6 +18,7 @@ exports.init = function (req, res) {
                     opponent_id: -1,
                     color: req.param('color') === 'red' ? 0 : 1,
                     mode: req.param('mode') === 'standard' ? 0 : 1,
+                    game_type: req.param('game_type'),
                     opponent_color: req.param('color') === 'red' ? 1 : 0
                 });
         }
