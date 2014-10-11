@@ -1,10 +1,15 @@
 "use strict";
 
-Invers.RandomPlayer = function (color, e) {
+Invers.RandomPlayer = function (c, e) {
+
+// private attributes
+    var _color = c;
+    var _engine = e;
+    var _level = 10;
 
 // public methods
     this.color = function() {
-        return mycolor;
+        return _color;
     };
 
     this.is_remote =function () {
@@ -12,12 +17,12 @@ Invers.RandomPlayer = function (color, e) {
     };
 
     this.move = function () {
-        var list = engine.get_possible_move_list();
+        var list = _engine.get_possible_move_list();
         var position;
         var l;
         var letter = 'X';
         var number = -1;
-        var color = engine.get_free_tiles()[Math.floor(Math.random() * 2)];
+        var color = _engine.get_free_tiles()[Math.floor(Math.random() * 2)];
 
         do {
             position = Math.floor(Math.random() * 4);
@@ -40,11 +45,7 @@ Invers.RandomPlayer = function (color, e) {
     };
 
     this.set_level = function (l) {
-        level = l;
+        _level = l;
     };
 
-// private attributes
-    var mycolor = color;
-    var engine = e;
-    var level = 10;
 };

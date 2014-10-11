@@ -57,6 +57,64 @@ Invers.Move = function (c, l, n, p) {
 
 Invers.Engine = function (t, c) {
 
+// private attributes
+    var type;
+    var color;
+
+    var phase;
+    var state;
+
+    var redTileNumber;
+    var yellowTileNumber;
+
+// private methods
+    var init = function (t, c) {
+        var tile_color = Invers.State.RED_FULL;
+
+        type = t;
+        color = c;
+        phase = Invers.Phase.PUSH_TILE;
+        state = [];
+        for (var i = 0; i < 6; ++i) {
+            var line = [];
+
+            for (var j = 0; j < 6; ++j) {
+                line.push(tile_color);
+                tile_color = tile_color === Invers.State.RED_FULL ? Invers.State.YELLOW_FULL : Invers.State.RED_FULL;
+            }
+            state.push(line);
+            tile_color = tile_color === Invers.State.RED_FULL ? Invers.State.YELLOW_FULL : Invers.State.RED_FULL;
+        }
+        redTileNumber = 1;
+        yellowTileNumber = 1;
+    };
+
+    var get_tile_state = function (coordinates) {
+        var i = coordinates.letter.charCodeAt(0) - "A".charCodeAt(0);
+        var j = coordinates.number - 1;
+
+        return state[i][j];
+    };
+
+    var is_finished = function(color) {
+        var state = (color === Invers.Color.RED ? Invers.State.RED_FULL : Invers.State.YELLOW_FULL);
+        var found = false;
+
+        for (var n = 1; n <= 6 && !found; ++n) {
+            for (var l = 0; l < 6 && !found; ++l) {
+                found = get_tile_state({ letter: String.fromCharCode('A'.charCodeAt(0) + l), number: n }) === state;
+            }
+        }
+        return !found;
+    };
+
+    var set_tile_state = function (coordinates, s) {
+        var i = coordinates.letter.charCodeAt(0) - "A".charCodeAt(0);
+        var j = coordinates.number - 1;
+
+        state[i][j] = s;
+    };
+
 // public methods
     this.change_color = function () {
         color = this.next_color(color);
@@ -111,20 +169,19 @@ Invers.Engine = function (t, c) {
         var top = [ ];
         var bottom = [ ];
         var state = color === Invers.Color.RED ? Invers.State.YELLOW_REVERSE : Invers.State.RED_REVERSE;
+        var coordinates;
 
         for (var n = 0; n < 6; ++n) {
             // RIGHT
             {
-                var coordinates = { letter: 'A', number: n + 1 };
-
+                coordinates = { letter: 'A', number: n + 1 };
                 if (get_tile_state(coordinates) !== state) {
                     right.push({ letter: 'X', number: n + 1 });
                 }
             }
             // LEFT
             {
-                var coordinates = { letter: 'F', number: n + 1 };
-
+                coordinates = { letter: 'F', number: n + 1 };
                 if (get_tile_state(coordinates) !== state) {
                     left.push({ letter: 'X', number: n + 1 });
                 }
@@ -134,16 +191,14 @@ Invers.Engine = function (t, c) {
         for (var l = 0; l < 6; ++l) {
             // BOTTOM
             {
-                var coordinates = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: 1 };
-
+                coordinates = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: 1 };
                 if (get_tile_state(coordinates) !== state) {
                     bottom.push({ letter: String.fromCharCode('A'.charCodeAt(0) + l), number: 0 });
                 }
             }
             // TOP
             {
-                var coordinates = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: 6 };
-
+                coordinates = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: 6 };
                 if (get_tile_state(coordinates) !== state) {
                     top.push({ letter: String.fromCharCode('A'.charCodeAt(0) + l), number: 0 });
                 }
@@ -181,58 +236,51 @@ Invers.Engine = function (t, c) {
 
     this.move = function (move) {
         var out;
+        var letter, number, state;
+        var origin, destination;
+        var n, l;
 
         if (move.letter() !== 'X') {
-            var letter = move.letter();
-
+            letter = move.letter();
             if (move.position() === Invers.Position.TOP) {
-                var state = get_tile_state({ letter: letter, number: 6 });
-
+                state = get_tile_state({ letter: letter, number: 6 });
                 out = state === Invers.State.RED_FULL || state === Invers.State.RED_REVERSE ? Invers.Color.RED : Invers.Color.YELLOW;
-                for (var n = 5; n >= 1; --n) {
-                    var destination = { letter: letter, number: n + 1 };
-                    var origin = { letter: letter, number: n };
-
+                for (n = 5; n >= 1; --n) {
+                    destination = { letter: letter, number: n + 1 };
+                    origin = { letter: letter, number: n };
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: letter, number: 1 },
                     (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             } else {
-                var state = get_tile_state({ letter: letter, number: 1 });
-
+                state = get_tile_state({ letter: letter, number: 1 });
                 out = state === Invers.State.RED_FULL || state === Invers.State.RED_REVERSE ? Invers.Color.RED : Invers.Color.YELLOW;
-                for (var n = 1; n < 6; ++n) {
-                    var destination = { letter: letter, number: n };
-                    var origin = { letter: letter, number: n + 1 };
-
+                for (n = 1; n < 6; ++n) {
+                    destination = { letter: letter, number: n };
+                    origin = { letter: letter, number: n + 1 };
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: letter, number: 6 },
                     (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             }
         } else {
-            var number = move.number();
-
+            number = move.number();
             if (move.position() === Invers.Position.RIGHT) {
-                var state = get_tile_state({letter: 'A', number: number });
-
+                state = get_tile_state({letter: 'A', number: number });
                 out = state === Invers.State.RED_FULL || state === Invers.State.RED_REVERSE ? Invers.Color.RED : Invers.Color.YELLOW;
-                for (var l = 0; l < 5; ++l) {
-                    var destination = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: number };
-                    var origin = { letter: String.fromCharCode('A'.charCodeAt(0) + l + 1), number: number };
-
+                for (l = 0; l < 5; ++l) {
+                    destination = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: number };
+                    origin = { letter: String.fromCharCode('A'.charCodeAt(0) + l + 1), number: number };
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: 'F', number: number },
                     (move.color() === Invers.Color.RED ? Invers.State.RED_REVERSE : Invers.State.YELLOW_REVERSE));
             } else {
-                var state = get_tile_state({ letter: 'F', number: number });
-
+                state = get_tile_state({ letter: 'F', number: number });
                 out = state === Invers.State.RED_FULL || state === Invers.State.RED_REVERSE ? Invers.Color.RED : Invers.Color.YELLOW;
-                for (var l = 4; l >= 0; --l) {
-                    var destination = { letter: String.fromCharCode('A'.charCodeAt(0) + l + 1), number: number };
-                    var origin = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: number };
-
+                for (l = 4; l >= 0; --l) {
+                    destination = { letter: String.fromCharCode('A'.charCodeAt(0) + l + 1), number: number };
+                    origin = { letter: String.fromCharCode('A'.charCodeAt(0) + l), number: number };
                     set_tile_state(destination, get_tile_state(origin));
                 }
                 set_tile_state({ letter: 'A', number: number },
@@ -283,7 +331,7 @@ Invers.Engine = function (t, c) {
         var color_index;
         var position;
         var N = list.top.length + list.bottom.length + list.left.length + list.right.length;
-        var N2 = N * this.get_different_color_number_of_free_tiles();
+//        var N2 = N * this.get_different_color_number_of_free_tiles();
         var L;
 
         if (index >= N) {
@@ -337,64 +385,6 @@ Invers.Engine = function (t, c) {
             return false;
         }
     };
-
-// private methods
-    var init = function (t, c) {
-        var tile_color = Invers.State.RED_FULL;
-
-        type = t;
-        color = c;
-        phase = Invers.Phase.PUSH_TILE;
-        state = [];
-        for (var i = 0; i < 6; ++i) {
-            var line = [];
-
-            for (var j = 0; j < 6; ++j) {
-                line.push(tile_color);
-                tile_color = tile_color === Invers.State.RED_FULL ? Invers.State.YELLOW_FULL : Invers.State.RED_FULL;
-            }
-            state.push(line);
-            tile_color = tile_color === Invers.State.RED_FULL ? Invers.State.YELLOW_FULL : Invers.State.RED_FULL;
-        }
-        redTileNumber = 1;
-        yellowTileNumber = 1;
-    };
-
-    var get_tile_state = function (coordinates) {
-        var i = coordinates.letter.charCodeAt(0) - "A".charCodeAt(0);
-        var j = coordinates.number - 1;
-
-        return state[i][j];
-    };
-
-    var is_finished = function(color) {
-        var state = (color === Invers.Color.RED ? Invers.State.RED_FULL : Invers.State.YELLOW_FULL);
-        var found = false;
-
-        for (var n = 1; n <= 6 && !found; ++n) {
-            for (var l = 0; l < 6 && !found; ++l) {
-                found = get_tile_state({ letter: String.fromCharCode('A'.charCodeAt(0) + l), number: n }) == state;
-            }
-        }
-        return !found;
-    };
-
-    var set_tile_state = function (coordinates, s) {
-        var i = coordinates.letter.charCodeAt(0) - "A".charCodeAt(0);
-        var j = coordinates.number - 1;
-
-        state[i][j] = s;
-    };
-
-// private attributes
-    var type;
-    var color;
-
-    var phase;
-    var state;
-
-    var redTileNumber;
-    var yellowTileNumber;
 
     init(t, c);
 };

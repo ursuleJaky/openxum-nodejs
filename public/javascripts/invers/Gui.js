@@ -2,80 +2,34 @@
 
 Invers.Gui = function (color, e, local) {
 
-// public methods
-    this.color = function () {
-        return mycolor;
-    };
+// private attributes
+    var engine = e;
+    var mycolor = color;
 
-    this.draw = function () {
-        context.lineWidth = 1;
+    var canvas;
+    var context;
+    var manager;
+    var height;
+    var width;
 
-        // background
-        context.fillStyle = "#000000";
-        roundRect(0, 0, canvas.width, canvas.height, 17, true, false);
+    var deltaX;
+    var deltaY;
+    var offsetX;
+    var offsetY;
+    var scaleX;
+    var scaleY;
 
-        draw_grid();
-        draw_inputs();
-        draw_free_tiles();
-    };
+    var opponentPresent = local;
 
-    this.engine = function () {
-        return engine;
-    };
-
-    this.get_move = function () {
-        if (selected_color !== Invers.Color.NONE && selected_index !== -1 && selected_position !== Invers.Position.NONE) {
-            var letter = 'X';
-            var number = 0;
-
-            if (selected_position === Invers.Position.LEFT || selected_position === Invers.Position.RIGHT) {
-                number = selected_index;
-            } else {
-                letter = String.fromCharCode('A'.charCodeAt(0) + (selected_index - 1));
-            }
-            return new Invers.Move(selected_color, letter, number, selected_position);
-        } else {
-            return undefined;
-        }
-    };
-
-    this.ready = function (r) {
-        opponentPresent = r;
-        manager.redraw();
-    };
-
-    this.set_canvas = function (c) {
-        canvas = c;
-        context = c.getContext("2d");
-        height = canvas.height;
-        width = canvas.width;
-
-        canvas.addEventListener("click", onClick);
-        deltaX = (width * 0.95 - 40) / 6;
-        deltaY = (height * 0.95 - 40) / 6;
-        offsetX = width / 2 - deltaX * 3;
-        offsetY = height / 2 - deltaY * 3;
-
-        scaleX = height / canvas.offsetHeight;
-        scaleY = width / canvas.offsetWidth;
-
-        this.draw();
-    };
-
-    this.set_manager = function (m) {
-        manager = m;
-    };
-
-    this.unselect = function () {
-        selected_color = Invers.Color.NONE;
-        selected_index = -1;
-        selected_position = Invers.Position.NONE;
-    };
+    var free_colors;
+    var selected_color;
+    var selected_position;
+    var selected_index;
 
 // private methods
-    var compute_coordinates = function (x, y) {
+/*    var compute_coordinates = function (x, y) {
         return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
-    };
+    }; */
 
     var draw_free_tile = function (index, color, selected) {
         if (selected) {
@@ -109,22 +63,24 @@ Invers.Gui = function (color, e, local) {
         var i;
 
         for (i = 0; i < engine.getRedTileNumber(); ++i) {
-            draw_free_tile(index, 'red', selected_color == index);
+            draw_free_tile(index, 'red', selected_color === index);
             free_colors[index] = Invers.Color.RED;
             ++index;
         }
         for (i = 0; i < engine.getYellowTileNumber(); ++i) {
-            draw_free_tile(index, 'yellow', selected_color == index);
+            draw_free_tile(index, 'yellow', selected_color === index);
             free_colors[index] = Invers.Color.YELLOW;
             ++index;
         }
     };
 
     var draw_grid = function () {
+        var i, j;
+
         context.lineWidth = 1;
         context.strokeStyle = "#000000";
-        for (var i = 0; i < 6; ++i) {
-            for (var j = 0; j < 6; ++j) {
+        for (i = 0; i < 6; ++i) {
+            for (j = 0; j < 6; ++j) {
                 context.fillStyle = (engine.get_state()[i][j] === Invers.State.RED_FULL ||
                     engine.get_state()[i][j] === Invers.State.RED_REVERSE) ? 'red' : 'yellow';
                 context.lineWidth = 1;
@@ -152,14 +108,51 @@ Invers.Gui = function (color, e, local) {
         }
     };
 
+    var is_forbidden = function (i, j, position, list) {
+        var ok = false;
+        var k;
+
+        if (position === Invers.Position.LEFT) {
+            ok = true;
+            for (k = 0; k < list.left.length; ++k) {
+                if (list.left[k].number === j + 1) {
+                    return false;
+                }
+            }
+        } else if (position === Invers.Position.RIGHT) {
+            ok = true;
+            for (k = 0; k < list.right.length; ++k) {
+                if (list.right[k].number === j + 1) {
+                    return false;
+                }
+            }
+        } else if (position === Invers.Position.TOP) {
+            ok = true;
+            for (k = 0; k < list.top.length; ++k) {
+                if (list.top[k].letter === String.fromCharCode('A'.charCodeAt(0) + i)) {
+                    return false;
+                }
+            }
+        } else if (position === Invers.Position.BOTTOM) {
+            ok = true;
+            for (k = 0; k < list.bottom.length; ++k) {
+                if (list.bottom[k].letter === String.fromCharCode('A'.charCodeAt(0) + i)) {
+                    return false;
+                }
+            }
+        }
+        return ok;
+    };
+
     var draw_inputs = function () {
+        var i;
         var list = engine.get_possible_move_list();
 
         context.lineWidth = 1;
         context.strokeStyle = "#ffffff";
         context.fillStyle = "#ffffff";
         // LEFT
-        for (var i = 0; i < 6; ++i) {
+        for (i = 0; i < 6; ++i) {
             if (!is_forbidden(0, i, Invers.Position.LEFT, list)) {
                 context.beginPath();
                 context.moveTo(offsetX - 25, offsetY + (i + 0.3) * deltaY);
@@ -171,7 +164,7 @@ Invers.Gui = function (color, e, local) {
             }
         }
         // RIGHT
-        for (var i = 0; i < 6; ++i) {
+        for (i = 0; i < 6; ++i) {
             if (!is_forbidden(5, i, Invers.Position.RIGHT, list)) {
                 context.beginPath();
                 context.moveTo(offsetX + deltaX * 6 + 25, offsetY + (i + 0.3) * deltaY);
@@ -183,7 +176,7 @@ Invers.Gui = function (color, e, local) {
             }
         }
         // TOP
-        for (var i = 0; i < 6; ++i) {
+        for (i = 0; i < 6; ++i) {
             if (!is_forbidden(i, 0, Invers.Position.TOP, list)) {
                 context.beginPath();
                 context.moveTo(offsetX + deltaX * (i + 0.3), offsetY - 25);
@@ -195,7 +188,7 @@ Invers.Gui = function (color, e, local) {
             }
         }
         // BOTTOM
-        for (var i = 0; i < 6; ++i) {
+        for (i = 0; i < 6; ++i) {
             if (!is_forbidden(i, 5, Invers.Position.BOTTOM, list)) {
                 context.beginPath();
                 context.moveTo(offsetX + deltaX * (i + 0.3), offsetY + 6 * deltaY + 25);
@@ -219,41 +212,6 @@ Invers.Gui = function (color, e, local) {
         selected_index = -1;
         selected_position = Invers.Position.NONE;
         free_colors = [];
-    };
-
-    var is_forbidden = function (i, j, position, list) {
-        var ok = false;
-
-        if (position === Invers.Position.LEFT) {
-            ok = true;
-            for (var k = 0; k < list.left.length; ++k) {
-                if (list.left[k].number === j + 1) {
-                    return false;
-                }
-            }
-        } else if (position === Invers.Position.RIGHT) {
-            ok = true;
-            for (var k = 0; k < list.right.length; ++k) {
-                if (list.right[k].number === j + 1) {
-                    return false;
-                }
-            }
-        } else if (position === Invers.Position.TOP) {
-            ok = true;
-            for (var k = 0; k < list.top.length; ++k) {
-                if (list.top[k].letter === String.fromCharCode('A'.charCodeAt(0) + i)) {
-                    return false;
-                }
-            }
-        } else if (position === Invers.Position.BOTTOM) {
-            ok = true;
-            for (var k = 0; k < list.bottom.length; ++k) {
-                if (list.bottom[k].letter === String.fromCharCode('A'.charCodeAt(0) + i)) {
-                    return false;
-                }
-            }
-        }
-        return ok;
     };
 
     var onClick = function (event) {
@@ -336,36 +294,75 @@ Invers.Gui = function (color, e, local) {
         }
     };
 
-// private attributes
-    var engine = e;
-    var mycolor = color;
+// public methods
+    this.color = function () {
+        return mycolor;
+    };
 
-    var canvas;
-    var context;
-    var manager;
-    var height;
-    var width;
+    this.draw = function () {
+        context.lineWidth = 1;
 
-    var deltaX;
-    var deltaY;
-    var offsetX;
-    var offsetY;
-    var scaleX;
-    var scaleY;
+        // background
+        context.fillStyle = "#000000";
+        roundRect(0, 0, canvas.width, canvas.height, 17, true, false);
 
-    var opponentPresent = local;
+        draw_grid();
+        draw_inputs();
+        draw_free_tiles();
+    };
 
-    var free_colors;
-    var selected_color;
-    var selected_position;
-    var selected_index;
-    var possible_move_list;
+    this.engine = function () {
+        return engine;
+    };
 
-    var moving_tower;
-    var target;
-    var delta;
-    var id;
+    this.get_move = function () {
+        if (selected_color !== Invers.Color.NONE && selected_index !== -1 && selected_position !== Invers.Position.NONE) {
+            var letter = 'X';
+            var number = 0;
+
+            if (selected_position === Invers.Position.LEFT || selected_position === Invers.Position.RIGHT) {
+                number = selected_index;
+            } else {
+                letter = String.fromCharCode('A'.charCodeAt(0) + (selected_index - 1));
+            }
+            return new Invers.Move(selected_color, letter, number, selected_position);
+        } else {
+            return undefined;
+        }
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        manager.redraw();
+    };
+
+    this.set_canvas = function (c) {
+        canvas = c;
+        context = c.getContext("2d");
+        height = canvas.height;
+        width = canvas.width;
+
+        canvas.addEventListener("click", onClick);
+        deltaX = (width * 0.95 - 40) / 6;
+        deltaY = (height * 0.95 - 40) / 6;
+        offsetX = width / 2 - deltaX * 3;
+        offsetY = height / 2 - deltaY * 3;
+
+        scaleX = height / canvas.offsetHeight;
+        scaleY = width / canvas.offsetWidth;
+
+        this.draw();
+    };
+
+    this.set_manager = function (m) {
+        manager = m;
+    };
+
+    this.unselect = function () {
+        selected_color = Invers.Color.NONE;
+        selected_index = -1;
+        selected_position = Invers.Position.NONE;
+    };
 
     init();
-}
-;
+};
