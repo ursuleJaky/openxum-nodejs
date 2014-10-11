@@ -1,10 +1,10 @@
 "use strict";
 
-Zertz.Gui = function (color, e) {
+Zertz.Gui = function (c, e, l) {
 
 // private attributes
+    var mycolor = c;
     var engine = e;
-    var mycolor = color;
 
     var canvas;
     var context;
@@ -21,6 +21,8 @@ Zertz.Gui = function (color, e) {
 
     var scaleX;
     var scaleY;
+
+    var opponentPresent = l;
 
     var pointerX = -1;
     var pointerY = -1;

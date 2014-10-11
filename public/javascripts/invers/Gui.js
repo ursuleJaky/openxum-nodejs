@@ -1,10 +1,10 @@
 "use strict";
 
-Invers.Gui = function (color, e, local) {
+Invers.Gui = function (c, e) {
 
 // private attributes
     var engine = e;
-    var mycolor = color;
+    var mycolor = c;
 
     var canvas;
     var context;
@@ -18,8 +18,6 @@ Invers.Gui = function (color, e, local) {
     var offsetY;
     var scaleX;
     var scaleY;
-
-    var opponentPresent = local;
 
     var free_colors;
     var selected_color;
@@ -329,11 +327,6 @@ Invers.Gui = function (color, e, local) {
         } else {
             return undefined;
         }
-    };
-
-    this.ready = function (r) {
-        opponentPresent = r;
-        manager.redraw();
     };
 
     this.set_canvas = function (c) {

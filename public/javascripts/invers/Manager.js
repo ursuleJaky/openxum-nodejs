@@ -1,11 +1,22 @@
 "use strict";
 
-Invers.Manager = function (e, g, o) {
+Invers.Status = function (e) {
+// private attributes
+    var element = e;
+
+    this.set_text = function (t) {
+        e.innerHTML = t;
+    };
+};
+
+Invers.Manager = function (e, g, o, s) {
 
 // private attributes
     var engine;
     var gui;
     var opponent;
+    var status;
+    var ready;
 
     var level;
 
@@ -13,9 +24,26 @@ Invers.Manager = function (e, g, o) {
     var moves;
 
 // private methods
+    var update_status = function () {
+        if (opponent.is_remote()) {
+            if (ready) {
+                if (engine.current_color() === opponent.color()) {
+                    status.set_text('wait');
+                } else {
+                    status.set_text('ready');
+                }
+            } else {
+                status.set_text('disconnect');
+            }
+        } else {
+            status.set_text(engine.current_color() === Invers.Color.RED ? 'Red' : 'Yellow');
+        }
+    };
+
     var apply_move = function (move) {
         engine.move(move);
         moves += move.get() + ';';
+        update_status();
     };
 
     var load_win = function () {
@@ -48,10 +76,13 @@ Invers.Manager = function (e, g, o) {
         }
     };
 
-    var init = function (e, g, o) {
+    var init = function (e, g, o, s) {
         engine = e;
         gui = g;
         opponent = o;
+        status = s;
+        ready = false;
+        update_status();
     };
 
 // public methods
@@ -112,9 +143,14 @@ Invers.Manager = function (e, g, o) {
         finish();
     };
 
+    this.ready = function (r) {
+        ready = r;
+        update_status();
+    };
+
     this.redraw = function () {
         gui.draw();
     };
 
-    init(e, g, o);
+    init(e, g, o, s);
 };

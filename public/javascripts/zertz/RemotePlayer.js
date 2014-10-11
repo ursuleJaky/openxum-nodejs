@@ -4,12 +4,10 @@ Zertz.RemotePlayer = function (c, e, u, o, g) {
 
 // private attributes
     var _color = c;
-//    var _engine = e;
     var _uid = u;
     var _gameID = g;
     var _opponentID = o;
     var _manager;
-    var _gui;
     var _connection;
 
 // private methods
@@ -24,9 +22,9 @@ Zertz.RemotePlayer = function (c, e, u, o, g) {
             var msg = JSON.parse(message.data);
 
             if (msg.type === 'start') {
-                _gui.ready(true);
+                _manager.ready(true);
             } else if (msg.type === 'disconnect') {
-                _gui.ready(false);
+                _manager.ready(false);
             } else if (msg.type === 'turn') {
                 var move = new Zertz.Move();
 
