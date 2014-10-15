@@ -27,7 +27,7 @@ block body
                     opponent = new Invers.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
                 } else if ('#{game_type}' === 'gui') {
                     opponent = gui;
-                } else if ('#{game_id}' === '-1') {
+                } else if ('#{game_type}' === 'ai') {
                     opponent = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
                 } else {
                     opponent = new Invers.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');

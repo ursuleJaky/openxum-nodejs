@@ -544,6 +544,14 @@ Zertz.Engine = function (t, c) {
         return get_intersection(letter, number);
     };
 
+    this.get_possible_move_list = function () {
+        // TODO
+    };
+
+    this.get_possible_move_number = function(list) {
+        // TODO
+    };
+
     this.get_possible_capturing_marbles = function (coordinates) {
         var list = [];
         var intersection = intersections[coordinates.hash()];
@@ -765,6 +773,14 @@ Zertz.Engine = function (t, c) {
     this.select_marble_in_pool = function (color) {
         selected_marble_in_pool = color;
         phase = Zertz.Phase.PUT_MARBLE;
+    };
+
+    this.remove_first_possible_move = function(list) {
+        // TODO
+    };
+
+    this.select_move = function (list, index) {
+        // TODO
     };
 
     this.type = function () {

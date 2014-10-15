@@ -88,6 +88,10 @@ OpenXum.Manager = function (e, g, o, s) {
         return _engine;
     };
 
+    this.gui = function () {
+        return _gui;
+    };
+
     this.load_level = function () {
         var key = 'openxum:' + _that.get_name() + ':level';
 
@@ -118,6 +122,8 @@ OpenXum.Manager = function (e, g, o, s) {
                     _opponent.move(_move);
                 }
                 _gui.unselect();
+            } else {
+                _that.process_move();
             }
         }
         if (_move) {

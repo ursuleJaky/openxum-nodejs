@@ -11,7 +11,7 @@ Invers.Manager = function (e, g, o, s) {
     this.play_opponent = _super.play_opponent;
     this.play_remote = _super.play_remote;
     this.ready = _super.ready;
-    this.redraw = _super.draw;
+    this.redraw = _super.redraw;
 
     this.get_current_color = function () {
         return _super.engine().current_color() === Invers.Color.RED ? 'Red' : 'Yellow';
@@ -23,6 +23,9 @@ Invers.Manager = function (e, g, o, s) {
 
     this.get_winner_color = function () {
         return _super.engine().winner_is() === Invers.Color.RED ? 'red' : 'yellow';
+    };
+
+    this.process_move = function () {
     };
 
     _super.that(this);
