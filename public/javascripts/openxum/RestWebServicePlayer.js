@@ -30,8 +30,9 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
             xhrFields: { withCredentials: true },
             success: function (data) {
                 _id = JSON.parse(data).id;
+                _manager.ready(true);
                 if (_engine.current_color() === _color && !_start) {
-                    _manager.play_other();
+                    _manager.play_opponent();
                 }
             }
         });
