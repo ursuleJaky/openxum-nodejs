@@ -21,17 +21,19 @@ block body
                 var canvas_div = document.getElementById("boardDiv");
                 var engine = new Invers.Engine(0, 0);
                 var gui = new Invers.Gui(#{color}, engine);
-                var other;
+                var opponent;
 
                 if ('#{game_type}' === 'remote_ai') {
-                    other = new Invers.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                    opponent = new Invers.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                } else if ('#{game_type}' === 'gui') {
+                    opponent = gui;
                 } else if ('#{game_id}' === '-1') {
-                    other = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
+                    opponent = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
                 } else {
-                    other = new Invers.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
+                    opponent = new Invers.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
                 }
 
-                var manager = new Invers.Manager(engine, gui, other, new OpenXum.Status(document.getElementById("status")));
+                var manager = new Invers.Manager(engine, gui, opponent, new OpenXum.Status(document.getElementById("status")));
 
                 if (canvas_div.clientHeight < canvas_div.clientWidth) {
                     canvas.height = canvas_div.clientHeight * 0.95;
@@ -43,14 +45,17 @@ block body
                 gui.set_canvas(canvas);
                 gui.set_manager(manager);
                 if ('#{game_id}' != '-1') {
-                    other.set_manager(manager);
+                    opponent.set_manager(manager);
+                    opponent.set_gui(gui);
                 } else {
-                    other.set_level(manager.load_level());
-                    if (other.is_remote()) {
-                        other.set_manager(manager);
+                    if (opponent !== gui) {
+                        opponent.set_level(manager.load_level())
+                    }
+                    if (opponent.is_remote()) {
+                        opponent.set_manager(manager);
                     }
                 }
-                if (engine.current_color() === other.color() && !other.is_remote()) {
+                if (opponent !== gui && engine.current_color() === opponent.color() && !opponent.is_remote()) {
                     manager.play_opponent();
                 }
             });

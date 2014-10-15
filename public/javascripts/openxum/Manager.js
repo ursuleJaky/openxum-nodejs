@@ -102,7 +102,7 @@ OpenXum.Manager = function (e, g, o, s) {
         _gui.draw();
         finish();
         if (!_engine.is_finished() && _engine.current_color() !== _gui.color()) {
-            if (!_opponent.is_remote()) {
+            if (!_opponent.is_remote() && _opponent !== _gui) {
                 this.play_opponent();
             }
         }
@@ -110,9 +110,9 @@ OpenXum.Manager = function (e, g, o, s) {
 
     this.play = function () {
         _move = null;
-        if (_engine.current_color() === _gui.color()) {
-            if (_gui.get_move()) {
-                _move = _gui.get_move();
+        if (_engine.current_color() === _gui.color() || _opponent === _gui) {
+            _move = _gui.get_move();
+            if (_move) {
                 apply_move(_move);
                 if (_opponent.is_remote()) {
                     _opponent.move(_move);

@@ -329,6 +329,10 @@ Invers.Gui = function (c, e) {
         }
     };
 
+    this.is_remote = function () {
+        return false;
+    };
+
     this.set_canvas = function (c) {
         canvas = c;
         context = c.getContext("2d");
