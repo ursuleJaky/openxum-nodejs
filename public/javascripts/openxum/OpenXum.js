@@ -1,0 +1,2 @@
+// namespace OpenXum
+var OpenXum = { };

@@ -26,12 +26,12 @@ block body
                 if ('#{game_type}' === 'remote_ai') {
                     other = new Invers.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
                 } else if ('#{game_id}' === '-1') {
-                    other = new Invers.MCTSPlayer(#{opponent_color}, engine);
+                    other = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
                 } else {
                     other = new Invers.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
                 }
 
-                var manager = new Invers.Manager(engine, gui, other, new Invers.Status(document.getElementById("status")));
+                var manager = new Invers.Manager(engine, gui, other, new OpenXum.Status(document.getElementById("status")));
 
                 if (canvas_div.clientHeight < canvas_div.clientWidth) {
                     canvas.height = canvas_div.clientHeight * 0.95;

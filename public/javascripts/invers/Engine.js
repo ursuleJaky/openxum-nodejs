@@ -52,6 +52,10 @@ Invers.Move = function (c, l, n, p) {
         return _position;
     };
 
+    this.to_object = function () {
+        return { color: _color, letter: _letter, number: _number, position: _position };
+    };
+
     init(c, l, n, p);
 };
 

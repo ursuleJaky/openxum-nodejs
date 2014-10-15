@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.MCTSPlayer = function (c, e) {
+OpenXum.MCTSPlayer = function (c, e) {
 
 // private attributes
     var _color = c;
