@@ -15,10 +15,9 @@ exports.init = function (req, res) {
                                 { safe: true }, function (err, games) {
                                     var other_online_games = games ? games : [];
 
-                                    req.app.db.models.Game.find({ game: gameType._id, type: 'offline', 'userCreated.id': { '$ne': req.user._id } }, 'name color mode userCreated.name',
+                                    req.app.db.models.Game.find({ game: gameType._id, type: 'offline', 'userCreated.id': { '$ne': req.user._id } }, 'name color mode userCreated.name userCreated.id',
                                         { safe: true }, function (err, games) {
                                             var other_offline_games = games ? games : [];
-
                                             res.render('games/new/index', {
                                                 game: req.param('game'),
                                                 user_id: req.user._id,

@@ -33,5 +33,8 @@ block body
                 td #{game.mode}
                 td #{game.opponent.name}
                 td
-                  a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='/games/play/' + "yinsh" + '/?game_id=' + game._id + '&owner_id=' + game.userCreated.name + '&opponent_id=' + game.opponent.name + '&color=' + game.color + '&mode=' + game.mode + '&replay=true&type=offline')
-                     |&nbsp;Jouer mon tour
+                  if game.myturn
+                     a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='/games/play/' + "yinsh" + '/?game_id=' + game._id + '&owner_id=' + game.userCreated.name + '&opponent_id=' + game.opponent.name + '&color=' + game.color + '&mode=' + game.mode + '&replay=true&type=offline')
+                        |&nbsp;Jouer mon tour
+                  else
+                     |Attendre mon tour

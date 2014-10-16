@@ -14,7 +14,8 @@ exports = module.exports = function (app, mongoose) {
         },
         opponent: {
             id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', null: true }
-        }
+        },
+        turnsequence: { type: Number, default: 0 }
     });
     gameSchema.index({ name: 1 });
     gameSchema.index({ game: 1 });

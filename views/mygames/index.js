@@ -15,19 +15,28 @@ exports.init = function (req, res) {
 							if (game.opponent !== null) {
 								req.app.db.models.User.findOne({_id: game.opponent.id }, null,
 									{ safe: true }, function (err, opponent) {
-										if (opponent){
-											game.opponent.name = opponent.username 
-										}
- 										if (game.opponent.id.toString() == req.user._id.toString()) {
-											console.log(game.color + colors[0]);
- 											if (game.color.toString() == colors[0].toString()){
- 												game.color = colors[1];
- 											} else {
- 												game.color = colors[0];
- 											}											
- 										} 
-										console.log(game);
-										
+                                        if (opponent){
+                                            game.opponent.name = opponent.username 
+                                        }
+                                        if (game.userCreated.id.toString() == req.user._id.toString()) {
+                                            game.turnsequence++;
+                                        }
+                                        if (game.turnsequence%2 != 0){
+                                            game.myturn = true; 
+                                        } else {
+                                            game.myturn = false;
+                                        }
+                                        
+                                        if (game.opponent.id){
+                                            if (game.opponent.id.toString() == req.user._id.toString()) {
+                                                console.log(game.color + colors[0]);
+                                                if (game.color.toString() == colors[0].toString()){
+                                                    game.color = colors[1];
+                                                } else {
+                                                    game.color = colors[0];
+                                                }											
+                                            } 
+                                        }										
 										gamesdetail.push(game);
 										if (gamesdetail.length === games.length){
 											if (notdone){

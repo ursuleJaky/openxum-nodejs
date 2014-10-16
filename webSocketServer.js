@@ -65,33 +65,40 @@ exports.Server = function (app) {
     };
 
     var onConfirm = function (msg) {
-        app.db.models.Game.update({ _id: msg.game_id }, { status: 'run', 'opponent.id': msg.opponent_id }, { }, function (err, numAffected) {
-            app.db.models.Game.findOne({ _id: msg.game_id }, null,
+       app.db.models.GameHisto.create({ gameId: msg.game_id }, function (err, numAffected) {
+          app.db.models.Game.update({ _id: msg.game_id }, { status: 'run', 'opponent.id': msg.opponent_id }, { }, function (err, numAffected) {
+             app.db.models.Game.findOne({ _id: msg.game_id }, null,
                 { safe: true }, function (err, game) {
-                    app.db.models.User.findOne({ _id: msg.opponent_id }, null,
-                        { safe: true }, function (err, user) {
-                            var c_opponent = clients[user.username];
+                   app.db.models.User.findOne({ _id: msg.opponent_id }, null,
+                      { safe: true }, function (err, user) {
+                         var c_opponent = clients[user.username];
 
-                            app.db.models.User.findOne({ _id: msg.owner_id }, null,
-                                { safe: true }, function (err, user2) {
-                                    var c_owner = clients[user2.username];
-                                    var response = {
-                                        type: 'confirm',
-                                        game_id: msg.game_id,
-                                        owner_id: user2.username,
-                                        opponent_id: user.username,
-                                        color: game.color,
-                                        mode: game.mode
-                                    };
-                                    c_owner.send(JSON.stringify(response));
-                                    if (c_opponent) {
-                                        c_opponent.send(JSON.stringify(response));
-                                    }
-                                });
-                        });
+                         app.db.models.User.findOne({ _id: msg.owner_id }, null,
+                            { safe: true }, function (err, user2) {
+                               var c_owner = clients[user2.username];
+                               var response = {
+                                  type: 'confirm',
+                                  game_id: msg.game_id,
+                                  owner_id: user2.username,
+                                  opponent_id: user.username,
+                                  color: game.color,
+                                  mode: game.mode,
+                                  type_of_game: msg.type_of_game
+                               };
+                               if (msg.type_of_game !== 'offline'){
+                                  c_owner.send(JSON.stringify(response));
+                               }
+                               if (c_opponent) {
+                                  c_opponent.send(JSON.stringify(response));
+                                 
+                               }
+                            });
+                         });
+                      });
+                   });
                 });
-        });
-    };
+        
+             };
 
     var onFinish = function (msg) {
         if (msg.user_id in currentGames) {
@@ -128,36 +135,34 @@ exports.Server = function (app) {
     };
 
     var onJoin = function (msg) {
-        app.db.models.GameHisto.create({ gameId: msg.game_id }, function (err, numAffected) {
-            app.db.models.Game.findOne({ _id: msg.game_id }, null,
-                { safe: true }, function (err, game) {
-                    app.db.models.User.findOne({ _id: msg.opponent_id }, null,
-                        { safe: true }, function (err, user) {
-                            var owner_id = game.userCreated.id;
-                            var c_opponent = clients[user.username];
+       app.db.models.Game.findOne({ _id: msg.game_id }, null,
+          { safe: true }, function (err, game) {
+             app.db.models.User.findOne({ _id: msg.opponent_id }, null,
+                { safe: true }, function (err, user) {
+                   var owner_id = game.userCreated.id;
+                   var c_opponent = clients[user.username];
 
-                            if (c_opponent) {
-                                app.db.models.User.findOne({ _id: owner_id }, null,
-                                    { safe: true }, function (err, user2) {
-                                        var c_owner = clients[user2.username];
-                                        var response = {
-                                            type: 'join',
-                                            game_id: msg.game_id,
-                                            owner_id: owner_id,
-                                            owner_name: user2.username,
-                                            opponent_id: msg.opponent_id,
-                                            opponent_name: user.username
-                                        };
-                                        if (c_owner) {
-                                            c_opponent.send(JSON.stringify(response));
-                                            c_owner.send(JSON.stringify(response));
-                                        }
-                                    });
+                   if (c_opponent) {
+                      app.db.models.User.findOne({ _id: owner_id }, null,
+                         { safe: true }, function (err, user2) {
+                            var c_owner = clients[user2.username];
+                            var response = {
+                               type: 'join',
+                               game_id: msg.game_id,
+                               owner_id: owner_id,
+                               owner_name: user2.username,
+                               opponent_id: msg.opponent_id,
+                               opponent_name: user.username
+                            };
+                            if (c_owner) {
+                               c_opponent.send(JSON.stringify(response));
+                               c_owner.send(JSON.stringify(response));
                             }
-                        });
+                         });
+                      }
+                   });
                 });
-        });
-    };
+             };
 
     var onMessage = function (connection, message) {
         var msg = JSON.parse(message.utf8Data);
@@ -188,12 +193,17 @@ exports.Server = function (app) {
             game_type: msg.game_type,
             opponent_id: msg.opponent_id
         };
+        
+        var response = { type: 'start' };
 
         if (msg.opponent_id in playingClients) {
-            var response = { type: 'start' };
-
+            
             playingClients[msg.user_id].send(JSON.stringify(response));
             playingClients[msg.opponent_id].send(JSON.stringify(response));
+        }
+        if (msg.type_of_game='offline'){
+           playingClients[msg.user_id].send(JSON.stringify(response));
+           
         }
     };
 
@@ -211,13 +221,11 @@ exports.Server = function (app) {
         } else if (game_type === 'tzaar') {
         } else if (game_type === 'yinsh') {
             response = new yinsh.play(msg);
-
-            //TODO généraliser à toutes les actions possibles
             move_str = "";
             if (response.move === 'put_ring') {
                 move_str = "Pr" + response.coordinates.letter + response.coordinates.number + ';';
             } else if (response.move === 'move_ring') {
-                move_str = "Mr" + response.coordinates.letter + response.coordinates.number + response.ring.letter + response.ring.number + ';';
+                move_str = "Mr" + response.ring.letter + response.ring.number + response.coordinates.letter + response.coordinates.number + ';';
             } else if (response.move === 'put_marker') {
                 move_str = "Pm" + response.coordinates.letter + response.coordinates.number + ';';
             }
@@ -225,6 +233,9 @@ exports.Server = function (app) {
             app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, GH) {
                 console.log(GH.moves + move_str)
                 app.db.models.GameHisto.update({ gameId: msg.game_id }, { moves: GH.moves + move_str }, function (err, numAffected) {
+                   app.db.models.Game.update({ _id: msg.game_id }, {$inc: { turnsequence: 1}}, function (err, numAffected) {
+                
+                   });
                 });
             });
         } else if (game_type === 'zertz') {
@@ -261,61 +272,18 @@ exports.Server = function (app) {
     var turn_indice = 0;
 
     var onReplay = function (connection, msg) {
-        var turn_indice = 0;
-        var colors = {0: 'black', 1: 'white'};
+       var turn_indice = 0;
+       var colors = {0: 'black', 1: 'white'};
 
-        var response = { };
-        app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, turns) {
-            turns.moves.split(";").forEach(function (move) {
-                move_detail = move.match(/.{2}/g);
-                var color = colors[turn_indice % 2];
-                turn_indice++;
-
-                // TODO généraliser à tous les jeux (spécifique Yinsh)
-                if (move_detail !== null) {
-                    if (move_detail[0] == 'Pr') {
-                        response = {
-                            type: 'turn',
-                            move: 'put_ring',
-                            coordinates: {
-                                letter: move_detail[1].match(/.{1}/g)[0],
-                                number: move_detail[1].match(/.{1}/g)[1]
-                            },
-                            color: color
-                        };
-                    } else if (move_detail[0] == 'Pm') {
-                        response = {
-                            type: 'turn',
-                            move: 'put_marker',
-                            coordinates: {
-                                letter: move_detail[1].match(/.{1}/g)[0],
-                                number: move_detail[1].match(/.{1}/g)[1]
-                            },
-                            color: color
-                        };
-                    } else if (move_detail[0] == 'Mr') {
-                        response = {
-                            type: 'turn',
-                            move: 'move_ring',
-                            coordinates: {
-                                letter: move_detail[1].match(/.{1}/g)[0],
-                                number: move_detail[1].match(/.{1}/g)[1]
-                            },
-                            ring: {
-                                letter: move_detail[2].match(/.{1}/g)[0],
-                                number: move_detail[2].match(/.{1}/g)[1]
-                            },
-                            color: color
-                        };
-                    }
-                    console.log(response);
-
-                    connection.send(JSON.stringify(response));
-                    //playingClients[currentGames[msg.user_id].opponent_id].send(JSON.stringify(response));
-                }
-            });
-        });
-    };
+       var response = { };
+       app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, turns) {
+          response = {
+             type: 'replay',
+             moves: turns.moves
+          };
+          connection.send(JSON.stringify(response)); 
+       });
+ };
 
     var clients;
     var playingClients;

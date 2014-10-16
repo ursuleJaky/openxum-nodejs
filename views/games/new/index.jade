@@ -83,6 +83,6 @@ block body
                                         td #{game.mode}
                                         td #{game.userCreated.name}
                                         td
-                                           a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href="javascript:client.join('#{user_id}','#{game._id}');")
+                                           a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href="javascript:client.confirm('#{game.userCreated.id}','#{user_id}','#{game._id}', 'offline');")
                                               i(class='glyphicon glyphicon-share')
                                               | &nbsp;join

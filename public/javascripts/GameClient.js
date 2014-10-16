@@ -2,13 +2,14 @@
 
 var GameClient = function (u, g) {
 
-    this.confirm = function (owner_id, opponent_id, game_id) {
+    this.confirm = function (owner_id, opponent_id, game_id, type_of_game) {
         if (connection) {
             var msg = {
                 type: 'confirm',
                 owner_id: owner_id,
                 opponent_id: opponent_id,
-                game_id: game_id
+                game_id: game_id,
+                type_of_game: type_of_game
             };
 
             console.log('confirm ' + game_id + ' with ' + owner_id + ' against ' + opponent_id);
@@ -67,10 +68,14 @@ var GameClient = function (u, g) {
                     }
                 } else if (msg.type === 'confirm') {
                     console.log('confirm ACK: ' + msg.game_id + ' with ' + msg.owner_id + ' against ' + msg.opponent_id + ' with ' + msg.color);
-                    if (msg.owner_id === uid) {
-                        window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id + '&owner_id=' + msg.owner_id + '&opponent_id=' + msg.opponent_id + '&color=' + msg.color + '&mode=' + msg.mode;
+                    if (msg.type_of_game !== 'offline'){
+                        if (msg.owner_id === uid) {
+                            window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id + '&owner_id=' + msg.owner_id + '&opponent_id=' + msg.opponent_id + '&color=' + msg.color + '&mode=' + msg.mode;
+                        } else {
+                            window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id + '&owner_id=' + msg.opponent_id + '&opponent_id=' + msg.owner_id + '&color=' + (msg.color === 'black' ? 'white' : 'black') + '&mode=' + msg.mode;
+                        }
                     } else {
-                        window.location.href = '/games/play/' + game + '/?game_id=' + msg.game_id + '&owner_id=' + msg.opponent_id + '&opponent_id=' + msg.owner_id + '&color=' + (msg.color === 'black' ? 'white' : 'black') + '&mode=' + msg.mode;
+                        window.location.href = '/mygames/';
                     }
                 }
             };

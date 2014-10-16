@@ -31,7 +31,7 @@ exports.create = function (req, res) {
 							 userCreated: { id: req.user._id },
 							 opponent: { id: null }
 						 };
-			  
+			             console.log(fieldsToSet);
 						 req.app.db.models.Game.create(fieldsToSet, function (err, user) {
 						 });
 					 }
