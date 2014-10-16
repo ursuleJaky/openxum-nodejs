@@ -197,7 +197,6 @@ exports.Server = function (app) {
         var response = { type: 'start' };
 
         if (msg.opponent_id in playingClients) {
-            
             playingClients[msg.user_id].send(JSON.stringify(response));
             playingClients[msg.opponent_id].send(JSON.stringify(response));
         }
