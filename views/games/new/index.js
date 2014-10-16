@@ -7,7 +7,7 @@ exports.init = function (req, res) {
                 { safe: true }, function (err, games) {
                     var my_online_games = games ? games : [];
 
-                    req.app.db.models.Game.find({ game: gameType._id, type: 'offline', 'userCreated.id': req.user._id }, null,
+                    req.app.db.models.Game.find({ game: gameType._id, type: 'offline', status: 'wait', 'userCreated.id': req.user._id }, null,
                         { safe: true }, function (err, games) {
                             var my_offline_games = games ? games : [];
 
