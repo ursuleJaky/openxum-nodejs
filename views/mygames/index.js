@@ -1,5 +1,5 @@
 'use strict';
-var colors = {0: 'black', 1: 'white'};
+var colors = { black: 0, white: 1};
 
 exports.init = function (req, res) {
 	if (req.user) {
@@ -18,25 +18,23 @@ exports.init = function (req, res) {
                                         if (opponent){
                                             game.opponent.name = opponent.username 
                                         }
-                                        if (game.userCreated.id.toString() == req.user._id.toString()) {
+                                        var isGameOwner = (game.userCreated.id.toString() === req.user._id.toString());
+                                        
+                                        if (isGameOwner) {
                                             game.turnsequence++;
                                         }
-                                        if (game.turnsequence%2 != 0){
-                                            game.myturn = true; 
-                                        } else {
-                                            game.myturn = false;
-                                        }
+                                        game.myturn = ((game.turnsequence+colors[game.color])%2 === 0);
                                         
                                         if (game.opponent.id){
-                                            if (game.opponent.id.toString() == req.user._id.toString()) {
-                                                console.log(game.color + colors[0]);
-                                                if (game.color.toString() == colors[0].toString()){
-                                                    game.color = colors[1];
+                                            if (isGameOwner) {
+                                                if (game.color.toString() === 'black'){
+                                                    game.color = 'white';
                                                 } else {
-                                                    game.color = colors[0];
+                                                    game.color = 'black';
                                                 }											
                                             } 
-                                        }										
+                                        }		
+                                        								
 										gamesdetail.push(game);
 										if (gamesdetail.length === games.length){
 											if (notdone){

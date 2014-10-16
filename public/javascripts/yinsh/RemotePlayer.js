@@ -40,10 +40,14 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
             game_id: _game_id,
             user_id: _uid
         };
-        setTimeout(function () {
-            _connection.send(JSON.stringify(msg));
-        }, 2000);
-
+        
+        var sendreplay = setInterval(function () {
+            if (_connection.readyState === 1) {
+                 _connection.send(JSON.stringify(msg));
+                 clearInterval(sendreplay);
+            }        
+        }, 100);
+        
     };
 
     this.move_ring = function (ring, coordinates) {
