@@ -140,5 +140,18 @@
 	"White": "White",
 	"Red": "Red",
 	"Yellow": "Yellow",
-	"Remote AI": "Remote AI"
+	"Remote AI": "Remote AI",
+	"Game number": "Game number",
+	"game number": "game number",
+	"First player": "First player",
+	"Random (Local)": "Random (Local)",
+	"MCTS (Local)": "MCTS (Local)",
+	"REST web service": "REST web service",
+	"Level": "Level",
+	"level": "level",
+	"URL": "URL",
+	"REST web service URL": "REST web service URL",
+	"Second player": "Second player",
+	"Run": "Run",
+	"start": "start"
 }

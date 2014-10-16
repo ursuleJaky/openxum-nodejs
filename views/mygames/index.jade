@@ -39,7 +39,7 @@ block body
                 td #{game.opponent.name}
                 td
                   if game.myturn
-                     a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='/games/play/' + '#{game.type}' + '/?game_id=' + game._id + '&owner_id=' + game.userCreated.name + '&opponent_id=' + game.opponent.name + '&color=' + game.color + '&mode=' + game.mode + '&replay=true&type=offline')
+                     a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='/games/play/' + '#{game.type}' + '/?game_id=' + game._id + '&owner_id=' + game.userCreated.name + '&opponent_id=' + game.opponent.name + '&color=' + game.currentColor + '&mode=' + game.mode + '&replay=true&type=offline')
                         |&nbsp;#{__("Play")}
                   else
                      | #{__("Wait")}

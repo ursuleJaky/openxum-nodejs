@@ -27,9 +27,9 @@ Invers.Gui = function (c, e, l) {
     var selected_index;
 
 // private methods
-/*    var compute_coordinates = function (x, y) {
-        return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
-    }; */
+    /*    var compute_coordinates = function (x, y) {
+     return { x: Math.floor((x - offsetX) / (deltaX + 4)), y: Math.floor((y - offsetY) / (deltaY + 4)) };
+     }; */
 
     var draw_free_tile = function (index, color, selected) {
         if (selected) {

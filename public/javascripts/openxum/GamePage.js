@@ -39,7 +39,7 @@ OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) 
     };
 
     var build_gui = function (namespace, color, game_id) {
-        gui = new namespace.Gui(color, engine, game_id === '-1');
+        gui = new namespace.Gui(color, engine, game_id === '-1', opponent === gui);
     };
 
     var build_move_list_modal = function () {

@@ -194,7 +194,7 @@ OpenXum.Manager = function (e, g, o, s) {
                 _move.parse(move);
                 _move_list.push(_move);
                 if (!pause) {
-                    _engine.move(move);
+                    _engine.move(_move);
                 }
             }
         });
