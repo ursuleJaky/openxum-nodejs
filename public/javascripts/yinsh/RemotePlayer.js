@@ -40,14 +40,14 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
             game_id: _game_id,
             user_id: _uid
         };
-        
+
         var sendreplay = setInterval(function () {
             if (_connection.readyState === 1) {
-                 _connection.send(JSON.stringify(msg));
-                 clearInterval(sendreplay);
-            }        
+                _connection.send(JSON.stringify(msg));
+                clearInterval(sendreplay);
+            }
         }, 100);
-        
+
     };
 
     this.move_ring = function (ring, coordinates) {
@@ -177,6 +177,7 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
         };
         _connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
+            var move;
 
             if (msg.type === 'start') {
                 _gui.ready(true);
@@ -184,7 +185,6 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                 _gui.ready(false);
             } else if (msg.type === 'turn') {
                 var ok = false;
-                var move;
 
                 if (msg.move === 'put_ring' && _engine.phase() === Yinsh.Phase.PUT_RING) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
@@ -200,7 +200,7 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                     move = new Yinsh.Move(Yinsh.MoveType.MOVE_RING, selected_ring, selected_coordinates);
                     ok = true;
                 } else if (msg.move === 'remove_row' && (_engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
-                _engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE)) {
+                    _engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE)) {
                     var r = [];
 
                     for (var index = 0; index < msg.row.length; ++index) {
@@ -209,24 +209,23 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                     move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, r);
                     ok = true;
                 } else if (msg.move === 'remove_ring' && (_engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
-                _engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE)) {
+                    _engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE)) {
                     selected_coordinates = new Yinsh.Coordinates(msg.coordinates.letter, msg.coordinates.number);
                     move = new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, selected_coordinates);
                     ok = true;
-                } 
+                }
                 if (ok) {
                     _manager.play_remote(move);
                 }
             } else if (msg.type === 'replay') {
-                    var move;
-                    msg.moves.split(";").forEach(function (turn) {
-                        if (turn != ""){
-                            move = new Yinsh.Move();
-                            move.parse(turn);
-                            _manager.play_remote(move);
-                        }
-                    });         
-                }
+                msg.moves.split(";").forEach(function (turn) {
+                    if (turn !== "") {
+                        move = new Yinsh.Move();
+                        move.parse(turn);
+                        _manager.play_remote(move);
+                    }
+                });
+            }
         };
 
         var loop = setInterval(function () {
@@ -234,12 +233,12 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                 console.log('error connection');
             } else {
                 console.log('connecting ' + _uid + ' ...');
-            var type_of_game="";
-            
-            if (/type=offline/.test(self.location.href)) {
-                type_of_game='offline';
-            }   
-                
+                var type_of_game = "";
+
+                if (/type=offline/.test(self.location.href)) {
+                    type_of_game = 'offline';
+                }
+
                 var msg = {
                     type: 'play',
                     user_id: _uid,
