@@ -83,34 +83,34 @@ Yinsh.Manager = function (e, gui_player, other_player, s) {
     this.play = function () {
         if (engine.current_color() === gui.color()) {
             if (engine.phase() === Yinsh.Phase.PUT_RING) {
+                apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_RING, gui.get_selected_coordinates()));
                 if (other.is_remote()) {
                     other.put_ring(gui.get_selected_coordinates(), engine.current_color());
                 }
-                apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_RING, gui.get_selected_coordinates()));
             } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
+                apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, gui.get_selected_coordinates()));
                 if (other.is_remote()) {
                     other.put_marker(gui.get_selected_coordinates(), engine.current_color());
                 }
-                apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, gui.get_selected_coordinates()));
             } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
+                apply_move(new Yinsh.Move(Yinsh.MoveType.MOVE_RING, gui.get_selected_ring(), gui.get_selected_coordinates()));
                 if (other.is_remote()) {
                     other.move_ring(gui.get_selected_ring(), gui.get_selected_coordinates());
                 }
-                apply_move(new Yinsh.Move(Yinsh.MoveType.MOVE_RING, gui.get_selected_ring(), gui.get_selected_coordinates()));
                 gui.clear_selected_ring();
             } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
                 engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+                apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, gui.get_selected_row()));
                 if (other.is_remote()) {
                     other.remove_row(gui.get_selected_row(), engine.current_color());
                 }
-                apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, gui.get_selected_row()));
                 gui.clear_selected_row();
             } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
                 engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
+                apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, gui.get_selected_coordinates()));
                 if (other.is_remote()) {
                     other.remove_ring(gui.get_selected_coordinates(), engine.current_color());
                 }
-                apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, gui.get_selected_coordinates()));
             }
         }
         gui.draw();

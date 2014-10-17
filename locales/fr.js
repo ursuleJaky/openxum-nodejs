@@ -112,5 +112,13 @@
 	"Email": "Email",
 	"Inscription date": "Date d'inscription",
 	"Stats": "Statistiques",
-	"My offline games": "Mes jeux hors-ligne"
+	"My offline games": "Mes jeux hors-ligne",
+	"Wait": "Attendre",
+	"Play": "Jouer",
+	"Name": "Nom",
+	"Color": "Couleur",
+	"Mode": "Mode",
+	"Owner": "Propriétaire",
+	"Opponent": "Adversaire",
+	"Actions": "Actions"
 }

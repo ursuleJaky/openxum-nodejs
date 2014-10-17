@@ -90,14 +90,12 @@ exports.Server = function (app) {
                                         }
                                         if (c_opponent) {
                                             c_opponent.send(JSON.stringify(response));
-
                                         }
                                     });
                             });
                     });
             });
         });
-
     };
 
     var onFinish = function (msg) {
@@ -109,9 +107,6 @@ exports.Server = function (app) {
                     delete playingClients[msg.user_id];
                     delete currentGames[msg.user_id];
                     if (game) {
-
-                        console.log(msg.moves);
-
                         // on ajoute le jeu à la collection GameHisto - attention le nom n'est pas unique
                         app.db.models.User.findOne({ username: msg.user_id }, null,
                             { safe: true }, function (err, userinfo) {
@@ -200,7 +195,7 @@ exports.Server = function (app) {
             playingClients[msg.user_id].send(JSON.stringify(response));
             playingClients[msg.opponent_id].send(JSON.stringify(response));
         }
-        if (msg.type_of_game = 'offline') {
+        if (msg.type_of_game === 'offline') {
             playingClients[msg.user_id].send(JSON.stringify(response));
 
         }
@@ -220,7 +215,9 @@ exports.Server = function (app) {
         } else if (game_type === 'tzaar') {
         } else if (game_type === 'yinsh') {
             response = new yinsh.play(msg);
-            move_str = "";
+
+            // TODO: remove this
+            var move_str = "";
             if (response.move === 'put_ring') {
                 move_str = "Pr" + response.coordinates.letter + response.coordinates.number + ';';
             } else if (response.move === 'move_ring') {
@@ -230,10 +227,8 @@ exports.Server = function (app) {
             }
 
             app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, GH) {
-                console.log(GH.moves + move_str)
                 app.db.models.GameHisto.update({ gameId: msg.game_id }, { moves: GH.moves + move_str }, function (err, numAffected) {
-                    app.db.models.Game.update({ _id: msg.game_id }, { $inc: { turnsequence: 1 } }, function (err, numAffected) {
-
+                    app.db.models.Game.update({ _id: msg.game_id }, { currentColor: msg.next_color }, function (err, numAffected) {
                     });
                 });
             });

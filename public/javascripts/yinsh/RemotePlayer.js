@@ -66,7 +66,8 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                 coordinates: {
                     letter: coordinates.letter(),
                     number: coordinates.number()
-                }
+                },
+                next_color: _engine.current_color() === Yinsh.Color.BLACK ? "black" : "white"
             };
             _connection.send(JSON.stringify(msg));
         }
@@ -85,7 +86,8 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                     letter: coordinates.letter(),
                     number: coordinates.number()
                 },
-                color: color
+                color: color,
+                next_color: _engine.current_color() === Yinsh.Color.BLACK ? "black" : "white"
             };
             _connection.send(JSON.stringify(msg));
         }
@@ -104,7 +106,8 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                     letter: coordinates.letter(),
                     number: coordinates.number()
                 },
-                color: color
+                color: color,
+                next_color: _engine.current_color() === Yinsh.Color.BLACK ? "black" : "white"
             };
             _connection.send(JSON.stringify(msg));
         }
@@ -123,7 +126,8 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                     letter: coordinates.letter(),
                     number: coordinates.number()
                 },
-                color: color
+                color: color,
+                next_color: _engine.current_color() === Yinsh.Color.BLACK ? "black" : "white"
             };
             _connection.send(JSON.stringify(msg));
         }
@@ -145,7 +149,8 @@ Yinsh.RemotePlayer = function (c, e, u, o, g) {
                 user_id: _uid,
                 move: 'remove_row',
                 row: r,
-                color: color
+                color: color,
+                next_color: _engine.current_color() === Yinsh.Color.BLACK ? "black" : "white"
             };
             _connection.send(JSON.stringify(msg));
         }
