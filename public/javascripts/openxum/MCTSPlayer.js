@@ -12,6 +12,10 @@ OpenXum.MCTSPlayer = function (c, e) {
         return _color;
     };
 
+    this.confirm = function() {
+        return false;
+    };
+
     this.is_remote =function () {
         return false;
     };

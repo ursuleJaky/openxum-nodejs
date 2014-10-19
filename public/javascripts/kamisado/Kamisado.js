@@ -10,9 +10,11 @@ Kamisado.load = function (callback) {
                         $.getScript('/javascripts/kamisado/Manager.js', function () {
                             $.getScript('/javascripts/kamisado/Gui.js', function () {
                                 $.getScript('/javascripts/kamisado/MCTSPlayer.js', function () {
-                                    $.getScript('/javascripts/kamisado/RestWebServicePlayer.js', function () {
-                                        $.getScript('/javascripts/kamisado/RemotePlayer.js', function () {
-                                            callback();
+                                    $.getScript('/javascripts/kamisado/RandomPlayer.js', function () {
+                                        $.getScript('/javascripts/kamisado/RestWebServicePlayer.js', function () {
+                                            $.getScript('/javascripts/kamisado/RemotePlayer.js', function () {
+                                                callback();
+                                            });
                                         });
                                     });
                                 });

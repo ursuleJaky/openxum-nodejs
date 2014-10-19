@@ -11,11 +11,15 @@ Kamisado.RandomPlayer = function (c, e) {
         return _color;
     };
 
+    this.confirm = function() {
+        return false;
+    };
+
     this.is_remote = function () {
         return false;
     };
 
-    this.move_tower = function () {
+    this.move = function () {
         var playable_tower = _engine.find_playable_tower(_color);
 
         if (!playable_tower) {
@@ -27,9 +31,19 @@ Kamisado.RandomPlayer = function (c, e) {
         if (list.length !== 0) {
             var coordinates = list[Math.floor(Math.random() * list.length)];
 
-            return { from: playable_tower, to: coordinates };
+            return new Kamisado.Move(playable_tower, coordinates);
         } else {
             return undefined;
         }
+    };
+
+    this.reinit = function (e) {
+        _engine = e;
+    };
+
+    this.set_level = function () {
+    };
+
+    this.set_manager = function () {
     };
 };

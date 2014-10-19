@@ -12,12 +12,20 @@ Kamisado.MCTSPlayer = function (c, e) {
         return _color;
     };
 
+    this.confirm = function() {
+        return false;
+    };
+
     this.is_remote =function () {
         return false;
     };
 
     this.move = function () {
         return (new MCTS.Player(_color, _engine, _level)).move();
+    };
+
+    this.reinit = function (e) {
+        _engine = e;
     };
 
     this.set_manager = function () {

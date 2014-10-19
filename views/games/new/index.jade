@@ -22,7 +22,11 @@ block body
                 div.panel-body
                     a(class='btn btn-primary btn-md active',href='/games/create/?game=#{game}')
                         i(class='glyphicon glyphicon-plus')
-                        | Create
+                        |  Create
+                    | &nbsp;&nbsp;
+                    a(class='btn btn-success btn-md active',href='/games/competition/?game=#{game}')
+                        i(class='glyphicon glyphicon-random')
+                        |  AI competition
                     br
                     - var list = [ 'My online games', 'My offline games', 'Other online games', 'Other offline games' ]
                     - each item in list

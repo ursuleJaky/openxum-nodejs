@@ -1,0 +1,78 @@
+extends ../../../layouts/default
+
+block head
+    title Games
+
+block neck
+    link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
+    link(rel='stylesheet', href='/css/openxum.css?#{cacheBreaker}')
+
+block body
+    br
+    div.row.vertical-offset-100
+        div.col-md-8.col-md-offset-2
+            div.panel.panel-primary
+                div.panel-heading
+                    h3(class='panel-title') AI competition [#{game}]
+                div.panel-body
+                    form.form-horizontal.col-md-10.col-md-offset-1(role='form', action='/games/competition/run/', method='post')
+                        div.col-md-12.form-group
+                            label.control-label.col-md-3 Game number
+                            div.col-md-9.btn-group.input-group
+                                input.form-control(type="text", name="game_number", value="10", placeholder="game number")
+                        br
+                        br
+                        div.panel.panel-primary
+                            div.panel-heading
+                                h4(class='panel-title') First player
+                            div.panel-body
+                                div.col-md-12.form_group
+                                    label.control-label.col-md-2 Type
+                                    div.col-md-10.btn-group.input-group(data-toggle="buttons")
+                                        label(class="btn btn-warning active")
+                                            input(type='radio',name='ai_types[0]',value='random',checked)
+                                            | Random (Local)
+                                        label(class="btn btn-primary")
+                                            input(type='radio',name='ai_types[0]',value='mcts')
+                                            | MCTS (Local)
+                                        label(class="btn btn-success")
+                                            input(type='radio',name='ai_types[0]',value='rest')
+                                            | REST web service
+                                br
+                                br
+                                div.col-md-12.form-group
+                                    label.control-label.col-md-2 Level
+                                    div.col-md-10.btn-group.input-group
+                                        input.form-control(type="text", name="levels[0]", value="1", placeholder="level")
+                                div.col-md-12.form-group
+                                    label.control-label.col-md-2 URL
+                                    div.col-md-10.btn-group.input-group
+                                        input.form-control(type="text", name="urls[0]", value="http://127.0.0.1/openxum-ws-php/index.php/", placeholder="REST web service URL")
+                        div.panel.panel-primary
+                           div.panel-heading
+                               h4(class='panel-title') Second player
+                           div.panel-body
+                               div.col-md-12.form_group
+                                   label.control-label.col-md-2 Type
+                                   div.col-md-10.btn-group.input-group(data-toggle="buttons")
+                                       label(class="btn btn-warning active")
+                                           input(type='radio',name='ai_types[1]',value='random',checked)
+                                           | Random (Local)
+                                       label(class="btn btn-primary")
+                                           input(type='radio',name='ai_types[1]',value='mcts')
+                                           | MCTS (Local)
+                                       label(class="btn btn-success")
+                                           input(type='radio',name='ai_types[1]',value='rest')
+                                           | REST web service
+                               br
+                               br
+                               div.col-md-12.form-group
+                                   label.control-label.col-md-2 Level
+                                   div.col-md-10.btn-group.input-group
+                                       input.form-control(type="text", name="levels[1]", value="1", placeholder="level")
+                               div.col-md-12.form-group
+                                   label.control-label.col-md-2 URL
+                                   div.col-md-10.btn-group.input-group
+                                       input.form-control(type="text", name="urls[1]", value="http://127.0.0.1/openxum-ws-php/index.php/", placeholder="REST web service URL")
+                        input(type='hidden',name='game',value='#{game}')
+                        input(type='submit',name='run',value='Run',class='btn btn-md btn-success btn-block')

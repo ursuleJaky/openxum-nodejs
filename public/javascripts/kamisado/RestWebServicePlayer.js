@@ -1,11 +1,11 @@
 "use strict";
 
 Kamisado.RestWebServicePlayer = function (c, e, l) {
-
 // private attributes
     var _color;
     var _engine;
     var _level;
+    var _url;
     var _login;
     var _manager;
 
@@ -38,20 +38,20 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         if (move) {
             $.ajax({
                 type: "PUT",
-                url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
+                url: _url + "openxum/move",
                 data: { id: _id, game: 'kamisado',
                     from: JSON.stringify(move.from()), to: JSON.stringify(move.to()) },
                 xhrFields: { withCredentials: true },
                 success: function (data) {
-                    if (JSON.parse(data).color === _color) {
-                        _manager.play_opponent();
-                    }
+//                    if (JSON.parse(data).color === _color) {
+                        _manager.play_other();
+//                    }
                 }
             });
         } else {
             $.ajax({
                 type: "GET",
-                url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
+                url: _url + "openxum/move",
                 data: { id: _id, game: 'kamisado', color: _color },
                 xhrFields: { withCredentials: true },
                 success: function (data) {
@@ -62,6 +62,10 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         }
     };
 
+    this.reinit = function (e) {
+        create();
+    };
+
     this.set_level = function (l) {
         _level = l;
     };
@@ -70,18 +74,16 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
         _manager = m;
     };
 
-// private method
-    var init = function (c, e, l) {
-        _color = c;
-        _engine = e;
-        _level = 10;
-        _login = l;
-        _start = false;
-        _id = -1;
+    this.set_url = function (u) {
+        _url = u;
+        create();
+    };
 
+// private method
+    var create = function () {
         $.ajax({
             type: "POST",
-            url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/create",
+            url: _url + "openxum/create",
             data: { game: 'kamisado', color: 0, login: _login },
             xhrFields: { withCredentials: true },
             success: function (data) {
@@ -89,10 +91,19 @@ Kamisado.RestWebServicePlayer = function (c, e, l) {
 
                 _id = response.id;
                 if (_engine.current_color() === _color && !_start) {
-                    _manager.play_other();
+                    _manager.play_opponent();
                 }
             }
         });
+    };
+
+    var init = function (c, e, l) {
+        _color = c;
+        _engine = e;
+        _level = 10;
+        _login = l;
+        _start = false;
+        _id = -1;
     };
 
     init(c, e, l);
