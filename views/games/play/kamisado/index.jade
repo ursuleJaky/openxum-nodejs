@@ -25,13 +25,16 @@ block body
 
                 if ('#{game_type}' === 'remote_ai') {
                     opponent = new Kamisado.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
-                } else if ('#{game_id}' === '-1') {
-                    opponent = new Kamisado.MCTSPlayer(#{opponent_color}, engine);
+                    opponent.set_url('http://127.0.0.1/openxum-ws-php/index.php/');
+                } else if ('#{game_type}' === 'gui') {
+                    opponent = gui;
+                } else if ('#{game_type}' === 'ai') {
+                    opponent = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
                 } else {
                     opponent = new Kamisado.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
                 }
 
-                var manager = new Kamisado.Manager(engine, gui, opponent);
+                var manager = new Kamisado.Manager(engine, gui, opponent, new OpenXum.Status(document.getElementById("status")));
 
                 if (canvas_div.clientHeight < canvas_div.clientWidth) {
                     canvas.height = canvas_div.clientHeight * 0.95;
@@ -46,12 +49,14 @@ block body
                     opponent.set_manager(manager);
                     opponent.set_gui(gui);
                 } else {
-                    opponent.set_level(manager.load_level());
+                    if (opponent !== gui) {
+                        opponent.set_level(manager.load_level())
+                    }
                     if (opponent.is_remote()) {
                         opponent.set_manager(manager);
                     }
                 }
-                if (engine.current_color() === opponent.color() && !opponent.is_remote()) {
+                if (opponent !== gui && engine.current_color() === opponent.color() && !opponent.is_remote()) {
                     manager.play_opponent();
                 }
             });
@@ -65,7 +70,10 @@ block body
                 div.modal-footer
                     div.btn-group
                         a.btn.btn-primary.new-game-button(href='#') New game
-
+    div.row
+        div.col-md-6.col-md-offset-3
+            a#status(class='btn btn-success btn-md active',href='#') Ready!
+            a#replay(class='btn btn-warning btn-md active',href='#') Replay
     div.row
         div.col-md-12(id='boardDiv')
             canvas(id='board',style='width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')

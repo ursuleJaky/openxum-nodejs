@@ -25,6 +25,7 @@ block body
 
                 if ('#{game_type}' === 'remote_ai') {
                     opponent = new Invers.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                    opponent.set_url('http://127.0.0.1/openxum-ws-php/index.php/');
                 } else if ('#{game_type}' === 'gui') {
                     opponent = gui;
                 } else if ('#{game_type}' === 'ai') {
@@ -44,7 +45,7 @@ block body
                 }
                 gui.set_canvas(canvas);
                 gui.set_manager(manager);
-                if ('#{game_id}' != '-1') {
+                if ('#{game_id}' !== '-1') {
                     opponent.set_manager(manager);
                     opponent.set_gui(gui);
                 } else {

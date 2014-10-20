@@ -90,6 +90,9 @@ OpenXum.RemotePlayer = function (c, e, u, o, g) {
         }
     };
 
+    this.set_gui = function () {
+    };
+
     this.set_manager = function (m) {
         _manager = m;
     };

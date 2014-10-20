@@ -1,7 +1,6 @@
 "use strict";
 
 Kamisado.RandomPlayer = function (c, e) {
-
 // private attributes
     var _color = c;
     var _engine = e;

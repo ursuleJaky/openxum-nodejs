@@ -9,8 +9,6 @@ block neck
 
 block body
     script(src='/javascripts/#{game}/#{name}.js')
-    script(src='/javascripts/openxum/OpenXum.js')
-    script(src='/javascripts/openxum/AIManager.js')
 
     script(language='javascript').
         $(document).ready(function() { #{name}.load(function() { }); });
@@ -18,20 +16,30 @@ block body
     script(language='javascript').
         function start() {
             var engine = new #{name}.Engine(0, 0);
-            var first = new #{name}.#{players[0]}(0, engine);
-            var second = new #{name}.#{players[1]}(1, engine);
+            var first;
+            var second;
             var progress_status = new OpenXum.ProgressStatus($('.progress-bar'), $('#results'), $('.progress'), #{game_number});
-            var manager = new OpenXum.AIManager(engine, first, second, progress_status);
 
-            first.set_level(#{levels[0]});
-            second.set_level(#{levels[1]});
+            if ('#{players[0]}' === 'MCTSPlayer') {
+                first = new OpenXum.MCTSPlayer(0, engine);
+                first.set_level(#{levels[0]});
+            } else {
+                first = new #{name}.#{players[0]}(0, engine);
+            }
+            if ('#{players[1]}' === 'MCTSPlayer') {
+                second = new OpenXum.MCTSPlayer(1, engine);
+                second.set_level(#{levels[1]});
+            } else {
+                second = new #{name}.#{players[1]}(1, engine);
+            }
             if ('#{players[0]}' === 'RestWebServicePlayer') {
                 first.set_url('#{urls[0]}');
             }
             if ('#{players[1]}' === 'RestWebServicePlayer') {
                 second.set_url('#{urls[1]}');
             }
-            manager.start();
+
+            (new OpenXum.AIManager(engine, first, second, progress_status)).start();
         };
 
     div.row.vertical-offset-100

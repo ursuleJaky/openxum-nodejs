@@ -24,6 +24,13 @@ OpenXum.MCTSPlayer = function (c, e) {
         return (new MCTS.Player(_color, _engine, _level)).move();
     };
 
+    this.reinit = function (e) {
+        _engine = e;
+    };
+
+    this.set_manager = function () {
+    };
+
     this.set_level = function (l) {
         _level = l;
     };

@@ -47,6 +47,10 @@ Kamisado.Move = function (f, t) {
         return _to;
     };
 
+    this.to_object = function () {
+        return { from: _from, to: _to };
+    };
+
     init(f, t);
 };
 

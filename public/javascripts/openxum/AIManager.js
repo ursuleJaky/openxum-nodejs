@@ -57,6 +57,7 @@ OpenXum.ProgressStatus = function (pb, r, p, n) {
 OpenXum.AIManager = function (e, f, s, st) {
 // private attributes
     var _that = this;
+    var _ready;
     var engine;
     var first_player;
     var second_player;
@@ -82,12 +83,17 @@ OpenXum.AIManager = function (e, f, s, st) {
         }
     };
 
+    this.ready = function (r) {
+        _ready = r;
+    };
+
     this.start = function () {
         timeout = setTimeout(run, 1000);
     };
 
 // private methods
     var init = function (e, f, s, st) {
+        _ready = false;
         engine = e;
         first_player = f;
         first_player.set_manager(_that);

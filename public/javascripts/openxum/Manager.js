@@ -43,6 +43,9 @@ OpenXum.Manager = function (e, g, o, s) {
     var apply_move = function (move) {
         _engine.move(move);
         _moves += move.get() + ';';
+        if (!_gui.is_animate()) {
+            _gui.draw();
+        }
         update_status();
     };
 
@@ -103,17 +106,15 @@ OpenXum.Manager = function (e, g, o, s) {
     };
 
     this.next = function () {
-        _gui.draw();
         finish();
         if (!_engine.is_finished() && _engine.current_color() !== _gui.color()) {
             if (!_opponent.is_remote() && _opponent !== _gui) {
-                this.play_opponent();
+                this.play_other(true);
             }
         }
     };
 
     this.play = function () {
-        _move = null;
         if (_engine.current_color() === _gui.color() || _opponent === _gui) {
             _move = _gui.get_move();
             if (_move) {
@@ -122,33 +123,35 @@ OpenXum.Manager = function (e, g, o, s) {
                     _opponent.move(_move);
                 }
                 _gui.unselect();
+                this.next();
             } else {
                 _that.process_move();
             }
-        }
-        if (_move) {
-            this.next();
-        }
-    };
-
-    this.play_opponent = function () {
-        _move = null;
-        if (!_opponent.is_remote() || (_opponent.is_remote() && _opponent.is_ready())) {
-            _move = _opponent.move();
-        }
-        if (_move) {
+        } else {
             apply_move(_move);
-            this.next();
+            if (_opponent.is_remote() && _opponent.confirm()) {
+                _opponent.move(_move);
+            }
+            _gui.unselect();
+            finish();
         }
     };
 
-    this.play_remote = function(move) {
-        apply_move(move);
-        if (_opponent.is_remote() && _opponent.confirm()) {
-            _opponent.move(move);
+    this.play_other = function (opponent) {
+        if (opponent) {
+            _move = null;
+            if (!_opponent.is_remote() || (_opponent.is_remote() && _opponent.is_ready())) {
+                _move = _opponent.move();
+            }
+            if (_move) {
+                _gui.move(_move, _opponent.color());
+            }
         }
-        _gui.draw();
-        finish();
+    };
+
+    this.play_remote = function (move) {
+        _move = move;
+        _gui.move(move, _opponent.color());
     };
 
     this.ready = function (r) {

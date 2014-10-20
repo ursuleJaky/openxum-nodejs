@@ -329,8 +329,16 @@ Invers.Gui = function (c, e) {
         }
     };
 
+    this.is_animate = function () {
+        return false;
+    };
+
     this.is_remote = function () {
         return false;
+    };
+
+    this.move = function (move, color) {
+        manager.play();
     };
 
     this.set_canvas = function (c) {

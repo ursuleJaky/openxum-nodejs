@@ -6,6 +6,7 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
     var _color;
     var _engine;
     var _level;
+    var _url;
     var _login;
     var _manager;
 
@@ -25,7 +26,7 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
     var create = function () {
         $.ajax({
             type: "POST",
-            url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/create",
+            url: _url + "openxum/create",
             data: { game: _that.get_name(), color: 0, login: _login },
             xhrFields: { withCredentials: true },
             success: function (data) {
@@ -62,19 +63,17 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
         if (move) {
             $.ajax({
                 type: "PUT",
-                url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
+                url: _url + "openxum/move",
                 data: { id: _id, game: _that.get_name(), move: JSON.stringify(move.to_object()) },
                 xhrFields: { withCredentials: true },
                 success: function (data) {
-                    if (JSON.parse(data).color === _color) {
-                        _manager.play_opponent();
-                    }
+                    _manager.play_other(JSON.parse(data).color === _color);
                 }
             });
         } else {
             $.ajax({
                 type: "GET",
-                url: "http://127.0.0.1/openxum-ws-php/index.php/openxum/move",
+                url: _url + "openxum/move",
                 data: { id: _id, game: _that.get_name(), color: _color },
                 xhrFields: { withCredentials: true },
                 success: function (data) {
@@ -85,6 +84,10 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
         return null;
     };
 
+    this.reinit = function (e) {
+        create();
+    };
+
     this.set_level = function (l) {
         _level = l;
     };
@@ -93,9 +96,13 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
         _manager = m;
     };
 
+    this.set_url = function (u) {
+        _url = u;
+        create();
+    };
+
     this.that = function (t) {
         _that = t;
-        create();
     };
 
     init(c, e, l);

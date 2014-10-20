@@ -41,11 +41,17 @@ Invers.RandomPlayer = function (c, e) {
         } else {
             number = l[Math.floor(Math.random() * l.length)].number;
         }
-        return { color: color, letter: letter, number: number, position: position };
+        return new Invers.Move(color, letter, number, position);
+    };
+
+    this.reinit = function (e) {
+        _engine = e;
     };
 
     this.set_level = function (l) {
         _level = l;
     };
 
+    this.set_manager = function () {
+    };
 };

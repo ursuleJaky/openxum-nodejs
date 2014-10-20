@@ -85,9 +85,9 @@ Kamisado.Gui = function (c, e, l) {
         context.lineTo(x, y + 2 * height / 3);
         context.lineTo(x, y + height / 3);
         context.lineTo(x + width / 3, y);
-        context.stroke();
-        context.fill();
         context.closePath();
+        context.fill();
+        context.stroke();
     };
 
     var draw_towers = function () {
@@ -141,47 +141,6 @@ Kamisado.Gui = function (c, e, l) {
         }
     };
 
-    var show_opponent_status = function (x, y) {
-        var text;
-        var _height = 20;
-        var _width = 100;
-
-        context.lineWidth = 1;
-        if (opponentPresent) {
-            if (engine.current_color() === mycolor) {
-                context.strokeStyle = "#00ff00";
-                context.fillStyle = "#00ff00";
-                text = 'ready';
-            } else {
-                context.strokeStyle = "#ffa500";
-                context.fillStyle = "#ffa500";
-                text = 'wait';
-            }
-        } else {
-            context.strokeStyle = "#ff0000";
-            context.fillStyle = "#ff0000";
-            text = 'disconnect';
-        }
-        context.beginPath();
-        context.fillRect(x, y, _width, _height);
-        context.strokeRect(x, y, _width, _height);
-        context.closePath();
-
-        context.strokeStyle = "#000000";
-        context.fillStyle = "#000000";
-        context.font = "12px arial";
-        context.textBaseline = "top";
-
-        var textWidth = context.measureText(text).width;
-
-        context.fillText(text, x + (_width - textWidth) / 2, y + 4);
-
-        context.strokeStyle = "#000000";
-        context.beginPath();
-        context.strokeRect(x, y, _width, _height);
-        context.closePath();
-    };
-
     var show_selectable_tower = function () {
         if (engine.get_play_color()) {
             var selectable_tower = engine.find_playable_tower(engine.current_color());
@@ -199,7 +158,7 @@ Kamisado.Gui = function (c, e, l) {
         }
     };
 
-    var draw2 = function () {
+    var draw = function () {
         context.lineWidth = 1;
 
         // background
@@ -214,9 +173,6 @@ Kamisado.Gui = function (c, e, l) {
         if (possible_move_list) {
             draw_possible_move();
         }
-
-        // opponent status
-        show_opponent_status(0, 0);
     };
 
     var getClickPosition = function (e) {
@@ -256,8 +212,8 @@ Kamisado.Gui = function (c, e, l) {
         possible_move_list = null;
     };
 
-    var animate_tower = function () {
-        draw2();
+    var move_tower = function () {
+        draw();
         draw_tower(moving_tower.x, moving_tower.y, moving_tower.w, moving_tower.h,
             moving_tower.color, moving_tower.selected_color);
         moving_tower.x += delta.x;
@@ -271,7 +227,7 @@ Kamisado.Gui = function (c, e, l) {
         }
     };
 
-    var move_tower2 = function () {
+    var animate = function (color) {
         var dx = selected_cell.x - selected_tower.x;
         var dy = selected_cell.y - selected_tower.y;
 
@@ -280,7 +236,7 @@ Kamisado.Gui = function (c, e, l) {
             y: offsetY + selected_tower.y * deltaY + 4,
             w: deltaX - 10,
             h: deltaY - 10,
-            color: engine.current_color(),
+            color: color === Kamisado.Color.BLACK ? '#000000' : '#ffffff',
             selected_color: selected_tower.tower_color
         };
         target = {
@@ -291,7 +247,7 @@ Kamisado.Gui = function (c, e, l) {
             x: (dx === 0 ? 0 : dx > 0 ? 1 : -1) * deltaX / 20,
             y: (dy === 0 ? 0 : dy > 0 ? 1 : -1) * deltaY / 20
         };
-        id = setInterval(animate_tower, 10);
+        id = setInterval(move_tower, 10);
     };
 
     var onClick = function (event) {
@@ -313,7 +269,7 @@ Kamisado.Gui = function (c, e, l) {
             if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list && engine.is_possible_move(coordinates, possible_move_list)) {
                 selected_cell = coordinates;
                 possible_move_list = null;
-                move_tower2();
+                animate(engine.current_color());
             }
         }
     };
@@ -324,11 +280,18 @@ Kamisado.Gui = function (c, e, l) {
     };
 
     this.draw = function () {
-        draw2();
+        draw();
     };
 
     this.engine = function () {
         return engine;
+    };
+
+    this.get_move = function () {
+        if (engine.phase() === Kamisado.Phase.MOVE_TOWER && selected_tower && selected_cell) {
+            return new Kamisado.Move(selected_tower, selected_cell);
+        }
+        return null;
     };
 
     this.get_selected_cell = function () {
@@ -339,15 +302,23 @@ Kamisado.Gui = function (c, e, l) {
         return selected_tower;
     };
 
-    this.move_tower = function (from, to) {
-        selected_tower = from;
-        selected_cell = to;
-        move_tower2();
+    this.is_animate = function () {
+        return true;
+    };
+
+    this.is_remote = function () {
+        return false;
+    };
+
+    this.move = function (move, color) {
+        selected_tower = move.from();
+        selected_tower = engine.find_tower(move.from(), color);
+        selected_cell = move.to();
+        animate(color);
     };
 
     this.ready = function (r) {
         opponentPresent = r;
-        manager.redraw();
     };
 
     this.set_canvas = function (c) {
