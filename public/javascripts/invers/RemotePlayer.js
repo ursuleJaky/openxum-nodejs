@@ -11,6 +11,7 @@ Invers.RemotePlayer = function (c, e, u, o, g) {
     this.is_ready = _super.is_ready;
     this.is_remote = _super.is_remote;
     this.move = _super.move;
+    this.set_gui = _super.set_gui;
     this.set_manager = _super.set_manager;
 
     this.buildMove = function () {

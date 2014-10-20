@@ -21,6 +21,10 @@ Zertz.Coordinates = function (l, n) {
     var number = n;
 
 // public methods
+    this.clone = function () {
+        return new Zertz.Coordinates(l, n);
+    };
+
     this.hash = function () {
         return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 7;
     };
@@ -54,6 +58,13 @@ Zertz.Intersection = function (c) {
     var state;
 
 // public methods
+    this.clone = function () {
+        var intersection = new Zertz.Intersection(coordinates.clone());
+
+        intersection.set(state);
+        return intersection;
+    };
+
     this.color = function () {
         if (state === Zertz.State.VACANT || state === Zertz.State.EMPTY) {
             return Zertz.MarbleColor.NONE;
@@ -106,6 +117,10 @@ Zertz.Intersection = function (c) {
 
     this.state = function () {
         return state;
+    };
+
+    this.set = function (_state) {
+        state = _state;
     };
 
 // private methods
@@ -185,6 +200,10 @@ Zertz.Move = function (t, c, to, mc, f) {
 
     this.to = function () {
         return _to;
+    };
+
+    this.to_object = function () {
+        return { type: _type, color: _color, to: _to, marble_color: _marble_color, from: _from };
     };
 
     this.type = function () {
@@ -474,6 +493,15 @@ Zertz.Engine = function (t, c) {
         } else {
             return capturedWhiteMarbleNumber[player];
         }
+    };
+
+    this.clone = function () {
+        var o = new Zertz.Engine(type, color);
+
+        o.set(phase, state, intersections, blackMarbleNumber, greyMarbleNumber,
+            whiteMarbleNumber, capturedBlackMarbleNumber, capturedGreyMarbleNumber,
+            capturedWhiteMarbleNumber);
+        return o;
     };
 
     this.current_color = function () {
@@ -781,6 +809,29 @@ Zertz.Engine = function (t, c) {
 
     this.select_move = function (list, index) {
         // TODO
+    };
+
+    this.set = function(_phase, _state, _intersections, _blackMarbleNumber, _greyMarbleNumber,
+        _whiteMarbleNumber, _capturedBlackMarbleNumber, _capturedGreyMarbleNumber, _capturedWhiteMarbleNumber) {
+        for (var index in _intersections) {
+            intersections[index] = _intersections[index].clone();
+        }
+
+        state = _state;
+        phase = _phase;
+
+        blackMarbleNumber = _blackMarbleNumber;
+        greyMarbleNumber = _greyMarbleNumber;
+        whiteMarbleNumber = _whiteMarbleNumber;
+        capturedBlackMarbleNumber = [];
+        capturedBlackMarbleNumber[0] = _capturedBlackMarbleNumber[0];
+        capturedBlackMarbleNumber[1] = _capturedBlackMarbleNumber[1];
+        capturedGreyMarbleNumber = [];
+        capturedGreyMarbleNumber[0] = _capturedGreyMarbleNumber[0];
+        capturedGreyMarbleNumber[1] = _capturedGreyMarbleNumber[1];
+        capturedWhiteMarbleNumber = [];
+        capturedWhiteMarbleNumber[0] = _capturedWhiteMarbleNumber[0];
+        capturedWhiteMarbleNumber[1] = _capturedWhiteMarbleNumber[1];
     };
 
     this.type = function () {

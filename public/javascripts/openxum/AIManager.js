@@ -67,6 +67,9 @@ OpenXum.AIManager = function (e, f, s, st) {
     var timeout;
     var backup;
 
+    var moves;
+    var all_moves;
+
 // public methods
     this.play_other = function () {
         if (engine.current_color() === other_player.color()) {
@@ -100,9 +103,11 @@ OpenXum.AIManager = function (e, f, s, st) {
         second_player = s;
         second_player.set_manager(_that);
         status = st;
+        all_moves = [];
     };
 
     var finish = function () {
+        all_moves.push(moves);
         status.update(engine.winner_is());
         engine = backup;
         first_player.reinit(backup);
@@ -111,6 +116,9 @@ OpenXum.AIManager = function (e, f, s, st) {
             timeout = setTimeout(run, 15);
         } else {
             clearTimeout(timeout);
+
+            console.log(all_moves);
+
         }
     };
 
@@ -123,6 +131,7 @@ OpenXum.AIManager = function (e, f, s, st) {
 
             if (!current_player.is_remote()) {
                 engine.move(move);
+                moves = moves + move.get() + ';';
                 if (other_player.is_remote()) {
                     other_player.move(move);
                 } else {
@@ -140,6 +149,7 @@ OpenXum.AIManager = function (e, f, s, st) {
 
     var run = function () {
         backup = engine.clone();
+        moves = '';
         if (engine.current_color() === first_player.color()) {
             play(first_player);
         } else {
