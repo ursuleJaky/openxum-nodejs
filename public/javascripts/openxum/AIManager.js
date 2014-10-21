@@ -1,7 +1,8 @@
 OpenXum.ProgressStatus = function (pb, r, p, n) {
 // private attributes
     var progress_bar = pb;
-    var results = r;
+    var abstract;
+    var list;
     var progress = p;
     var simulation_number = n;
 
@@ -9,18 +10,32 @@ OpenXum.ProgressStatus = function (pb, r, p, n) {
     var second_victories = 0;
     var index = 0;
 
+    var build_move_list = function (moves) {
+        var list = $('<ol>');
+
+        for (var index = 0; index < moves.length; ++index) {
+            var item = $('<li>');
+
+            item.html(moves[index].to_string());
+            item.appendTo(list);
+        }
+        return list;
+    };
+
     var compute_pourcent = function () {
         var x = index / simulation_number * 100;
 
         return (Math.round(x * 100) / 100) + '%';
     };
 
-    var init = function () {
+    var init = function (r) {
         var pourcent = compute_pourcent();
 
         progress_bar.width(pourcent);
         progress_bar.text(pourcent);
         progress.addClass('active');
+        abstract = r.find('div#abstract');
+        list = r.find('div#list');
     };
 
     var update = function () {
@@ -28,11 +43,55 @@ OpenXum.ProgressStatus = function (pb, r, p, n) {
 
         progress_bar.width(pourcent);
         progress_bar.text(pourcent);
-        results.html('Results: ' + first_victories + ' first victories and ' +
+        abstract.html('Results: ' + first_victories + ' first victories and ' +
             second_victories + ' second victories <br>');
     };
 
 // public methods
+    this.display_games = function (moves) {
+        var main_div = $('<div/>', {
+            class: 'panel-group',
+            id: 'accordion'
+        });
+
+        main_div.appendTo(list);
+        for (var index = 0; index < moves.length; ++index) {
+            var panel = $('<div/>', {
+                class: 'panel panel-default'
+            });
+            var panel_heading = $('<div/>', {
+                class: 'panel-heading'
+            });
+            var title = $('<h4/>', {
+                class: 'panel-title'
+            });
+            var collapse = $('<a/>', {
+                'data-toggle': 'collapse',
+                'data-parent': '#accordion',
+                href: '#collapse' + (index + 1)
+            });
+            var collapse_div = $('<div/>', {
+                id: 'collapse' + (index + 1),
+                class: 'panel-collapse collapse' + (index === 0 ? ' in' : '')
+            });
+            var panel_body = $('<div/>', {
+                class: 'panel-body'
+            });
+
+            collapse.html('Game #' + (index + 1));
+            collapse.appendTo(title);
+            title.appendTo(panel_heading);
+            panel_heading.appendTo(panel);
+
+            var move_list = build_move_list(moves[index]);
+
+            move_list.appendTo(panel_body);
+            panel_body.appendTo(collapse_div);
+            collapse_div.appendTo(panel);
+            panel.appendTo(main_div);
+        }
+    };
+
     this.end = function () {
         return index === simulation_number;
     };
@@ -51,7 +110,7 @@ OpenXum.ProgressStatus = function (pb, r, p, n) {
         update();
     };
 
-    init();
+    init(r);
 };
 
 OpenXum.AIManager = function (e, f, s, st) {
@@ -116,9 +175,7 @@ OpenXum.AIManager = function (e, f, s, st) {
             timeout = setTimeout(run, 15);
         } else {
             clearTimeout(timeout);
-
-            console.log(all_moves);
-
+            status.display_games(all_moves);
         }
     };
 
@@ -131,7 +188,7 @@ OpenXum.AIManager = function (e, f, s, st) {
 
             if (!current_player.is_remote()) {
                 engine.move(move);
-                moves = moves + move.get() + ';';
+                moves.push(move);
                 if (other_player.is_remote()) {
                     other_player.move(move);
                 } else {
@@ -149,7 +206,7 @@ OpenXum.AIManager = function (e, f, s, st) {
 
     var run = function () {
         backup = engine.clone();
-        moves = '';
+        moves = [];
         if (engine.current_color() === first_player.color()) {
             play(first_player);
         } else {

@@ -51,6 +51,11 @@ Kamisado.Move = function (f, t) {
         return { from: _from, to: _to };
     };
 
+    this.to_string = function () {
+        return 'move tower from ' + String.fromCharCode('a'.charCodeAt(0) + _from.x) + (_from.y + 1) +
+            ' to ' + String.fromCharCode('a'.charCodeAt(0) + _to.x) + (_to.y + 1);
+    };
+
     init(f, t);
 };
 

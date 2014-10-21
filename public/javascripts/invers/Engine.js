@@ -45,7 +45,7 @@ Invers.Move = function (c, l, n, p) {
         _color = str.charAt(0) === 'R' ? Invers.Color.RED : Invers.Color.YELLOW;
         _letter = str.charAt(1);
         _number = str.charCodeAt(2) - '1'.charCodeAt(0) + 1;
-        _position = str.charAt(3) === 'b' ? Invers.Position.BOTTOM : str.charAt(3) === 't' ? Invers.Position.TOP : str.charAt(3) === 'r' ? Invers.Position.RIGHT: Invers.Position.LEFT;
+        _position = str.charAt(3) === 'b' ? Invers.Position.BOTTOM : str.charAt(3) === 't' ? Invers.Position.TOP : str.charAt(3) === 'r' ? Invers.Position.RIGHT : Invers.Position.LEFT;
     };
 
     this.position = function () {
@@ -54,6 +54,14 @@ Invers.Move = function (c, l, n, p) {
 
     this.to_object = function () {
         return { color: _color, letter: _letter, number: _number, position: _position };
+    };
+
+    this.to_string = function () {
+        return 'put ' + (_color === Invers.Color.RED ? 'red' : 'yellow') + ' title at ' +
+            _letter + _number + ' from ' +
+            (_position === Invers.Position.BOTTOM ? 'bottom' :
+                (_position === Invers.Position.TOP ? 'top' :
+                    (_position === Invers.Position.RIGHT ? 'right' : 'left')));
     };
 
     init(c, l, n, p);
@@ -100,7 +108,7 @@ Invers.Engine = function (t, c) {
         return state[i][j];
     };
 
-    var is_finished = function(color) {
+    var is_finished = function (color) {
         var state = (color === Invers.Color.RED ? Invers.State.RED_FULL : Invers.State.YELLOW_FULL);
         var found = false;
 
@@ -155,11 +163,11 @@ Invers.Engine = function (t, c) {
         return free_colors;
     };
 
-    this.getRedTileNumber = function() {
+    this.getRedTileNumber = function () {
         return redTileNumber;
     };
 
-    this.getYellowTileNumber = function() {
+    this.getYellowTileNumber = function () {
         return yellowTileNumber;
     };
 
@@ -211,7 +219,7 @@ Invers.Engine = function (t, c) {
         return { right: right, left: left, top: top, bottom: bottom };
     };
 
-    this.get_possible_move_number = function(list) {
+    this.get_possible_move_number = function (list) {
         return (list.top.length + list.bottom.length + list.left.length + list.right.length) * this.get_different_color_number_of_free_tiles();
     };
 
@@ -223,7 +231,7 @@ Invers.Engine = function (t, c) {
         return phase === Invers.Phase.FINISH;
     };
 
-    this.is_possible = function(coordinates) {
+    this.is_possible = function (coordinates) {
         var found = false;
         var list = this.get_possible_move_list();
         var i = 0;
@@ -312,11 +320,11 @@ Invers.Engine = function (t, c) {
         return c === Invers.Color.RED ? Invers.Color.YELLOW : Invers.Color.RED;
     };
 
-    this.phase = function() {
+    this.phase = function () {
         return phase;
     };
 
-    this.remove_first_possible_move = function(list) {
+    this.remove_first_possible_move = function (list) {
         var L = list;
 
         if (L.top.length > 0) {
