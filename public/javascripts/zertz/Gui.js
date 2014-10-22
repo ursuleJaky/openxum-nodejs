@@ -672,8 +672,11 @@ Zertz.Gui = function (c, e, l) {
                 null, null);
             this.unselect();
         } else if (engine.phase() === Zertz.Phase.CAPTURE) {
+            var state = engine.get_intersection_state(this.get_selected_marble().letter(), this.get_selected_marble().number);
+
             move = new Zertz.Move(Zertz.MoveType.CAPTURE, engine.current_color(), this.get_selected_coordinates(),
-                null, this.get_selected_marble());
+                (state === Zertz.State.BLACK_MARBLE ? Zertz.MarbleColor.BLACK :
+                    (state === Zertz.State.WHITE_MARBLE ? Zertz.MarbleColor.WHITE : Zertz.MarbleColor.GREY)), this.get_selected_marble());
             this.unselect();
         }
         return move;

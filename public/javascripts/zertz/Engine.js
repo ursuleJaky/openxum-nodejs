@@ -206,6 +206,22 @@ Zertz.Move = function (t, c, to, mc, f) {
         return { type: _type, color: _color, to: _to, marble_color: _marble_color, from: _from };
     };
 
+    this.to_string = function () {
+        var str = 'player ' + (_color === Zertz.Color.ONE ? '1' : '2') + ': ';
+
+        if (_type === Zertz.MoveType.PUT_MARBLE) {
+            str += 'put ' + (_marble_color === Zertz.MarbleColor.BLACK ? 'black' :
+                    _marble_color === Zertz.MarbleColor.WHITE ? 'white' : 'grey') +
+                ' marble to ' + _to.to_string();
+        } else if (_type === Zertz.MoveType.REMOVE_RING) {
+            str += 'remove ring to ' + _to.to_string();
+        } else { // _type === Zertz.MoveType.CAPTURE
+            str += 'capture ' + (_marble_color === Zertz.MarbleColor.BLACK ? 'black' :
+                    _marble_color === Zertz.MarbleColor.WHITE ? 'white' : 'grey') + ' marble at ' + _to.to_string() + ' with ' + _from.to_string();
+        }
+        return str;
+    };
+
     this.type = function () {
         return _type;
     };
@@ -570,6 +586,11 @@ Zertz.Engine = function (t, c) {
 
     this.get_intersection = function (letter, number) {
         return get_intersection(letter, number);
+    };
+
+    this.get_intersection_state = function (letter, number) {
+        return get_intersection(letter, number).state();
+
     };
 
     this.get_possible_move_list = function () {
