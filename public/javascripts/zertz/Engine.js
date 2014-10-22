@@ -524,6 +524,10 @@ Zertz.Engine = function (t, c) {
         return color;
     };
 
+    this.current_color_string = function () {
+        return color === Zertz.Color.ONE ? 'one' : 'two';
+    };
+
     this.exist_intersection = function (letter, number) {
         var coordinates = new Zertz.Coordinates(letter, number);
 

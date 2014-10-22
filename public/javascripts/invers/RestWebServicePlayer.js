@@ -15,7 +15,7 @@ Invers.RestWebServicePlayer = function (c, e, l) {
     this.set_manager = _super.set_manager;
     this.set_url = _super.set_url;
 
-    this.buildMove = function (o) {
+    this.buildm_ove = function (o) {
         return new Invers.Move(o.color, o.letter, o.number, o.position);
     };
 

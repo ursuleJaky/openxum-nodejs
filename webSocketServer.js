@@ -206,38 +206,16 @@ exports.Server = function (app) {
         var response = { };
         var game_type = currentGames[msg.user_id].game_type;
 
-        if (game_type === 'dvonn') {
-        } else if (game_type === 'invers') {
-            response = msg;
-        } else if (game_type === 'gipf') {
-        } else if (game_type === 'kamisado') {
-            response = msg;
-        } else if (game_type === 'tzaar') {
-        } else if (game_type === 'yinsh') {
-            response = new yinsh.play(msg);
-
-            // TODO: remove this
-            var move_str = "";
-            if (response.move === 'put_ring') {
-                move_str = "Pr" + response.coordinates.letter + response.coordinates.number + ';';
-            } else if (response.move === 'move_ring') {
-                move_str = "Mr" + response.ring.letter + response.ring.number + response.coordinates.letter + response.coordinates.number + ';';
-            } else if (response.move === 'put_marker') {
-                move_str = "Pm" + response.coordinates.letter + response.coordinates.number + ';';
-            }
-
-            app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, GH) {
-                app.db.models.GameHisto.update({ gameId: msg.game_id }, { moves: GH.moves + move_str }, function (err, numAffected) {
-                    app.db.models.Game.update({ _id: msg.game_id }, { currentColor: msg.next_color }, function (err, numAffected) {
-                    });
+        response = msg;
+        app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, GH) {
+            app.db.models.GameHisto.update({ gameId: msg.game_id }, { moves: GH.moves + ';' + msg.move }, function (err, numAffected) {
+                app.db.models.Game.update({ _id: msg.game_id }, { currentColor: msg.next_color }, function (err, numAffected) {
+                    if (c_opponent) {
+                        c_opponent.send(JSON.stringify(response));
+                    }
                 });
             });
-        } else if (game_type === 'zertz') {
-            response = msg;
-        }
-        if (c_opponent) {
-            c_opponent.send(JSON.stringify(response));
-        }
+        });
     };
 
     var sendConnectedClients = function () {
@@ -263,18 +241,18 @@ exports.Server = function (app) {
         }
     };
 
-    var turn_indice = 0;
+//    var turn_indice = 0;
 
     var onReplay = function (connection, msg) {
-        var turn_indice = 0;
-        var colors = {0: 'black', 1: 'white'};
+//        var turn_indice = 0;
+//        var colors = {0: 'black', 1: 'white'};
 
-        var response = { };
         app.db.models.GameHisto.findOne({ gameId: msg.game_id }, null, function (err, turns) {
-            response = {
+            var response = {
                 type: 'replay',
                 moves: turns.moves
             };
+
             connection.send(JSON.stringify(response));
         });
     };

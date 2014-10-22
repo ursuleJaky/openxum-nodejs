@@ -20,16 +20,18 @@ OpenXum.RemotePlayer = function (c, e, u, o, g) {
         };
         _connection.onmessage = function (message) {
             var msg = JSON.parse(message.data);
+            var move;
 
             if (msg.type === 'start') {
                 _manager.ready(true);
             } else if (msg.type === 'disconnect') {
                 _manager.ready(false);
             } else if (msg.type === 'turn') {
-                var move = _that.buildMove();
-
+                move = _that.build_move();
                 move.parse(msg.move);
                 _manager.play_remote(move);
+            } else if (msg.type === 'replay') {
+                _manager.replay(msg.moves);
             }
         };
 
@@ -62,7 +64,7 @@ OpenXum.RemotePlayer = function (c, e, u, o, g) {
         return false;
     };
 
-    this.finish = function(moves) {
+    this.finish = function (moves) {
         var msg = {
             type: 'finish',
             user_id: _uid,
@@ -82,12 +84,29 @@ OpenXum.RemotePlayer = function (c, e, u, o, g) {
     this.move = function (move) {
         if (move) {
             var msg = {
+                game_id: _gameID,
                 type: 'turn',
                 user_id: _uid,
-                move: move.get()
+                move: move.get(),
+                next_color: _manager.engine().current_color_string()
             };
             _connection.send(JSON.stringify(msg));
         }
+    };
+
+    this.replay_game = function () {
+        var send_replay = setInterval(function () {
+            if (_connection.readyState === 1) {
+                var msg = {
+                    type: 'replay',
+                    game_id: _gameID,
+                    user_id: _uid
+                };
+
+                _connection.send(JSON.stringify(msg));
+                clearInterval(send_replay);
+            }
+        }, 100);
     };
 
     this.set_gui = function () {

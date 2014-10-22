@@ -33,7 +33,7 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
                 _id = JSON.parse(data).id;
                 _manager.ready(true);
                 if (_engine.current_color() === _color && !_start) {
-                    _manager.play_opponent();
+                    _manager.play_other();
                 }
             }
         });
@@ -77,7 +77,7 @@ OpenXum.RestWebServicePlayer = function (c, e, l) {
                 data: { id: _id, game: _that.get_name(), color: _color },
                 xhrFields: { withCredentials: true },
                 success: function (data) {
-                    _manager.play_remote(_that.buildMove(JSON.parse(data)));
+                    _manager.play_remote(_that.build_move(JSON.parse(data)));
                 }
             });
         }

@@ -8,37 +8,32 @@ block neck
 
 block body
     script(src='/javascripts/yinsh/Yinsh.js')
-    script(src='/javascripts/yinsh/Engine.js')
-    script(src='/javascripts/yinsh/Manager.js')
-    script(src='/javascripts/yinsh/Gui.js')
-    script(src='/javascripts/yinsh/RandomPlayer.js')
-    script(src='/javascripts/yinsh/RemotePlayer.js')
 
     script(language='javascript').
         $(document).ready(function() {
+            Yinsh.load(function() {
                 $('#winnerModal .new-game-button').click(function() {
                     $('#winnerModal').modal('hide');
-                    window.location.href = '/games/create/?game=yinsh';
+                    window.location.href = '/games/play/?game=yinsh';
                 });
 
                 var canvas = document.getElementById("board");
                 var canvas_div = document.getElementById("boardDiv");
-                var markerNumber = document.getElementById("markerNumber");
-                var turnList = document.getElementById("turnList");
                 var engine = new Yinsh.Engine(#{mode}, 0);
                 var gui = new Yinsh.Gui(#{color}, engine, '#{game_id}' === '-1');
-                var other;
+                var opponent;
 
                 if ('#{game_type}' === 'remote_ai') {
-                    // other = new Yinsh.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
-                } else if ('#{game_id}' === '-1') {
-                    other = new Yinsh.RandomPlayer(#{opponent_color}, engine);
+                    // opponent = new Yinsh.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
+                } else if ('#{game_type}' === 'gui') {
+                    opponent = gui;
+                } else if ('#{game_type}' === 'ai') {
+                    // opponent = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
+                    opponent = new Yinsh.RandomPlayer(#{opponent_color}, engine);
                 } else {
-                    other = new Yinsh.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
+                    opponent = new Yinsh.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
                 }
-
-                var manager = new Yinsh.Manager(engine, gui, other, new Yinsh.Status(markerNumber, turnList));
-
+                var manager = new Yinsh.Manager(engine, gui, opponent, new OpenXum.Status(document.getElementById("status")));
                 if (canvas_div.clientHeight < canvas_div.clientWidth) {
                     canvas.height = canvas_div.clientHeight * 0.95;
                     canvas.width = canvas_div.clientHeight * 0.95;
@@ -48,30 +43,30 @@ block body
                 }
                 gui.set_canvas(canvas);
                 gui.set_manager(manager);
-                if ('#{game_id}' !== '-1') {
-                    other.set_manager(manager);
-                    other.set_gui(gui);
+                if ('#{game_id}' != '-1') {
+                    opponent.set_manager(manager);
+                    opponent.set_gui(gui);
                 } else {
-                    other.set_level(manager.load_level());
-                    if (other.is_remote()) {
-                        other.set_manager(manager);
+                    if (opponent !== gui) {
+                        opponent.set_level(manager.load_level())
+                    }
+                    if (opponent.is_remote()) {
+                        opponent.set_manager(manager);
                     }
                 }
-                if (engine.current_color() === other.color() && !other.is_remote()) {
+                if (opponent !== gui && engine.current_color() === opponent.color() && !opponent.is_remote()) {
                     manager.play_other();
                 }
                 if ('#{replay}' === 'true') {
-                   other.replayGame();
+                   opponent.replay_game();
                 }
-                $( "#target" ).click(function() {
-                   other.replayGame();
+                $( "#replay" ).click(function() {
+                   opponent.replay_game();
                 });
+            });
         });
 
     br
-    
-    div
-       a#target Replay
     div.modal.fade#winnerModal(tabindex='-1',role='dialog',aria-labelledby='winnerModelLabel',aria-hidden='true')
         div.modal-dialog
             div.modal-content
@@ -79,15 +74,11 @@ block body
                 div.modal-footer
                     div.btn-group
                         a.btn.btn-primary.new-game-button(href='#') New game
-
     div.row
-        div.col-md-3.visible-md.visible-lg
-            table(style='width: 100%; height: 100%; table-layout: fixed; padding: 10px')
-                tr(style='height: 50px')
-                    td
-                        span#markerNumber
-                tr(style='vertical-align: top;')
-                    td
-                        span#turnList(style='display:block; overflow: auto')
-        div.col-md-9#boardDiv
-            canvas#board(style='width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')
+        div.col-md-6.col-md-offset-3
+            a#status(class='btn btn-success btn-md active',href='#') Ready!
+            a#replay(class='btn btn-warning btn-md active',href='#') Replay
+            a#list(class='btn btn-danger btn-md active',href='#') Move list
+    div.row
+        div.col-md-12(id='boardDiv')
+            canvas(id='board',style='width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')

@@ -245,6 +245,10 @@ Kamisado.Engine = function (t, c) {
         return color;
     };
 
+    this.current_color_string = function () {
+        return color === Kamisado.Color.BLACK ? 'black' : 'white';
+    };
+
     this.find_playable_tower = function (color) {
         return find_playable_tower(color);
     };

@@ -1,163 +1,38 @@
 "use strict";
 
-Yinsh.Status = function (markerNumber, turnList) {
-    this.markerNumber = markerNumber;
-    this.turnList = turnList;
-};
-
-Yinsh.Manager = function (e, gui_player, other_player, s) {
-
+Yinsh.Manager = function (e, g, o, s) {
 // private attributes
-    var engine = e;
-    var gui = gui_player;
-    var other = other_player;
-    var status = s;
-
-    var level;
-
-    var moves = '';
-
-    status.markerNumber.innerHTML = engine.available_marker_number();
-
-// private methods
-    var apply_move = function (move) {
-        engine.move(move);
-        moves += move.get() + ';';
-    };
-
-    var load_win = function() {
-        var key = 'openxum:yinsh:win';
-        var win = 0;
-
-        if (localStorage[key]) {
-            win = JSON.parse(localStorage[key]);
-        }
-        return win;
-    };
-
-    var finish = function () {
-        if (engine.is_finished()) {
-            if (other.is_remote()) {
-                other.finish(moves);
-            }
-
-            var popup = document.getElementById("winnerModalText");
-
-            popup.innerHTML = "<h4>The winner is " +
-                (engine.winner_is() === Yinsh.Color.BLACK ? "black" : "white") + "!</h4>";
-            $("#winnerModal").modal("show");
-
-            if (engine.winner_is() === gui.color()) {
-                var win = load_win() + 1;
-
-                localStorage['openxum:yinsh:win'] = JSON.stringify(win);
-                if (win > 5) {
-                    localStorage['openxum:yinsh:level'] = JSON.stringify(level + 10);
-                    localStorage['openxum:yinsh:win'] = JSON.stringify(0);
-                }
-            }
-        }
-    };
-
-    var update_status = function () {
-        status.markerNumber.innerHTML = engine.available_marker_number();
-        status.turnList.innerHTML = "";
-
-        var turn_list = engine.turn_list();
-        for (var i = 0; i < turn_list.length; ++i) {
-            status.turnList.innerHTML += turn_list[i] + "<br />";
-        }
-    };
+    var _super = new OpenXum.Manager(e, g, o, s);
 
 // public methods
-    this.load_level = function() {
-        var key = 'openxum:yinsh:level';
+    this.engine = _super.engine;
+    this.load_level = _super.load_level;
+    this.next = _super.next;
+    this.play = _super.play;
+    this.play_other = _super.play_other;
+    this.play_remote = _super.play_remote;
+    this.ready = _super.ready;
+    this.redraw = _super.redraw;
+    this.replay = _super.replay;
 
-        level = 10;
-        if (localStorage[key]) {
-            level = JSON.parse(localStorage[key]);
-        }
-        return level;
+    this.build_move = function () {
+        return new Yinsh.Move();
     };
 
-    this.play = function () {
-        if (engine.current_color() === gui.color()) {
-            if (engine.phase() === Yinsh.Phase.PUT_RING) {
-                apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_RING, gui.get_selected_coordinates()));
-                if (other.is_remote()) {
-                    other.put_ring(gui.get_selected_coordinates(), engine.current_color());
-                }
-            } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
-                apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, gui.get_selected_coordinates()));
-                if (other.is_remote()) {
-                    other.put_marker(gui.get_selected_coordinates(), engine.current_color());
-                }
-            } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
-                apply_move(new Yinsh.Move(Yinsh.MoveType.MOVE_RING, gui.get_selected_ring(), gui.get_selected_coordinates()));
-                if (other.is_remote()) {
-                    other.move_ring(gui.get_selected_ring(), gui.get_selected_coordinates());
-                }
-                gui.clear_selected_ring();
-            } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
-                engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-                apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, gui.get_selected_row()));
-                if (other.is_remote()) {
-                    other.remove_row(gui.get_selected_row(), engine.current_color());
-                }
-                gui.clear_selected_row();
-            } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
-                engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
-                apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, gui.get_selected_coordinates()));
-                if (other.is_remote()) {
-                    other.remove_ring(gui.get_selected_coordinates(), engine.current_color());
-                }
-            }
-        }
-        gui.draw();
-        update_status();
-        finish();
-        if (!engine.is_finished() && engine.current_color() !== gui.color()) {
-            if (!other.is_remote()) {
-                this.play_other();
-            }
-        }
+    this.get_current_color = function () {
+        return _super.engine().current_color() === Yinsh.Color.BLACK ? 'Black' : 'White';
     };
 
-    this.play_other = function () {
-        if (engine.phase() === Yinsh.Phase.PUT_RING) {
-            apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_RING, other.put_ring()));
-        } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
-            var from, to;
-
-            from = other.put_marker();
-            apply_move(new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, from));
-            to = other.move_ring(from);
-            apply_move(new Yinsh.Move(Yinsh.MoveType.MOVE_RING, from, to));
-        } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
-            engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
-            apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, other.remove_row()));
-        } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
-            engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
-            apply_move(new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, other.remove_ring()));
-        }
-        gui.draw();
-        update_status();
-        finish();
-        if (!engine.is_finished() && engine.current_color() !== gui.color()) {
-            if (!other.is_remote()) {
-                this.play_other();
-            }
-        }
+    this.get_name = function () {
+        return 'yinsh';
     };
 
-    this.play_remote = function (move) {
-        apply_move(move);
-        gui.draw();
-        update_status();
-        finish();
+    this.get_winner_color = function () {
+        return _super.engine().winner_is() === Yinsh.Color.BLACK ? 'black' : 'white';
     };
 
-    this.redraw = function () {
-        gui.draw();
+    this.process_move = function () {
     };
+
+    _super.that(this);
 };

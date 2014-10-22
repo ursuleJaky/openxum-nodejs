@@ -31,6 +31,10 @@ Yinsh.Coordinates = function (l, n) {
     var number = n;
 
 // public methods
+    this.clone = function () {
+        return new Yinsh.Coordinates(l, n);
+    };
+
     this.distance = function (coordinates) {
         if (coordinates.letter() === letter) {
             return coordinates.number() - number;
@@ -67,8 +71,11 @@ Yinsh.Intersection = function (c) {
     var state = Yinsh.State.VACANT;
 
 // public methods
-    this.hash = function () {
-        return coordinates.hash();
+    this.clone = function () {
+        var intersection = new Yinsh.Intersection(coordinates.clone());
+
+        intersection.set(state);
+        return intersection;
     };
 
     this.color = function () {
@@ -85,6 +92,10 @@ Yinsh.Intersection = function (c) {
         }
     };
 
+    this.coordinates = function () {
+        return coordinates;
+    };
+
     this.flip = function () {
         if (state === Yinsh.State.BLACK_MARKER) {
             state = Yinsh.State.WHITE_MARKER;
@@ -93,8 +104,8 @@ Yinsh.Intersection = function (c) {
         }
     };
 
-    this.coordinates = function () {
-        return coordinates;
+    this.hash = function () {
+        return coordinates.hash();
     };
 
     this.letter = function () {
@@ -143,23 +154,29 @@ Yinsh.Intersection = function (c) {
         state = Yinsh.State.VACANT;
     };
 
+    this.set = function (_state) {
+        state = _state;
+    };
+
     this.state = function () {
         return state;
     };
 };
 
-Yinsh.Move = function (t, c1, c2) {
+Yinsh.Move = function (t, c, c1, c2) {
 
 // private attributes
     var _type;
+    var _color;
     var _coordinates;
     var _from;
     var _to;
     var _row;
 
 // private methods
-    var init = function (t, c1, c2) {
+    var init = function (t, c, c1, c2) {
         _type = t;
+        _color = c;
         if (_type === Yinsh.MoveType.PUT_RING || _type === Yinsh.MoveType.PUT_MARKER || _type === Yinsh.MoveType.REMOVE_RING) {
             _coordinates = c1;
         } else if (_type === Yinsh.MoveType.MOVE_RING) {
@@ -173,15 +190,16 @@ Yinsh.Move = function (t, c1, c2) {
 // public methods
     this.get = function () {
         if (_type === Yinsh.MoveType.PUT_RING) {
-            return 'Pr' + _coordinates.to_string();
+            return 'Pr' + (_color === Yinsh.Color.BLACK ? "B" : "W") + _coordinates.to_string();
         } else if (_type === Yinsh.MoveType.PUT_MARKER) {
-            return 'Pm' + _coordinates.to_string();
+            return 'Pm' + (_color === Yinsh.Color.BLACK ? "B" : "W") + _coordinates.to_string();
         } else if (_type === Yinsh.MoveType.REMOVE_RING) {
-            return 'Rr' + _coordinates.to_string();
+            return 'Rr' + (_color === Yinsh.Color.BLACK ? "B" : "W") + _coordinates.to_string();
         } else if (_type === Yinsh.MoveType.MOVE_RING) {
-            return 'Mr' + _from.to_string() + _to.to_string();
+            return 'Mr' + (_color === Yinsh.Color.BLACK ? "B" : "W") + _from.to_string() + _to.to_string();
         } else {
-            var str = 'RR';
+            var str = 'RR' + (_color === Yinsh.Color.BLACK ? "B" : "W");
+
             for (var index = 0; index < _row.length; ++index) {
                 str += _row[index].to_string();
             }
@@ -195,18 +213,6 @@ Yinsh.Move = function (t, c1, c2) {
 
     this.from = function () {
         return _from;
-    };
-
-    this.row = function () {
-        return _row;
-    };
-
-    this.to = function () {
-        return _to;
-    };
-
-    this.type = function () {
-        return _type;
     };
 
     this.parse = function (str) {
@@ -223,21 +229,59 @@ Yinsh.Move = function (t, c1, c2) {
         } else if (type === 'RR') {
             _type = Yinsh.MoveType.REMOVE_ROW;
         }
+        _color = str.charAt(2) === 'B' ? Yinsh.Color.BLACK : Yinsh.Color.WHITE;
         if (_type === Yinsh.MoveType.PUT_RING || _type === Yinsh.MoveType.PUT_MARKER || _type === Yinsh.MoveType.REMOVE_RING) {
-            _coordinates = new Yinsh.Coordinates(str.charAt(2), parseInt(str.charAt(3)));
+            _coordinates = new Yinsh.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
         } else if (_type === Yinsh.MoveType.MOVE_RING) {
-            _from = new Yinsh.Coordinates(str.charAt(2), parseInt(str.charAt(3)));
-            _to = new Yinsh.Coordinates(str.charAt(4), parseInt(str.charAt(5)));
+            _from = new Yinsh.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+            _to = new Yinsh.Coordinates(str.charAt(5), parseInt(str.charAt(6)));
         } else {
             _row = [];
             for (var index = 0; index < 5; ++index) {
-                _row.push(new Yinsh.Coordinates(str.charAt(2 + 2 * index),
-                    parseInt(str.charAt(3 + 2 * index))));
+                _row.push(new Yinsh.Coordinates(str.charAt(3 + 2 * index),
+                    parseInt(str.charAt(4 + 2 * index))));
             }
         }
     };
 
-    init(t, c1, c2);
+    this.row = function () {
+        return _row;
+    };
+
+    this.to = function () {
+        return _to;
+    };
+
+    this.to_object = function () {
+        return { type: _type, color: _color, coordinates: _coordinates, from: _from, to: _to, row: _row };
+    };
+
+    this.to_string = function () {
+        var str;
+
+        if (_type === Yinsh.MoveType.PUT_RING) {
+            return 'put ' + (_color === Yinsh.Color.BLACK ? 'black' : 'white') + ' ring at ' + _coordinates.to_string();
+        } else if (_type === Yinsh.MoveType.PUT_MARKER) {
+            return 'put ' + (_color === Yinsh.Color.BLACK ? 'black' : 'white') + ' marker at ' + _coordinates.to_string();
+        } else if (_type === Yinsh.MoveType.REMOVE_RING) {
+            return 'remove ' + (_color === Yinsh.Color.BLACK ? 'black' : 'white') + ' ring at ' + _coordinates.to_string();
+        } else if (_type === Yinsh.MoveType.MOVE_RING) {
+            return 'move ' + (_color === Yinsh.Color.BLACK ? 'black' : 'white') + ' ring from ' + _from.to_string() + ' to ' + _to.to_string();
+        } else {
+            str = 'ring ' + (_color === Yinsh.Color.BLACK ? 'black' : 'white') + ' row ( ';
+            for (var index = 0; index < _row.length; ++index) {
+                str += _row[index].to_string() + ' ';
+            }
+            str += ')';
+            return str;
+        }
+    };
+
+    this.type = function () {
+        return _type;
+    };
+
+    init(t, c, c1, c2);
 };
 
 Yinsh.Engine = function (t, c) {
@@ -251,7 +295,6 @@ Yinsh.Engine = function (t, c) {
     var removed_black_ring_number = 0;
     var removed_white_ring_number = 0;
     var intersections = {};
-    var turn_list = [];
     var phase = Yinsh.Phase.PUT_RING;
     var letters = [ "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K" ];
 
@@ -419,85 +462,97 @@ Yinsh.Engine = function (t, c) {
         return result;
     };
 
-/*    var verify_intersection_in_row = function (letter, number, color, ok) {
-        var _ok = ok;
-        var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
+    /*    var verify_intersection_in_row = function (letter, number, color, ok) {
+     var _ok = ok;
+     var coordinates = (new Yinsh.Coordinates(letter, number)).hash();
 
-        if (coordinates in intersections) {
-            if (intersections[coordinates].color() !== color) {
-                _ok = false;
-            }
-        }
-        return _ok;
-    };
+     if (coordinates in intersections) {
+     if (intersections[coordinates].color() !== color) {
+     _ok = false;
+     }
+     }
+     return _ok;
+     };
 
-    var verify_row = function (begin, end, color) {
-        var ok = true;
-        var n;
-        var l;
+     var verify_row = function (begin, end, color) {
+     var ok = true;
+     var n;
+     var l;
 
-        if (begin.letter() === end.letter()) {
-            if (begin.number() < end.number()) {
-                n = begin.number() + 1;
-                while (n < end.number() && ok) {
-                    verify_intersection_in_row(begin.letter(), n, color, ok);
-                    ++n;
-                }
-            } else {
-                n = begin.number() - 1;
-                while (n > end.number() && ok) {
-                    verify_intersection_in_row(begin.letter(), n, color, ok);
-                    --n;
-                }
-            }
-        } else if (begin.number() === end.number()) {
-            if (begin.letter() < end.letter()) {
-                l = begin.letter() + 1;
-                while (l < end.letter() && ok) {
-                    verify_intersection_in_row(l, begin.number(), color, ok);
-                    ++l;
-                }
-            } else {
-                l = begin.letter() - 1;
-                while (l > end.letter() && ok) {
-                    verify_intersection_in_row(l, begin.number(), color, ok);
-                    --l;
-                }
-            }
-        } else {
-            if (begin.letter() - end.letter() ===
-                begin.number() - end.number()) {
-                if (begin.letter() < end.letter()) {
-                    n = begin.number() + 1;
-                    l = begin.letter() + 1;
-                    while (l < end.letter() && ok) {
-                        verify_intersection_in_row(l, n, color, ok);
-                        ++l;
-                        ++n;
-                    }
-                } else {
-                    n = begin.number() - 1;
-                    l = begin.letter() - 1;
-                    while (l > end.letter() && ok) {
-                        verify_intersection_in_row(l, n, color, ok);
-                        --l;
-                        --n;
-                    }
-                }
-            } else {
-                ok = false;
-            }
-        }
-        return ok;
-    }; */
+     if (begin.letter() === end.letter()) {
+     if (begin.number() < end.number()) {
+     n = begin.number() + 1;
+     while (n < end.number() && ok) {
+     verify_intersection_in_row(begin.letter(), n, color, ok);
+     ++n;
+     }
+     } else {
+     n = begin.number() - 1;
+     while (n > end.number() && ok) {
+     verify_intersection_in_row(begin.letter(), n, color, ok);
+     --n;
+     }
+     }
+     } else if (begin.number() === end.number()) {
+     if (begin.letter() < end.letter()) {
+     l = begin.letter() + 1;
+     while (l < end.letter() && ok) {
+     verify_intersection_in_row(l, begin.number(), color, ok);
+     ++l;
+     }
+     } else {
+     l = begin.letter() - 1;
+     while (l > end.letter() && ok) {
+     verify_intersection_in_row(l, begin.number(), color, ok);
+     --l;
+     }
+     }
+     } else {
+     if (begin.letter() - end.letter() ===
+     begin.number() - end.number()) {
+     if (begin.letter() < end.letter()) {
+     n = begin.number() + 1;
+     l = begin.letter() + 1;
+     while (l < end.letter() && ok) {
+     verify_intersection_in_row(l, n, color, ok);
+     ++l;
+     ++n;
+     }
+     } else {
+     n = begin.number() - 1;
+     l = begin.letter() - 1;
+     while (l > end.letter() && ok) {
+     verify_intersection_in_row(l, n, color, ok);
+     --l;
+     --n;
+     }
+     }
+     } else {
+     ok = false;
+     }
+     }
+     return ok;
+     }; */
 
 // public methods
     this.available_marker_number = function () {
         return marker_number;
     };
 
+    this.clone = function () {
+        var o = new Yinsh.Engine(type, current_color);
+
+        o.set(phase, marker_number, placed_black_ring_coordinates, placed_white_ring_coordinates,
+            removed_black_ring_number, removed_white_ring_number, intersections);
+        return o;
+    };
+
     this.current_color = function () {
         return current_color;
+    };
+
+    this.current_color_string = function () {
+        return current_color === Yinsh.Color.BLACK ? 'black' : 'white';
     };
 
     this.exist_intersection = function (letter, number) {
@@ -527,6 +582,14 @@ Yinsh.Engine = function (t, c) {
     this.get_placed_ring_coordinates = function (color) {
         return (color === Yinsh.Color.BLACK) ? placed_black_ring_coordinates :
             placed_white_ring_coordinates;
+    };
+
+    this.get_possible_move_list = function () {
+        // TODO
+    };
+
+    this.get_possible_move_number = function (list) {
+        // TODO
     };
 
     this.get_possible_moving_list = function (origin, color, control) {
@@ -772,8 +835,6 @@ Yinsh.Engine = function (t, c) {
                 phase = Yinsh.Phase.REMOVE_ROWS_BEFORE;
             }
         }
-        turn_list.push("move " + (color === Yinsh.Color.BLACK ? "black" : "white") + " ring from " +
-            origin.to_string() + " to " + destination.to_string());
         return true;
     };
 
@@ -793,7 +854,6 @@ Yinsh.Engine = function (t, c) {
             return false;
         }
         phase = Yinsh.Phase.MOVE_RING;
-        turn_list.push("put " + (color === Yinsh.Color.BLACK ? "black" : "white") + " marker at " + coordinates.to_string());
         return true;
     };
 
@@ -821,10 +881,16 @@ Yinsh.Engine = function (t, c) {
             phase = Yinsh.Phase.PUT_MARKER;
         }
         change_color();
-        turn_list.push("put " + (color === Yinsh.Color.BLACK ? "black" : "white") + " ring at " + coordinates.to_string());
         return true;
     };
 
+    this.remove_first_possible_move = function (list) {
+        // TODO
+    };
+
+    this.select_move = function (list, index) {
+        // TODO
+    };
     this.remove_row = function (row, color) {
         var j;
 
@@ -839,13 +905,6 @@ Yinsh.Engine = function (t, c) {
         } else {
             phase = Yinsh.Phase.REMOVE_RING_BEFORE;
         }
-
-        var turn = "remove " + (color === Yinsh.Color.BLACK ? "black" : "white") + " row [ ";
-        for (j = 0; j < row.length; ++j) {
-            turn += row[j].to_string() + " ";
-        }
-        turn += "]";
-        turn_list.push(turn);
         return true;
     };
 
@@ -887,8 +946,6 @@ Yinsh.Engine = function (t, c) {
                 }
             }
         }
-        turn_list.push("remove " + (color === Yinsh.Color.BLACK ? "black" : "white") +
-            " ring at " + coordinates.to_string());
         return true;
     };
 
@@ -904,8 +961,23 @@ Yinsh.Engine = function (t, c) {
         return rows[0];
     };
 
-    this.turn_list = function () {
-        return turn_list;
+    this.set = function (_phase, _marker_number, _placed_black_ring_coordinates, _placed_white_ring_coordinates, _removed_black_ring_number, _removed_white_ring_number, _intersections) {
+        var index;
+
+        for (index in _intersections) {
+            intersections[index] = _intersections[index].clone();
+        }
+
+        phase = _phase;
+        marker_number = _marker_number;
+        for (index = 0; index < _placed_black_ring_coordinates.length; ++index) {
+            placed_black_ring_coordinates[index] = _placed_black_ring_coordinates[index].clone;
+        }
+        for (index = 0; index < _placed_white_ring_coordinates.length; ++index) {
+            placed_white_ring_coordinates[index] = _placed_white_ring_coordinates[index].clone;
+        }
+        removed_black_ring_number = _removed_black_ring_number;
+        removed_white_ring_number = _removed_white_ring_number;
     };
 
     this.verify_moving = function (origin, destination) {

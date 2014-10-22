@@ -1,6 +1,6 @@
 "use strict";
 
-Zertz.RestWebServicePlayer = function (c, e, l) {
+Yinsh.RestWebServicePlayer = function (c, e, l) {
 // private attributes
     var _super = new OpenXum.RestWebServicePlayer(c, e, l);
 
@@ -16,11 +16,11 @@ Zertz.RestWebServicePlayer = function (c, e, l) {
     this.set_url = _super.set_url;
 
     this.build_move = function (o) {
-        return new Zertz.Move(o.type, o.color, o.to, o.marble_color, o.from);
+        return new Yinsh.Move(o.type, o.color, o.coordinates, o.from, o.to, o.row);
     };
 
     this.get_name = function () {
-        return 'zertz';
+        return 'yinsh';
     };
 
     _super.that(this);

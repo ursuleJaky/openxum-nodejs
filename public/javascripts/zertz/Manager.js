@@ -12,6 +12,11 @@ Zertz.Manager = function (e, g, o, s) {
     this.play_remote = _super.play_remote;
     this.ready = _super.ready;
     this.redraw = _super.redraw;
+    this.replay = _super.replay;
+
+    this.build_move = function () {
+        return new Zertz.Move();
+    };
 
     this.get_current_color = function () {
         return _super.engine().current_color() === Zertz.Color.ONE ? 'One' : 'Two';

@@ -554,47 +554,6 @@ Yinsh.Gui = function (color, e, local) {
         }
     };
 
-    var show_opponent_status = function (x, y) {
-        var text;
-        var _height = 25;
-        var _width = 100;
-
-        context.lineWidth = 1;
-        if (opponentPresent) {
-            if (engine.current_color() === mycolor) {
-                context.strokeStyle = "#00ff00";
-                context.fillStyle = "#00ff00";
-                text = 'ready';
-            } else {
-                context.strokeStyle = "#ffa500";
-                context.fillStyle = "#ffa500";
-                text = 'wait';
-            }
-        } else {
-            context.strokeStyle = "#ff0000";
-            context.fillStyle = "#ff0000";
-            text = 'disconnect';
-        }
-        context.beginPath();
-        context.fillRect(x, y, _width, _height);
-        context.strokeRect(x, y, _width, _height);
-        context.closePath();
-
-        context.strokeStyle = "#000000";
-        context.fillStyle = "#000000";
-        context.font = "16px arial";
-        context.textBaseline = "top";
-
-        var textWidth = context.measureText(text).width;
-
-        context.fillText(text, x + (_width - textWidth) / 2, y + 4);
-
-        context.strokeStyle = "#000000";
-        context.beginPath();
-        context.strokeRect(x, y, _width, _height);
-        context.closePath();
-    };
-
 // public methods
     this.clear_selected_ring = function () {
         selected_ring = new Yinsh.Coordinates('X', -1);
@@ -630,13 +589,29 @@ Yinsh.Gui = function (color, e, local) {
 
         //intersection
         show_intersection();
-
-        // opponent status
-        show_opponent_status(10, 10);
     };
 
     this.engine = function () {
         return engine;
+    };
+
+    this.get_move = function () {
+        var move = null;
+
+        if (engine.phase() === Yinsh.Phase.PUT_RING) {
+            move = new Yinsh.Move(Yinsh.MoveType.PUT_RING, engine.current_color(), this.get_selected_coordinates());
+        } else if (engine.phase() === Yinsh.Phase.PUT_MARKER) {
+            move = new Yinsh.Move(Yinsh.MoveType.PUT_MARKER, engine.current_color(), this.get_selected_coordinates());
+        } else if (engine.phase() === Yinsh.Phase.MOVE_RING) {
+            move = new Yinsh.Move(Yinsh.MoveType.MOVE_RING, engine.current_color(), this.get_selected_ring(), this.get_selected_coordinates());
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_ROWS_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_ROWS_BEFORE) {
+            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_ROW, engine.current_color(), this.get_selected_row());
+        } else if (engine.phase() === Yinsh.Phase.REMOVE_RING_AFTER ||
+            engine.phase() === Yinsh.Phase.REMOVE_RING_BEFORE) {
+            move = new Yinsh.Move(Yinsh.MoveType.REMOVE_RING, engine.current_color(), this.get_selected_coordinates());
+        }
+        return move;
     };
 
     this.get_selected_coordinates = function () {
@@ -645,6 +620,18 @@ Yinsh.Gui = function (color, e, local) {
 
     this.get_selected_ring = function () {
         return selected_ring;
+    };
+
+    this.is_animate = function () {
+        return false;
+    };
+
+    this.is_remote = function () {
+        return false;
+    };
+
+    this.move = function (move, color) {
+        manager.play();
     };
 
     this.ready = function (r) {
@@ -668,5 +655,12 @@ Yinsh.Gui = function (color, e, local) {
 
     this.set_manager = function (m) {
         manager = m;
+    };
+
+    this.unselect = function () {
+        if (engine.phase() !== Yinsh.Phase.MOVE_RING) {
+            this.clear_selected_ring();
+        }
+        this.clear_selected_row();
     };
 };

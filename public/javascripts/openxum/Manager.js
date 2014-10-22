@@ -133,7 +133,7 @@ OpenXum.Manager = function (e, g, o, s) {
                 _opponent.move(_move);
             }
             _gui.unselect();
-            finish();
+            this.next();
         }
     };
 
@@ -154,8 +154,21 @@ OpenXum.Manager = function (e, g, o, s) {
         _gui.move(move, _opponent.color());
     };
 
+    this.replay = function (moves) {
+        _moves = moves;
+        moves.split(";").forEach(function (move) {
+            if (move !== '') {
+                _move = _that.build_move();
+                _move.parse(move);
+                _engine.move(_move);
+            }
+        });
+        _gui.draw();
+    };
+
     this.ready = function (r) {
         _ready = r;
+        _gui.ready(r);
         update_status();
     };
 

@@ -143,6 +143,10 @@ Invers.Engine = function (t, c) {
         return color;
     };
 
+    this.current_color_string = function () {
+        return color === Invers.Color.RED ? 'red' : 'yellow';
+    };
+
     this.get_different_color_number_of_free_tiles = function () {
         return (redTileNumber === 2 || yellowTileNumber === 2) ? 1 : 2;
     };
