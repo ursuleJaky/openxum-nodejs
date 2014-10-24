@@ -597,13 +597,13 @@ Zertz.Engine = function (t, c) {
 
     };
 
-    this.get_possible_move_list = function () {
-        // TODO
-    };
+    /*    this.get_possible_move_list = function () {
+     // TODO
+     };
 
-    this.get_possible_move_number = function(list) {
-        // TODO
-    };
+     this.get_possible_move_number = function(list) {
+     // TODO
+     }; */
 
     this.get_possible_capturing_marbles = function (coordinates) {
         var list = [];
@@ -828,16 +828,15 @@ Zertz.Engine = function (t, c) {
         phase = Zertz.Phase.PUT_MARBLE;
     };
 
-    this.remove_first_possible_move = function(list) {
-        // TODO
-    };
+    /*    this.remove_first_possible_move = function(list) {
+     // TODO
+     };
 
-    this.select_move = function (list, index) {
-        // TODO
-    };
+     this.select_move = function (list, index) {
+     // TODO
+     }; */
 
-    this.set = function(_phase, _state, _intersections, _blackMarbleNumber, _greyMarbleNumber,
-        _whiteMarbleNumber, _capturedBlackMarbleNumber, _capturedGreyMarbleNumber, _capturedWhiteMarbleNumber) {
+    this.set = function (_phase, _state, _intersections, _blackMarbleNumber, _greyMarbleNumber, _whiteMarbleNumber, _capturedBlackMarbleNumber, _capturedGreyMarbleNumber, _capturedWhiteMarbleNumber) {
         for (var index in _intersections) {
             intersections[index] = _intersections[index].clone();
         }

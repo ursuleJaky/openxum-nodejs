@@ -12,12 +12,14 @@ Yinsh.load = function (callback) {
                                 $.getScript('/javascripts/openxum/MCTSPlayer.js', function () {
                                     $.getScript('/javascripts/openxum/RestWebServicePlayer.js', function () {
                                         $.getScript('/javascripts/openxum/AIManager.js', function () {
-                                            $.getScript('/javascripts/yinsh/Engine.js', function () {
-                                                $.getScript('/javascripts/yinsh/Manager.js', function () {
-                                                    $.getScript('/javascripts/yinsh/Gui.js', function () {
-                                                        $.getScript('/javascripts/yinsh/RandomPlayer.js', function () {
-                                                            $.getScript('/javascripts/yinsh/RemotePlayer.js', function () {
-                                                                callback();
+                                            $.getScript('/javascripts/openxum/GamePage.js', function () {
+                                                $.getScript('/javascripts/yinsh/Engine.js', function () {
+                                                    $.getScript('/javascripts/yinsh/Manager.js', function () {
+                                                        $.getScript('/javascripts/yinsh/Gui.js', function () {
+                                                            $.getScript('/javascripts/yinsh/RandomPlayer.js', function () {
+                                                                $.getScript('/javascripts/yinsh/RemotePlayer.js', function () {
+                                                                    callback();
+                                                                });
                                                             });
                                                         });
                                                     });

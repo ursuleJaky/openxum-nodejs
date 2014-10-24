@@ -584,13 +584,13 @@ Yinsh.Engine = function (t, c) {
             placed_white_ring_coordinates;
     };
 
-    this.get_possible_move_list = function () {
-        // TODO
-    };
+    /*    this.get_possible_move_list = function () {
+     // TODO
+     };
 
-    this.get_possible_move_number = function (list) {
-        // TODO
-    };
+     this.get_possible_move_number = function (list) {
+     // TODO
+     }; */
 
     this.get_possible_moving_list = function (origin, color, control) {
         var list = [];
@@ -884,13 +884,14 @@ Yinsh.Engine = function (t, c) {
         return true;
     };
 
-    this.remove_first_possible_move = function (list) {
-        // TODO
-    };
+    /*    this.remove_first_possible_move = function (list) {
+     // TODO
+     };
 
-    this.select_move = function (list, index) {
-        // TODO
-    };
+     this.select_move = function (list, index) {
+     // TODO
+     }; */
+
     this.remove_row = function (row, color) {
         var j;
 

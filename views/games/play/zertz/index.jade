@@ -12,59 +12,7 @@ block body
     script(language='javascript').
         $(document).ready(function() {
             Zertz.load(function() {
-                $('#winnerModal .new-game-button').click(function() {
-                    $('#winnerModal').modal('hide');
-                    window.location.href = '/games/play/?game=zertz';
-                });
-
-                var canvas = document.getElementById("board");
-                var canvas_div = document.getElementById("boardDiv");
-                var engine = new Zertz.Engine(#{mode}, 0);
-                var gui = new Zertz.Gui(#{color}, engine, '#{game_id}' === '-1');
-                var opponent;
-
-                if ('#{game_type}' === 'remote_ai') {
-                    // opponent = new Zertz.RestWebServicePlayer(#{opponent_color}, engine, '#{user.username}');
-                } else if ('#{game_type}' === 'gui') {
-                    opponent = gui;
-                } else if ('#{game_type}' === 'ai') {
-                    // opponent = new OpenXum.MCTSPlayer(#{opponent_color}, engine);
-                    opponent = new Zertz.RandomPlayer(#{opponent_color}, engine);
-                } else {
-                    opponent = new Zertz.RemotePlayer(#{opponent_color}, engine, '#{owner_id}', '#{opponent_id}', '#{game_id}');
-                }
-
-                var manager = new Zertz.Manager(engine, gui, opponent, new OpenXum.Status(document.getElementById("status")));
-
-                if (canvas_div.clientHeight < canvas_div.clientWidth) {
-                    canvas.height = canvas_div.clientHeight * 0.95;
-                    canvas.width = canvas_div.clientHeight * 0.95;
-                } else {
-                    canvas.height = canvas_div.clientWidth * 0.95;
-                    canvas.width = canvas_div.clientWidth * 0.95;
-                }
-                gui.set_canvas(canvas);
-                gui.set_manager(manager);
-                if ('#{game_id}' != '-1') {
-                    opponent.set_manager(manager);
-                    opponent.set_gui(gui);
-                } else {
-                    if (opponent !== gui) {
-                        opponent.set_level(manager.load_level())
-                    }
-                    if (opponent.is_remote()) {
-                        opponent.set_manager(manager);
-                    }
-                }
-                if (opponent !== gui && engine.current_color() === opponent.color() && !opponent.is_remote()) {
-                    manager.play_other();
-                }
-                if ('#{replay}' === 'true') {
-                   opponent.replay_game();
-                }
-                $( "#replay" ).click(function() {
-                   opponent.replay_game();
-                });
+                new OpenXum.GamePage(Zertz, 'zertz', #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
             });
         });
 

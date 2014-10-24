@@ -25,7 +25,11 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, u, oi, opi, r) {
         } else if (game_type === 'gui') {
             opponent = gui;
         } else if (game_type === 'ai') {
-            opponent = new OpenXum.MCTSPlayer(opponent_color, engine);
+            if (engine.get_possible_move_list) {
+                opponent = new OpenXum.MCTSPlayer(opponent_color, engine);
+            } else {
+                opponent = new namespace.RandomPlayer(opponent_color, engine);
+            }
         } else {
             opponent = new namespace.RemotePlayer(opponent_color, engine, owner_id, opponent_id, game_id);
         }
