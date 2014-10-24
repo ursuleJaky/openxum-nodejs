@@ -121,5 +121,6 @@
 	"Mode": "Mode",
 	"Owner": "Owner",
 	"Opponent": "Opponent",
-	"Actions": "Actions"
+	"Actions": "Actions",
+	"Type": "Type"
 }

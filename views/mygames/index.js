@@ -12,33 +12,37 @@ exports.init = function (req, res) {
                     var notdone = true;
 
                     games.forEach(function (game) {
-                        req.app.db.models.User.findOne({_id: game.userCreated.id }, null,
-                            { safe: true }, function (err, userCreated) {
-                                game.userCreated.name = userCreated.username;
-                                if (game.opponent !== null) {
-                                    req.app.db.models.User.findOne({_id: game.opponent.id }, null,
-                                        { safe: true }, function (err, opponent) {
-                                            var isGameOwner = game.userCreated.id.toString() === req.user._id.toString();
-                                            if (opponent) {
-                                                game.opponent.name = opponent.username;
-                                            }
-                                            if (isGameOwner) {
-                                                game.myturn = game.currentColor === game.color;
-                                            } else {
-                                                game.myturn = game.currentColor !== game.color;
-                                            }
-                                            gamesdetail.push(game);
-                                            if (gamesdetail.length === games.length) {
-                                                if (notdone) {
-                                                    res.render('mygames/index', {
-                                                        user_id: req.user._id,
-                                                        my_offline_games: gamesdetail
-                                                    });
-                                                    notdone = false;
-                                                }
-                                            }
-                                        });
-                                }
+                        req.app.db.models.GameType.findOne({ _id: game.game }, null,
+                            { safe: true }, function (err, gameType) {
+                                game.type = gameType.name;
+                                req.app.db.models.User.findOne({ _id: game.userCreated.id }, null,
+                                    { safe: true }, function (err, userCreated) {
+                                        game.userCreated.name = userCreated.username;
+                                        if (game.opponent !== null) {
+                                            req.app.db.models.User.findOne({_id: game.opponent.id }, null,
+                                                { safe: true }, function (err, opponent) {
+                                                    var isGameOwner = game.userCreated.id.toString() === req.user._id.toString();
+                                                    if (opponent) {
+                                                        game.opponent.name = opponent.username;
+                                                    }
+                                                    if (isGameOwner) {
+                                                        game.myturn = game.currentColor === game.color;
+                                                    } else {
+                                                        game.myturn = game.currentColor !== game.color;
+                                                    }
+                                                    gamesdetail.push(game);
+                                                    if (gamesdetail.length === games.length) {
+                                                        if (notdone) {
+                                                            res.render('mygames/index', {
+                                                                user_id: req.user._id,
+                                                                my_offline_games: gamesdetail
+                                                            });
+                                                            notdone = false;
+                                                        }
+                                                    }
+                                                });
+                                        }
+                                    });
                             });
                     });
                 } else {

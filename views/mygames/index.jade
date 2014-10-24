@@ -13,29 +13,32 @@ block body
        h1 #{__("My offline games")}
        table.table
           tr
-          th
-             | #{__("Name")}
-          th
-             | #{__("Color")}
-          th
-             | #{__("Mode")}
-          th
-             | #{__("Owner")}
-          th
-             | #{__("Opponent")}
-          th
-             | #{__("Actions")}
+            th
+               | #{__("Name")}
+            th
+               | #{__("Type")}
+            th
+               | #{__("Color")}
+            th
+               | #{__("Mode")}
+            th
+               | #{__("Owner")}
+            th
+               | #{__("Opponent")}
+            th
+               | #{__("Actions")}
 
           each game in my_offline_games
              tr
                 td #{game.name}
+                td #{game.type}
                 td #{game.color}
                 td #{game.mode}
                 td #{game.userCreated.name}
                 td #{game.opponent.name}
                 td
                   if game.myturn
-                     a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='/games/play/' + "yinsh" + '/?game_id=' + game._id + '&owner_id=' + game.userCreated.name + '&opponent_id=' + game.opponent.name + '&color=' + game.currentColor + '&mode=' + game.mode + '&replay=true&type=offline')
+                     a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='/games/play/' + '#{game.type}' + '/?game_id=' + game._id + '&owner_id=' + game.userCreated.name + '&opponent_id=' + game.opponent.name + '&color=' + game.currentColor + '&mode=' + game.mode + '&replay=true&type=offline')
                         |&nbsp;#{__("Play")}
                   else
                      | #{__("Wait")}

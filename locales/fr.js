@@ -120,5 +120,6 @@
 	"Mode": "Mode",
 	"Owner": "Propriétaire",
 	"Opponent": "Adversaire",
-	"Actions": "Actions"
+	"Actions": "Actions",
+	"Type": "Type"
 }

@@ -9,7 +9,8 @@ exports.init = function (req, res) {
                     opponent_id: req.param('opponent_id'),
                     mode: req.param('mode') === 'standard' ? 0 : 1,
                     color: req.param('color') === 'red' ? 0 : 1,
-                    opponent_color: req.param('color') === 'red' ? 1 : 0
+                    opponent_color: req.param('color') === 'red' ? 1 : 0,
+                    replay: req.param('replay')
                 });
         } else {
             res.render('games/play/invers/index',
