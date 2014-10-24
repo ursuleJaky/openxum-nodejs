@@ -122,5 +122,6 @@
 	"Owner": "Owner",
 	"Opponent": "Opponent",
 	"Actions": "Actions",
-	"Type": "Type"
+	"Type": "Type",
+	"Welcome to OpenXum": "Welcome to OpenXum"
 }

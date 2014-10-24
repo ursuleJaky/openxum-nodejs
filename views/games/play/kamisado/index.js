@@ -7,10 +7,11 @@ exports.init = function (req, res) {
                 { game_id: req.param('game_id'),
                     owner_id: req.param('owner_id'),
                     opponent_id: req.param('opponent_id'),
-                    mode: req.param('mode') === 'simple' ? 0 : 1,
                     color: req.param('color') === 'black' ? 0 : 1,
+                    mode: req.param('mode') === 'simple' ? 0 : 1,
+                    game_type: req.param('game_type'),
                     opponent_color: req.param('color') === 'black' ? 1 : 0,
-                    replay: req.param('replay')
+                    replay: req.param('replay') ? req.param('replay') : false
                 });
         } else {
             res.render('games/play/kamisado/index',
@@ -20,7 +21,8 @@ exports.init = function (req, res) {
                     color: req.param('color') === 'black' ? 0 : 1,
                     mode: req.param('mode') === 'simple' ? 0 : 1,
                     game_type: req.param('game_type'),
-                    opponent_color: req.param('color') === 'black' ? 1 : 0
+                    opponent_color: req.param('color') === 'black' ? 1 : 0,
+                    replay: false
                 });
         }
     } else {
