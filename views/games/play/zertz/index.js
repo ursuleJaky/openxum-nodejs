@@ -9,7 +9,8 @@ exports.init = function (req, res) {
                     opponent_id: req.param('opponent_id'),
                     mode: req.param('mode') === 'regular' ? 0 : 1,
                     color: req.param('color') === 'one' ? 0 : 1,
-                    opponent_color: req.param('color') === 'one' ? 1 : 0
+                    opponent_color: req.param('color') === 'one' ? 1 : 0,
+                    replay: req.param('replay')
                 });
         } else {
             res.render('games/play/zertz/index',
