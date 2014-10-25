@@ -166,7 +166,7 @@ OpenXum.Manager = function (e, g, o, s) {
                 _engine.move(_move);
             }
         });
-        _gui.draw();
+        this.ready(true);
     };
 
     this.ready = function (r) {

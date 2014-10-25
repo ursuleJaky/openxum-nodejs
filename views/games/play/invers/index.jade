@@ -12,7 +12,7 @@ block body
     script(language='javascript').
         $(document).ready(function() {
             Invers.load(function() {
-                new OpenXum.GamePage(Invers, 'invers', #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
+                new OpenXum.GamePage(Invers, 'invers', #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', #{mode}, '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
             });
         });
 

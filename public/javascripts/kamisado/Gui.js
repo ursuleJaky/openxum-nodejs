@@ -319,6 +319,9 @@ Kamisado.Gui = function (c, e, l) {
 
     this.ready = function (r) {
         opponentPresent = r;
+        if (manager) {
+            manager.redraw();
+        }
     };
 
     this.set_canvas = function (c) {

@@ -1,6 +1,6 @@
 "use strict";
 
-Dvonn.Gui = function (c, e) {
+Dvonn.Gui = function (c, e, l) {
 // private attributes
     var engine = e;
     var mycolor = c;
@@ -21,7 +21,7 @@ Dvonn.Gui = function (c, e) {
     var scaleX;
     var scaleY;
 
-    var opponentPresent = false;
+    var opponentPresent = l;
 
     var pointerX = -1;
     var pointerY = -1;
@@ -101,10 +101,12 @@ Dvonn.Gui = function (c, e) {
 
     this.ready = function (r) {
         opponentPresent = r;
-        manager.redraw();
+        if (manager) {
+            manager.redraw();
+        }
     };
 
-     this.set_canvas = function (c) {
+    this.set_canvas = function (c) {
         canvas = c;
         context = c.getContext("2d");
         height = canvas.height;

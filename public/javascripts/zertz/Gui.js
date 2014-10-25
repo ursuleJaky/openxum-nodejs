@@ -706,6 +706,13 @@ Zertz.Gui = function (c, e, l) {
         manager.play();
     };
 
+    this.ready = function (r) {
+        opponentPresent = r;
+        if (manager) {
+            manager.redraw();
+        }
+    };
+
     this.set_canvas = function (c) {
         canvas = c;
         context = c.getContext("2d");

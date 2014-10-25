@@ -1,10 +1,10 @@
 "use strict";
 
-Yinsh.Gui = function (color, e, local) {
+Yinsh.Gui = function (c, e, l) {
 
 // private attributes
     var engine = e;
-    var mycolor = color;
+    var mycolor = c;
 
     var canvas;
     var context;
@@ -21,7 +21,7 @@ Yinsh.Gui = function (color, e, local) {
     var scaleX;
     var scaleY;
 
-    var opponentPresent = local;
+    var opponentPresent = l;
 
     var pointerX = -1;
     var pointerY = -1;

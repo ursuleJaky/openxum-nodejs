@@ -12,7 +12,7 @@ block body
     script(language='javascript').
         $(document).ready(function() {
             Dvonn.load(function() {
-                new OpenXum.GamePage(Dvonn, 'dvonn', #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
+                new OpenXum.GamePage(Dvonn, 'dvonn', #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', #{mode}, '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
 
             });
         });

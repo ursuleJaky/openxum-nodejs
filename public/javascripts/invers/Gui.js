@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.Gui = function (c, e) {
+Invers.Gui = function (c, e, l) {
 
 // private attributes
     var engine = e;
@@ -18,6 +18,8 @@ Invers.Gui = function (c, e) {
     var offsetY;
     var scaleX;
     var scaleY;
+
+    var opponentPresent = l;
 
     var free_colors;
     var selected_color;
@@ -339,6 +341,13 @@ Invers.Gui = function (c, e) {
 
     this.move = function (move, color) {
         manager.play();
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        if (manager) {
+            manager.redraw();
+        }
     };
 
     this.set_canvas = function (c) {

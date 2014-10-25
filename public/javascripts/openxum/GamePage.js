@@ -18,7 +18,7 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
         gui = new namespace.Gui(color, engine, game_id === '-1');
     };
 
-    var build_opponent = function (namespace, game_type, game_id, opponent_color, username, owner_id, opponent_id) {
+    var build_opponent = function (namespace, color, game_type, game_id, opponent_color, username, owner_id, opponent_id) {
         if (game_type === 'remote_ai') {
             opponent = new namespace.RestWebServicePlayer(opponent_color, engine, username);
             opponent.set_url('http://127.0.0.1/openxum-ws-php/index.php/');
@@ -31,7 +31,11 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
                 opponent = new namespace.RandomPlayer(opponent_color, engine);
             }
         } else {
-            opponent = new namespace.RemotePlayer(opponent_color, engine, owner_id, opponent_id, game_id);
+            if (username === owner_id) {
+                opponent = new namespace.RemotePlayer(opponent_color, engine, owner_id, opponent_id, game_id);
+            } else {
+                opponent = new namespace.RemotePlayer(color, engine, owner_id, opponent_id, game_id);
+            }
         }
     };
 
@@ -75,7 +79,7 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
 
         build_engine(namespace, mode, color);
         build_gui(namespace, color, game_id);
-        build_opponent(namespace, game_type, game_id, opponent_color, username, owner_id, opponent_id);
+        build_opponent(namespace, color, game_type, game_id, opponent_color, username, owner_id, opponent_id);
         build_manager(namespace);
         set_gui();
         set_opponent(game_id);
