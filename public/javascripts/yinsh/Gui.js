@@ -186,8 +186,8 @@ Yinsh.Gui = function (color, e, local) {
     };
 
     var draw_marker = function (x, y, color) {
-        context.beginPath();
         context.lineWidth = 1;
+        context.strokeStyle = "#000000";
         if (color === Yinsh.Color.BLACK) {
             context.fillStyle = "#000000";
         } else if (color === Yinsh.Color.WHITE) {
@@ -195,6 +195,7 @@ Yinsh.Gui = function (color, e, local) {
         } else {
             context.fillStyle = "#ff0000";
         }
+        context.beginPath();
         context.arc(x, y, delta_x * (1.0 / 3 - 1.0 / 10) - 1, 0.0, 2 * Math.PI, false);
         context.fill();
         context.stroke();
