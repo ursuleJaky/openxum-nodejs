@@ -16,7 +16,7 @@ Gipf.RestWebServicePlayer = function (c, e, l) {
     this.set_url = _super.set_url;
 
     this.build_move = function (o) {
-        return new Gipf.Move(o.color, o.letter, o.number, o.position);
+        return new Gipf.Move(o.type, o.color, o.coordinates, o.from, o.to);
     };
 
     this.get_name = function () {

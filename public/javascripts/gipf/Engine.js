@@ -13,14 +13,19 @@ Gipf.end_diagonal_number = [ 9, 9, 9, 9, 9, 8, 7, 6, 5 ];
 // enums definition
 Gipf.GameType = { BASIC: 0, STANDARD: 1, TOURNAMENT: 2 };
 Gipf.Color = { NONE: -1, BLACK: 0, WHITE: 1 };
-Gipf.Phase = { PUT_FIRST_PIECE: 0, PUT_PIECE: 1, PUSH_PIECE: 2, CAPTURE_PIECE: 3, REMOVE_ROWS: 4 };
+Gipf.Phase = { PUT_FIRST_PIECE: 0, PUT_PIECE: 1, PUSH_PIECE: 2, CAPTURE_PIECE: 3, REMOVE_ROW_AFTER: 4, REMOVE_ROW_BEFORE: 5 };
 Gipf.State = { VACANT: 0, WHITE_PIECE: 1, WHITE_GIPF: 2, BLACK_PIECE: 3, BLACK_GIPF: 4 };
+Gipf.MoveType = { PUT_FIRST_PIECE: 0, PUT_PIECE: 1, PUSH_PIECE: 2, REMOVE_ROW_AFTER: 3, REMOVE_ROW_BEFORE: 4 };
 Gipf.Direction = { NORTH_WEST: 0, NORTH: 1, NORTH_EAST: 2, SOUTH_EAST: 3, SOUTH: 4, SOUTH_WEST: 5 };
 Gipf.letters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I' ];
 
 Gipf.Coordinates = function (l, n) {
 
 // public methods
+    this.clone = function () {
+        return new Gipf.Coordinates(l, n);
+    };
+
     this.hash = function () {
         return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 9;
     };
@@ -69,7 +74,18 @@ Gipf.Coordinates = function (l, n) {
 };
 
 Gipf.Intersection = function (c) {
+// private attributes
+    var coordinates;
+    var state;
+
 // public methods
+    this.clone = function () {
+        var intersection = new Gipf.Intersection(coordinates.clone());
+
+        intersection.set(state);
+        return intersection;
+    };
+
     this.color = function () {
         if (state === Gipf.State.VACANT) {
             return -1;
@@ -116,6 +132,10 @@ Gipf.Intersection = function (c) {
         return { color: color, gipf: gipf };
     };
 
+    this.set = function (_state) {
+        state = _state;
+    };
+
     this.state = function () {
         return state;
     };
@@ -126,22 +146,143 @@ Gipf.Intersection = function (c) {
         state = Gipf.State.VACANT;
     };
 
-// private attributes
-    var coordinates;
-    var state;
-
     init(c);
 };
 
+Gipf.Move = function (t, c, c1, c2) {
+
+// private attributes
+    var _type;
+    var _color;
+    var _coordinates;
+    var _from;
+    var _to;
+
+// private methods
+    var init = function (t, c, c1, c2) {
+        _type = t;
+        _color = c;
+        if (_type === Gipf.MoveType.PUT_FIRST_PIECE || _type === Gipf.MoveType.PUT_PIECE) {
+            _coordinates = c1;
+        } else if (_type === Gipf.MoveType.PUSH_PIECE) {
+            _from = c1;
+            _to = c2;
+        } else if (_type === Gipf.MoveType.REMOVE_ROW_AFTER || _type === Gipf.MoveType.REMOVE_ROW_BEFORE) {
+            _coordinates = c1;
+        }
+    };
+
+// public methods
+    this.get = function () {
+        if (_type === Gipf.MoveType.PUT_FIRST_PIECE) {
+            return 'PP' + (_color === Gipf.Color.BLACK ? "B" : "W") + _coordinates.to_string();
+        } else if (_type === Gipf.MoveType.PUT_PIECE) {
+            return 'Pp' + (_color === Gipf.Color.BLACK ? "B" : "W") + _coordinates.to_string();
+        } else if (_type === Gipf.MoveType.PUSH_PIECE) {
+            return 'pp' + (_color === Gipf.Color.BLACK ? "B" : "W") + _from.to_string() + _to.to_string();
+        } else if (_type === Gipf.MoveType.REMOVE_ROW_AFTER) {
+            return 'RR' + (_color === Gipf.Color.BLACK ? "B" : "W") + _coordinates.to_string();
+        } else if (_type === Gipf.MoveType.REMOVE_ROW_BEFORE) {
+            return 'Rr' + (_color === Gipf.Color.BLACK ? "B" : "W") + _coordinates.to_string();
+        }
+    };
+
+    this.coordinates = function () {
+        return _coordinates;
+    };
+
+    this.from = function () {
+        return _from;
+    };
+
+    this.parse = function (str) {
+        var type = str.substring(0, 2);
+
+        if (type === 'PP') {
+            _type = Gipf.MoveType.PUT_FIRST_PIECE;
+        } else if (type === 'Pp') {
+            _type = Gipf.MoveType.PUT_PIECE;
+        } else if (type === 'pp') {
+            _type = Gipf.MoveType.PUSH_PIECE;
+        } else if (type === 'RR') {
+            _type = Gipf.MoveType.REMOVE_ROW_AFTER;
+        } else if (type === 'Rr') {
+            _type = Gipf.MoveType.REMOVE_ROW_BEFORE;
+        }
+        _color = str.charAt(2) === 'B' ? Gipf.Color.BLACK : Gipf.Color.WHITE;
+        if (_type === Gipf.MoveType.PUT_FIRST_PIECE || _type === Gipf.MoveType.PUT_PIECE) {
+            _coordinates = new Gipf.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+        } else if (_type === Gipf.MoveType.PUSH_PIECE) {
+            _from = new Gipf.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+            _to = new Gipf.Coordinates(str.charAt(5), parseInt(str.charAt(6)));
+        } else if (_type === Gipf.MoveType.REMOVE_ROW_AFTER || _type === Gipf.MoveType.REMOVE_ROW_BEFORE) {
+            _coordinates = new Gipf.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+        }
+    };
+
+    this.to = function () {
+        return _to;
+    };
+
+    this.to_object = function () {
+        return { type: _type, color: _color, coordinates: _coordinates, from: _from, to: _to };
+    };
+
+    this.to_string = function () {
+        var str;
+
+        if (_type === Gipf.MoveType.PUT_FIRST_PIECE) {
+            return 'put first ' + (_color === Gipf.Color.BLACK ? 'black' : 'white') + ' piece at ' + _coordinates.to_string();
+        } else if (_type === Gipf.MoveType.PUT_PIECE) {
+            return 'put ' + (_color === Gipf.Color.BLACK ? 'black' : 'white') + ' piece at ' + _coordinates.to_string();
+        } else if (_type === Gipf.MoveType.PUSH_PIECE) {
+            return 'push ' + (_color === Gipf.Color.BLACK ? "black" : "white") + ' piece from ' + _from.to_string() + ' to ' + _to.to_string();
+        } else if (_type === Gipf.MoveType.REMOVE_ROW_AFTER || _type === Gipf.MoveType.REMOVE_ROW_BEFORE) {
+            return 'remove ' + (_color === Gipf.Color.BLACK ? "black" : "white") + ' at ' + _coordinates.to_string();
+        }
+    };
+
+    this.type = function () {
+        return _type;
+    };
+
+    init(t, c, c1, c2);
+};
+
 Gipf.Engine = function (t, c) {
+// private attributes
+    var type;
+    var current_color;
+    var intersections;
+
+    var phase;
+    var state;
+
+    var initialPlacedPieceNumber;
+    var blackPieceNumber;
+    var whitePieceNumber;
+    var blackCapturedPieceNumber;
+    var whiteCapturedPieceNumber;
 
 // public methods
     this.change_color = function () {
-        color = this.next_color(color);
+        current_color = this.next_color(current_color);
+    };
+
+    this.clone = function () {
+        var o = new Gipf.Engine(type, current_color);
+
+        o.set(phase, state, initialPlacedPieceNumber, blackPieceNumber, whitePieceNumber,
+            blackCapturedPieceNumber, whiteCapturedPieceNumber, intersections);
+        return o;
     };
 
     this.current_color = function () {
-        return color;
+        return current_color;
+    };
+
+    this.current_color_string = function () {
+        return current_color === Gipf.Color.BLACK ? 'black' : 'white';
     };
 
     this.exist_intersection = function (letter, number) {
@@ -195,6 +336,14 @@ Gipf.Engine = function (t, c) {
         }
         return list;
     }; */
+
+    /*    this.get_possible_move_list = function () {
+     // TODO
+     };
+
+     this.get_possible_move_number = function (list) {
+     // TODO
+     }; */
 
     this.get_possible_first_putting_list = function() {
         var list = [];
@@ -419,16 +568,28 @@ Gipf.Engine = function (t, c) {
         return whitePieceNumber;
     };
 
-    this.phase = function () {
-        return phase;
-    };
-
     this.is_finished = function () {
         return blackPieceNumber === 0 || whitePieceNumber === 0;
     };
 
+    this.move = function (move) {
+        if (move.type() === Gipf.MoveType.PUT_FIRST_PIECE) {
+            this.put_first_piece(move.coordinates(), current_color, type !== Gipf.GameType.BASIC);
+        } else if (move.type() === Gipf.MoveType.PUT_PIECE) {
+            this.put_piece(move.coordinates(), current_color);
+        } else if (move.type() === Gipf.MoveType.PUSH_PIECE) {
+            this.push_piece(move.from(), move.to(), current_color);
+        } else if (move.type() === Gipf.MoveType.REMOVE_ROW_AFTER || move.type() === Gipf.MoveType.REMOVE_ROW_BEFORE) {
+            this.remove_row(move.coordinates(), current_color, move.type() === Gipf.MoveType.REMOVE_ROW_AFTER);
+        }
+    };
+
     this.next_color = function (c) {
         return c === Gipf.Color.BLACK ? Gipf.Color.WHITE : Gipf.Color.BLACK;
+    };
+
+    this.phase = function () {
+        return phase;
     };
 
     this.push_piece = function(origin, destination, color) {
@@ -455,16 +616,20 @@ Gipf.Engine = function (t, c) {
             }
             delta_letter = -delta_letter;
             delta_number = -delta_number;
-            while (coordinates.hash() != origin.hash()) {
+            while (coordinates.hash() !== origin.hash()) {
                 move_piece(coordinates, coordinates.move(delta_letter, delta_number));
                 coordinates = coordinates.move(delta_letter, delta_number);
             }
         }
         if (this.get_rows(color).length > 0) {
-            phase = Gipf.Phase.REMOVE_ROWS;
+            phase = Gipf.Phase.REMOVE_ROW_AFTER;
         } else {
-            phase = Gipf.Phase.PUT_PIECE;
             this.change_color();
+            if (this.get_rows(current_color).length > 0) {
+                phase = Gipf.Phase.REMOVE_ROW_BEFORE;
+            } else {
+                phase = Gipf.Phase.PUT_PIECE;
+            }
         }
     };
 
@@ -534,6 +699,29 @@ Gipf.Engine = function (t, c) {
                 this.change_color();
             }
         }
+    };
+
+    /*    this.remove_first_possible_move = function (list) {
+     // TODO
+     };
+
+     this.select_move = function (list, index) {
+     // TODO
+     }; */
+
+    this.set = function (_phase, _state, _initialPlacedPieceNumber, _blackPieceNumber, _whitePieceNumber,
+        _blackCapturedPieceNumber, _whiteCapturedPieceNumber, _intersections) {
+        for (var index in _intersections) {
+            intersections[index] = _intersections[index].clone();
+        }
+
+        phase = _phase;
+        state = _state;
+        initialPlacedPieceNumber = _initialPlacedPieceNumber;
+        blackPieceNumber = _blackPieceNumber;
+        whitePieceNumber = _whitePieceNumber;
+        blackCapturedPieceNumber = _blackCapturedPieceNumber;
+        whiteCapturedPieceNumber = _whiteCapturedPieceNumber;
     };
 
     this.type = function() {
@@ -768,7 +956,7 @@ Gipf.Engine = function (t, c) {
 
     var init = function (t, c) {
         type = t;
-        color = c;
+        current_color = c;
         phase = Gipf.Phase.PUT_FIRST_PIECE;
         initialPlacedPieceNumber = 0;
         blackPieceNumber = 18;
@@ -840,20 +1028,6 @@ Gipf.Engine = function (t, c) {
             --whitePieceNumber;
         }
     };
-
-// private attributes
-    var type;
-    var color;
-    var intersections;
-
-    var phase;
-    var state;
-
-    var initialPlacedPieceNumber;
-    var blackPieceNumber;
-    var whitePieceNumber;
-    var blackCapturedPieceNumber;
-    var whiteCapturedPieceNumber;
 
     init(t, c);
 };

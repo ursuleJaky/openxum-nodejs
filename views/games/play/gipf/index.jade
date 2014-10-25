@@ -12,31 +12,7 @@ block body
     script(language='javascript').
         $(document).ready(function() {
             Gipf.load(function() {
-                $('#winnerModal .new-game-button').click(function() {
-                    $('#winnerModal').modal('hide');
-                    window.location.href = '/games/play/?game=gipf';
-                });
-
-                var canvas = document.getElementById("board");
-                var canvas_div = document.getElementById("boardDiv");
-                var engine = new Gipf.Engine(#{mode}, 0);
-                var gui = new Gipf.Gui(#{color}, engine);
-                var other = new Gipf.RandomPlayer(#{other_color}, engine);
-                var manager = new Gipf.Manager(engine, gui, other);
-
-                if (canvas_div.clientHeight < canvas_div.clientWidth) {
-                    canvas.height = canvas_div.clientHeight * 0.95;
-                    canvas.width = canvas_div.clientHeight * 0.95;
-                } else {
-                    canvas.height = canvas_div.clientWidth * 0.95;
-                    canvas.width = canvas_div.clientWidth * 0.95;
-                }
-                gui.set_canvas(canvas);
-                gui.set_manager(manager);
-                other.set_level(manager.load_level());
-                if (engine.current_color() == other.color()) {
-                    manager.play_other();
-                }
+                new OpenXum.GamePage(Gipf, 'gipf', #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', #{mode}, '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
             });
         });
 
@@ -49,6 +25,11 @@ block body
                     div.btn-group
                         a.btn.btn-primary.new-game-button(href='#') New game
 
+    div.row
+        div.col-md-6.col-md-offset-3
+            a#status(class='btn btn-success btn-md active',href='#') Ready!
+            a#replay(class='btn btn-warning btn-md active',href='#') Replay
+            a#list(class='btn btn-danger btn-md active',href='#') Move list
     div.row
         div.col-md-12(id='boardDiv')
             canvas(id='board',style='width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')

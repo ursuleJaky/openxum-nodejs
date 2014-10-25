@@ -1,6 +1,33 @@
 "use strict";
 
-Gipf.Gui = function (color, e) {
+Gipf.Gui = function (c, e, l) {
+// private attributes
+    var engine = e;
+    var mycolor = c;
+
+    var canvas;
+    var context;
+    var manager;
+    var height;
+    var width;
+
+    var tolerance = 15;
+
+    var delta_x;
+    var delta_y;
+    var delta_xy;
+    var offset;
+
+    var scaleX;
+    var scaleY;
+
+    var opponentPresent = l;
+
+    var pointerX = -1;
+    var pointerY = -1;
+
+    var selected_coordinates;
+    var selected_piece;
 
 // public methods
     this.color = function () {
@@ -33,7 +60,7 @@ Gipf.Gui = function (color, e) {
             show_possible_first_putting();
         } else if (engine.phase() === Gipf.Phase.PUT_PIECE) {
             show_possible_putting();
-        } else if (engine.phase() === Gipf.Phase.PUSH_PIECE) {
+        } else if (engine.phase() === Gipf.Phase.PUSH_PIECE && engine.current_color() === mycolor) {
             show_possible_pushing();
         }
         /*else if (parent()->phase() == Gui::REMOVE_ROWS) {
@@ -45,12 +72,48 @@ Gipf.Gui = function (color, e) {
         return engine;
     };
 
+    this.get_move = function () {
+        var move = null;
+
+        if (engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
+            move = new Gipf.Move(Gipf.MoveType.PUT_FIRST_PIECE, engine.current_color(), this.get_selected_coordinates());
+        } else if (engine.phase() === Gipf.Phase.PUT_PIECE) {
+            move = new Gipf.Move(Gipf.MoveType.PUT_PIECE, engine.current_color(), this.get_selected_piece());
+        } else if (engine.phase() === Gipf.Phase.PUSH_PIECE) {
+            move = new Gipf.Move(Gipf.MoveType.PUSH_PIECE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER) {
+            move = new Gipf.Move(Gipf.MoveType.REMOVE_ROW_AFTER, engine.current_color(), this.get_selected_coordinates());
+        } else if (engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
+            move = new Gipf.Move(Gipf.MoveType.REMOVE_ROW_BEFORE, engine.current_color(), this.get_selected_coordinates());
+        }
+        return move;
+    };
+
     this.get_selected_coordinates = function () {
         return selected_coordinates;
     };
 
     this.get_selected_piece = function () {
         return selected_piece;
+    };
+
+    this.is_animate = function () {
+        return false;
+    };
+
+    this.is_remote = function () {
+        return false;
+    };
+
+    this.move = function (move, color) {
+        manager.play();
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        if (manager) {
+            manager.redraw();
+        }
     };
 
     this.set_canvas = function (c) {
@@ -74,7 +137,9 @@ Gipf.Gui = function (color, e) {
 
     this.unselect = function () {
         selected_coordinates = null;
-        selected_piece = null;
+        if (engine.phase() !== Gipf.Phase.PUSH_PIECE) {
+            selected_piece = null;
+        }
     };
 
 // private methods
@@ -336,7 +401,7 @@ Gipf.Gui = function (color, e) {
     };
 
     var draw_rows = function () {
-        if (engine.phase() === Gipf.Phase.REMOVE_ROWS) {
+        if (engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER || engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
             var srows = [engine.get_rows(engine.current_color())];
 
             for (var i = 0; i < srows.length; ++i) {
@@ -439,10 +504,10 @@ Gipf.Gui = function (color, e) {
         var pos = getClickPosition(event);
         var letter = compute_letter(pos.x, pos.y);
 
-        if (letter != 'X') {
+        if (letter !== 'X') {
             var number = compute_number(pos.x, pos.y);
 
-            if (number != -1) {
+            if (number !== -1) {
                 var ok = false;
 
                 if (engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
@@ -460,7 +525,7 @@ Gipf.Gui = function (color, e) {
                         selected_coordinates = new Gipf.Coordinates(letter, number);
                         ok = true;
                     }
-                } else if (engine.phase() === Gipf.Phase.REMOVE_ROWS) {
+                } else if (engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER || engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
                     selected_coordinates = new Gipf.Coordinates(letter, number);
                     ok = true;
                 }
@@ -475,10 +540,10 @@ Gipf.Gui = function (color, e) {
         var pos = getClickPosition(event);
         var letter = compute_letter(pos.x, pos.y);
 
-        if (letter != 'X') {
+        if (letter !== 'X') {
             var number = compute_number(pos.x, pos.y);
 
-            if (number != -1) {
+            if (number !== -1) {
                 if (compute_pointer(pos.x, pos.y)) {
                     manager.redraw();
                 }
@@ -575,32 +640,6 @@ Gipf.Gui = function (color, e) {
             context.stroke();
         }
     };
-
-// private attributes
-    var engine = e;
-    var mycolor = color;
-
-    var canvas;
-    var context;
-    var manager;
-    var height;
-    var width;
-
-    var tolerance = 15;
-
-    var delta_x;
-    var delta_y;
-    var delta_xy;
-    var offset;
-
-    var scaleX;
-    var scaleY;
-
-    var pointerX = -1;
-    var pointerY = -1;
-
-    var selected_coordinates;
-    var selected_piece;
 
     init();
 };
