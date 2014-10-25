@@ -21,6 +21,10 @@ Dvonn.letters = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K' ];
 Dvonn.Coordinates = function (l, n) {
 
 // public methods
+    this.clone = function () {
+        return new Dvonn.Coordinates(l, n);
+    };
+
     this.distance = function (coordinates) {
         if (coordinates.letter() === letter) {
             return coordinates.number() - number;
@@ -34,11 +38,11 @@ Dvonn.Coordinates = function (l, n) {
     };
 
     this.is_valid = function () {
-        return (number == 1 && letter >= 'A' && letter <= 'I') ||
-            (number == 2 && letter >= 'A' && letter <= 'J') ||
-            (number == 3 && letter >= 'A' && letter <= 'K') ||
-            (number == 4 && letter >= 'B' && letter <= 'K') ||
-            (number == 5 && letter >= 'C' && letter <= 'K');
+        return (number === 1 && letter >= 'A' && letter <= 'I') ||
+            (number === 2 && letter >= 'A' && letter <= 'J') ||
+            (number === 3 && letter >= 'A' && letter <= 'K') ||
+            (number === 4 && letter >= 'B' && letter <= 'K') ||
+            (number === 5 && letter >= 'C' && letter <= 'K');
     };
 
     this.letter = function () {
@@ -81,8 +85,11 @@ Dvonn.Coordinates = function (l, n) {
 
 Dvonn.Intersection = function (c) {
 // public methods
-    this.hash = function () {
-        return coordinates.hash();
+    this.clone = function () {
+        var intersection = new Dvonn.Intersection(coordinates.clone());
+
+        intersection.set(state, stack.clone());
+        return intersection;
     };
 
     this.color = function () {
@@ -98,6 +105,10 @@ Dvonn.Intersection = function (c) {
 
     this.dvonn = function() {
         return stack.dvonn();
+    };
+
+    this.hash = function () {
+        return coordinates.hash();
     };
 
     this.letter = function () {
@@ -134,6 +145,11 @@ Dvonn.Intersection = function (c) {
         return state;
     };
 
+    this.set = function (_state, _stack) {
+        state = _state;
+        stack = _stack;
+    };
+
     this.size = function() {
         return stack.size();
     };
@@ -160,6 +176,10 @@ Dvonn.Piece = function (c) {
         return _color;
     };
 
+    this.clone = function () {
+        return new Dvonn.Piece(_color);
+    };
+
     this.dvonn = function() {
         return _dvonn;
     };
@@ -167,7 +187,7 @@ Dvonn.Piece = function (c) {
 // private attributes
     var init = function(c) {
         _color = c;
-        _dvonn = c == Dvonn.Color.RED;
+        _dvonn = c === Dvonn.Color.RED;
     };
 
     var _color;
@@ -189,12 +209,21 @@ Dvonn.Stack = function () {
         }
     };
 
+    this.clone = function () {
+        var o = new Dvonn.Stack();
+
+        for (var i = 0; i < _pieces.length; ++i) {
+            o.put_piece(_pieces[i].clone());
+        }
+        return o;
+    };
+
     this.dvonn = function() {
         return _dvonn;
     };
 
     this.empty = function() {
-        return _pieces.length == 0;
+        return _pieces.length === 0;
     };
 
     this.put_piece = function(piece) {
@@ -232,6 +261,108 @@ Dvonn.Stack = function () {
     var _dvonn;
 
     init();
+};
+
+Dvonn.Move = function (t, c, f, to, l) {
+// private attributes
+    var _type;
+    var _color;
+    var _from;
+    var _to;
+    var _list;
+
+// private methods
+    var init = function (t, c, f, to, l) {
+        _type = t;
+        _color = c;
+        _from = f;
+        _to = to;
+        _list = l;
+    };
+
+// public methods
+    this.color = function () {
+        return _color;
+    };
+
+    this.from = function () {
+        return _from;
+    };
+
+    this.get = function () {
+        if (_type === Dvonn.Phase.PUT_DVONN_PIECE) {
+            return 'PP' + (_color === Dvonn.Color.BLACK ? 'B' : 'W') + _from.to_string();
+        } else if (_type === Dvonn.Phase.PUT_PIECE) {
+            return 'Pp' + (_color === Dvonn.Color.BLACK ? 'B' : 'W') + _from.to_string();
+        } else if (_type === Dvonn.Phase.MOVE_STACK) {
+            var str = 'Ms' + (_color === Dvonn.Color.BLACK ? 'B' : 'W') + _from.to_string() + _to.to_string() +
+                '[';
+
+            for (var i = 0; i < _list.length; ++i) {
+                str += _list[i].to_string();
+            }
+            str += ']';
+            return str;
+        }
+    };
+
+    this.list = function () {
+        return _list;
+    };
+
+    this.parse = function (str) {
+        var type = str.substring(0, 2);
+
+        if (type === 'PP') {
+            _type = Dvonn.Phase.PUT_DVONN_PIECE;
+            _from = new Dvonn.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+        } else if (type === 'Pp') {
+            _type = Dvonn.Phase.PUT_PIECE;
+            _from = new Dvonn.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+        } else if (type === 'Ms') {
+            _type = Dvonn.Phase.MOVE_STACK;
+            _from = new Dvonn.Coordinates(str.charAt(3), parseInt(str.charAt(4)));
+            _to = new Dvonn.Coordinates(str.charAt(5), parseInt(str.charAt(6)));
+            _list = [];
+            for (var index = 0; index < (str.length - 8) / 2; ++index) {
+                _list.push(new Dvonn.Coordinates(str.charAt(8 + 2 * index),
+                    parseInt(str.charAt(9 + 2 * index))));
+            }
+        }
+    };
+
+    this.to = function () {
+        return _to;
+    };
+
+    this.to_object = function () {
+        return { type: _type, color: _color, from: _from, to: _to, list: _list};
+    };
+
+    this.to_string = function () {
+        if (_type === Dvonn.Phase.PUT_DVONN_PIECE) {
+            return 'put ' + (_color === Dvonn.Color.BLACK ? 'black' : 'white') + ' dvonn piece at ' + _from.to_string();
+        } else if (_type === Dvonn.Phase.PUT_PIECE) {
+            return 'put ' + (_color === Dvonn.Color.BLACK ? 'black' : 'white') + ' piece at ' + _from.to_string();
+        } else if (_type === Dvonn.Phase.MOVE_STACK) {
+            var str = 'move stack from ' + _from.to_string() + ' to ' + _to.to_string();
+
+            if (_list.length > 0) {
+                str += ' and remove pieces at ( '
+                for (var i = 0; i < _list.length; ++i) {
+                    str += _list[i].to_string() + ' ';
+                }
+                str += ')';
+            }
+            return str;
+        }
+    };
+
+    this.type = function () {
+        return _type;
+    };
+
+    init(t, c, f, to, l);
 };
 
 Dvonn.Engine = function (t, c) {
@@ -272,8 +403,19 @@ Dvonn.Engine = function (t, c) {
         }
     };
 
+    this.clone = function () {
+        var o = new Dvonn.Engine(type, color);
+
+        o.set(phase, state, intersections, placedDvonnPieceNumber, placedPieceNumber);
+        return o;
+    };
+
     this.current_color = function () {
         return color;
+    };
+
+    this.current_color_string = function () {
+        return color === Dvonn.Color.BLACK ? 'black' : 'white';
     };
 
     this.exist_intersection = function (letter, number) {
@@ -307,9 +449,13 @@ Dvonn.Engine = function (t, c) {
         return intersections;
     };
 
-    this.phase = function () {
-        return phase;
-    };
+    /*    this.get_possible_move_list = function () {
+     // TODO
+     };
+
+     this.get_possible_move_number = function (list) {
+     // TODO
+     }; */
 
     this.get_possible_moving_stacks = function (color) {
         var list = [];
@@ -363,8 +509,21 @@ Dvonn.Engine = function (t, c) {
 
     this.is_finished = function () {
         return phase === Dvonn.Phase.MOVE_STACK &&
-            this.get_possible_moving_stacks(Dvonn.Color.WHITE).length == 0 &&
-            this.get_possible_moving_stacks(Dvonn.Color.BLACK).length == 0;
+            this.get_possible_moving_stacks(Dvonn.Color.WHITE).length === 0 &&
+            this.get_possible_moving_stacks(Dvonn.Color.BLACK).length === 0;
+    };
+
+    this.move = function (move) {
+        if (move.type() === Dvonn.Phase.PUT_DVONN_PIECE) {
+            this.put_dvonn_piece(move.from());
+        } else if (move.type() === Dvonn.Phase.PUT_PIECE) {
+            this.put_piece(move.from(), color);
+        } else if (move.type() === Dvonn.Phase.MOVE_STACK) {
+            this.move_stack(move.from(), move.to());
+            if (move.list().length > 0) {
+                this.remove_stacks(move.list());
+            }
+        }
     };
 
     this.move_no_stack = function () {
@@ -398,6 +557,10 @@ Dvonn.Engine = function (t, c) {
         this.change_color();
     };
 
+    this.phase = function () {
+        return phase;
+    };
+
     this.put_piece = function (coordinates, color) {
         if (coordinates.hash() in intersections) {
             if (intersections[coordinates.hash()].state() === Dvonn.State.VACANT) {
@@ -424,7 +587,6 @@ Dvonn.Engine = function (t, c) {
                 }
             }
         }
-        this.remove_stacks(list);
         return list;
     };
 
@@ -432,6 +594,27 @@ Dvonn.Engine = function (t, c) {
         for (var index in list) {
             intersections[list[index].hash()].remove_stack();
         }
+    };
+
+    /*    this.remove_first_possible_move = function (list) {
+     // TODO
+     };
+
+     this.select_move = function (list, index) {
+     // TODO
+     }; */
+
+    this.set = function (_phase, _state, _intersections, _placedDvonnPieceNumber, _placedPieceNumber) {
+        var index;
+
+        for (index in _intersections) {
+            intersections[index] = _intersections[index].clone();
+        }
+
+        phase = _phase;
+        state = _state;
+        placedDvonnPieceNumber = _placedDvonnPieceNumber;
+        placedPieceNumber = _placedPieceNumber;
     };
 
     this.verify_moving = function (origin, destination) {

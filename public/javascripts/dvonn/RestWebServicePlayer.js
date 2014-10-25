@@ -1,6 +1,6 @@
 "use strict";
 
-Invers.RestWebServicePlayer = function (c, e, l) {
+Dvonn.RestWebServicePlayer = function (c, e, l) {
 // private attributes
     var _super = new OpenXum.RestWebServicePlayer(c, e, l);
 
@@ -16,11 +16,11 @@ Invers.RestWebServicePlayer = function (c, e, l) {
     this.set_url = _super.set_url;
 
     this.build_move = function (o) {
-        return new Invers.Move(o.color, o.letter, o.number, o.position);
+        return new Dvonn.Move(o.color, o.letter, o.number, o.position);
     };
 
     this.get_name = function () {
-        return 'invers';
+        return 'dvonn';
     };
 
     _super.that(this);

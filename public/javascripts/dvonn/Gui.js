@@ -1,6 +1,34 @@
 "use strict";
 
-Dvonn.Gui = function (color, e) {
+Dvonn.Gui = function (c, e) {
+// private attributes
+    var engine = e;
+    var mycolor = c;
+
+    var canvas;
+    var context;
+    var manager;
+    var height;
+    var width;
+
+    var tolerance = 15;
+
+    var delta_x;
+    var delta_y;
+    var delta_xy;
+    var offset;
+
+    var scaleX;
+    var scaleY;
+
+    var opponentPresent = false;
+
+    var pointerX = -1;
+    var pointerY = -1;
+
+    var selected_color;
+    var selected_coordinates;
+    var selected_piece;
 
 // public methods
     this.color = function () {
@@ -35,6 +63,22 @@ Dvonn.Gui = function (color, e) {
         return engine;
     };
 
+    this.get_move = function () {
+        var move = null;
+
+        if (engine.phase() === Dvonn.Phase.PUT_DVONN_PIECE) {
+            move = new Dvonn.Move(Dvonn.Phase.PUT_DVONN_PIECE, engine.current_color(), this.get_selected_coordinates());
+        } else if (engine.phase() === Dvonn.Phase.PUT_PIECE) {
+            move = new Dvonn.Move(Dvonn.Phase.PUT_PIECE, engine.current_color(), this.get_selected_coordinates());
+        } else if (engine.phase() === Dvonn.Phase.MOVE_STACK) {
+            var e = engine.clone();
+
+            e.move_stack(this.get_selected_piece(), this.get_selected_coordinates());
+            move = new Dvonn.Move(Dvonn.Phase.MOVE_STACK, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates(), e.remove_isolated_stacks());
+        }
+        return move;
+    };
+
     this.get_selected_coordinates = function () {
         return selected_coordinates;
     };
@@ -43,7 +87,24 @@ Dvonn.Gui = function (color, e) {
         return selected_piece;
     };
 
-    this.set_canvas = function (c) {
+    this.is_animate = function () {
+        return false;
+    };
+
+    this.is_remote = function () {
+        return false;
+    };
+
+    this.move = function (move, color) {
+        manager.play();
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        manager.redraw();
+    };
+
+     this.set_canvas = function (c) {
         canvas = c;
         context = c.getContext("2d");
         height = canvas.height;
@@ -331,10 +392,10 @@ Dvonn.Gui = function (color, e) {
         var pos = getClickPosition(event);
         var letter = compute_letter(pos.x, pos.y);
 
-        if (letter != 'X') {
+        if (letter !== 'X') {
             var number = compute_number(pos.x, pos.y);
 
-            if (number != -1) {
+            if (number !== -1) {
                 var ok = false;
 
                 if (engine.phase() === Dvonn.Phase.PUT_DVONN_PIECE && engine.get_intersection(letter, number).state() === Dvonn.State.VACANT) {
@@ -355,7 +416,7 @@ Dvonn.Gui = function (color, e) {
                         if (engine.can_move(coordinates)) {
                             var color = engine.get_intersection(letter, number).color();
 
-                            if (color != Dvonn.Color.RED && engine.current_color() === color) {
+                            if (color !== Dvonn.Color.RED && engine.current_color() === color) {
                                 selected_piece = coordinates;
                                 selected_color = color;
                                 manager.redraw();
@@ -423,33 +484,6 @@ Dvonn.Gui = function (color, e) {
             context.stroke();
         }
     };
-
-// private attributes
-    var engine = e;
-    var mycolor = color;
-
-    var canvas;
-    var context;
-    var manager;
-    var height;
-    var width;
-
-    var tolerance = 15;
-
-    var delta_x;
-    var delta_y;
-    var delta_xy;
-    var offset;
-
-    var scaleX;
-    var scaleY;
-
-    var pointerX = -1;
-    var pointerY = -1;
-
-    var selected_color;
-    var selected_coordinates;
-    var selected_piece;
 
     init();
 };
