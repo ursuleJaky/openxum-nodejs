@@ -83,7 +83,10 @@ OpenXum.Manager = function (e, g, o, s) {
         _gui = g;
         _opponent = o;
         _status = s;
-        _ready = false;
+        _ready = _opponent === _gui;
+        if (_ready) {
+            _gui.ready(true);
+        }
     };
 
 // public methods
