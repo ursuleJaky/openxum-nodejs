@@ -1,6 +1,6 @@
 "use strict";
 
-Dvonn.RestWebServicePlayer = function (c, e, l) {
+Gipf.RestWebServicePlayer = function (c, e, l) {
 // private attributes
     var _super = new OpenXum.RestWebServicePlayer(c, e, l);
 
@@ -16,11 +16,11 @@ Dvonn.RestWebServicePlayer = function (c, e, l) {
     this.set_url = _super.set_url;
 
     this.build_move = function (o) {
-        return new Dvonn.Move(o.type, o.color, o.from, o.to, o.list);
+        return new Gipf.Move(o.color, o.letter, o.number, o.position);
     };
 
     this.get_name = function () {
-        return 'dvonn';
+        return 'gipf';
     };
 
     _super.that(this);
