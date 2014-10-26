@@ -1,6 +1,36 @@
 "use strict";
 
-Tzaar.Gui = function (color, e) {
+Tzaar.Gui = function (c, e, l) {
+// private attributes
+    var engine = e;
+    var mycolor = c;
+
+    var canvas;
+    var context;
+    var manager;
+    var height;
+    var width;
+
+    var tolerance = 15;
+
+    var delta_x;
+    var delta_y;
+    var delta_xy;
+    var offset;
+
+    var scaleX;
+    var scaleY;
+
+    var opponentPresent = l;
+
+    var pointerX = -1;
+    var pointerY = -1;
+
+    var selected_coordinates;
+    var selected_piece;
+    var selected_capture;
+    var selected_make_stack;
+    var selected_pass;
 
 // public methods
     this.color = function () {
@@ -44,6 +74,23 @@ Tzaar.Gui = function (color, e) {
         return engine;
     };
 
+    this.get_move = function () {
+        var move = null;
+
+        if (engine.phase() === Tzaar.Phase.FIRST_MOVE) {
+            move = new Tzaar.Move(Tzaar.MoveType.FIRST_MOVE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (engine.phase() === Tzaar.Phase.CAPTURE) {
+            move = new Tzaar.Move(Tzaar.MoveType.CAPTURE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (engine.phase() === Tzaar.Phase.CHOOSE) {
+            move = new Tzaar.Move(Tzaar.MoveType.CHOOSE, engine.current_color(), null, null, this.get_selected_capture() ? Tzaar.Phase.SECOND_CAPTURE : this.get_selected_make_stack() ? Tzaar.Phase.MAKE_STRONGER : Tzaar.Phase.PASS);
+        } else if (engine.phase() === Tzaar.Phase.SECOND_CAPTURE) {
+            move = new Tzaar.Move(Tzaar.MoveType.SECOND_CAPTURE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
+            move = new Tzaar.Move(Tzaar.MoveType.MAKE_STRONGER, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        }
+        return move;
+    };
+
     this.get_selected_capture = function () {
         return selected_capture;
     };
@@ -62,6 +109,25 @@ Tzaar.Gui = function (color, e) {
 
     this.get_selected_piece = function () {
         return selected_piece;
+    };
+
+    this.is_animate = function () {
+        return false;
+    };
+
+    this.is_remote = function () {
+        return false;
+    };
+
+    this.move = function (move, color) {
+        manager.play();
+    };
+
+    this.ready = function (r) {
+        opponentPresent = r;
+        if (manager) {
+            manager.redraw();
+        }
     };
 
     this.set_canvas = function (c) {
@@ -84,7 +150,7 @@ Tzaar.Gui = function (color, e) {
     };
 
     this.unselect = function (all) {
-        if (all) {
+        if (engine.phase() === Tzaar.Phase.FIRST_MOVE || engine.phase() === Tzaar.Phase.CAPTURE || engine.phase() === Tzaar.Phase.CHOOSE) {
             selected_capture = false;
             selected_make_stack = false;
             selected_pass = false;
@@ -632,35 +698,6 @@ Tzaar.Gui = function (color, e) {
             context.stroke();
         }
     };
-
-// private attributes
-    var engine = e;
-    var mycolor = color;
-
-    var canvas;
-    var context;
-    var manager;
-    var height;
-    var width;
-
-    var tolerance = 15;
-
-    var delta_x;
-    var delta_y;
-    var delta_xy;
-    var offset;
-
-    var scaleX;
-    var scaleY;
-
-    var pointerX = -1;
-    var pointerY = -1;
-
-    var selected_coordinates;
-    var selected_piece;
-    var selected_capture;
-    var selected_make_stack;
-    var selected_pass;
 
     init();
 };

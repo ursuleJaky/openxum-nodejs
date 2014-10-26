@@ -1,6 +1,6 @@
 "use strict";
 
-OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
+OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) {
 // private attributes
     var canvas;
     var canvas_div;
@@ -71,13 +71,13 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
         }
     };
 
-    var init = function (namespace, name, color, opponent_color, game_type, game_id, mode, username, owner_id, opponent_id, replay) {
+    var init = function (namespace, name, first_color, color, opponent_color, game_type, game_id, mode, username, owner_id, opponent_id, replay) {
         $('#winnerModal .new-game-button').click(function () {
             $('#winnerModal').modal('hide');
             window.location.href = '/games/play/?game=' + name;
         });
 
-        build_engine(namespace, mode, color);
+        build_engine(namespace, mode, first_color);
         build_gui(namespace, color, game_id);
         build_opponent(namespace, color, game_type, game_id, opponent_color, username, owner_id, opponent_id);
         build_manager(namespace);
@@ -85,7 +85,7 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
         set_opponent(game_id);
 
         if (opponent !== gui && engine.current_color() === opponent.color() && !opponent.is_remote()) {
-            manager.play_other();
+            manager.play_other(true);
         }
         if (replay === true) {
             opponent.replay_game();
@@ -95,5 +95,5 @@ OpenXum.GamePage = function (namespace, n, c, oc, gt, gi, m, u, oi, opi, r) {
         });
     };
 
-    init(namespace, n, c, oc, gt, gi, m, u, oi, opi, r);
+    init(namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r);
 };

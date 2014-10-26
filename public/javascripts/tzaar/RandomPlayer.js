@@ -1,11 +1,14 @@
 "use strict";
 
-Tzaar.RandomPlayer = function (color, e) {
+Tzaar.RandomPlayer = function (c, e) {
+// private attributes
+    var _color = c;
+    var _engine = e;
 
 // public methods
     this.capture = function () {
         var found = false;
-        var list = engine.get_no_free_intersections(mycolor);
+        var list = _engine.get_no_free_intersections(_color);
         var origin = new Tzaar.Coordinates('X', -1);
         var destination = new Tzaar.Coordinates('X', -1);
 
@@ -13,7 +16,7 @@ Tzaar.RandomPlayer = function (color, e) {
             var index = Math.floor(Math.random() * list.length);
 
             origin = list[index];
-            var destination_list = engine.get_distant_neighbors(origin.coordinates(), mycolor === Tzaar.Color.BLACK ? Tzaar.Color.WHITE : Tzaar.Color.BLACK, true);
+            var destination_list = _engine.get_distant_neighbors(origin.coordinates(), _color === Tzaar.Color.BLACK ? Tzaar.Color.WHITE : Tzaar.Color.BLACK, true);
 
             if (destination_list.length > 0) {
                 var destination_index = Math.floor(Math.random() * destination_list.length);
@@ -34,35 +37,34 @@ Tzaar.RandomPlayer = function (color, e) {
                 list.splice(index2, 1);
             }
         }
-        return { origin: origin, destination: destination };
+        return { origin: origin.coordinates(), destination: destination };
     };
 
     this.choose = function () {
-        if (engine.can_capture(mycolor)) {
-            if (engine.can_make_stack(mycolor)) {
-                var i = Math.floor(Math.random() * 3);
+        var i;
 
+        if (_engine.can_capture(_color)) {
+            if (_engine.can_make_stack(_color)) {
+                i = Math.floor(Math.random() * 3);
                 if (i === 0) {
                     return Tzaar.Phase.SECOND_CAPTURE;
-                } else if (i == 1) {
+                } else if (i === 1) {
                     return Tzaar.Phase.MAKE_STRONGER;
                 } else {
                     return Tzaar.Phase.PASS;
                 }
             } else {
-                var i = Math.floor(Math.random() * 2);
-
-                if (i == 0) {
+                i = Math.floor(Math.random() * 2);
+                if (i === 0) {
                     return Tzaar.Phase.SECOND_CAPTURE;
                 } else {
                     return Tzaar.Phase.PASS;
                 }
             }
         } else {
-            if (engine.can_make_stack(mycolor)) {
-                var i = Math.floor(Math.random() * 2);
-
-                if (i == 0) {
+            if (_engine.can_make_stack(_color)) {
+                i = Math.floor(Math.random() * 2);
+                if (i === 0) {
                     return Tzaar.Phase.MAKE_STRONGER;
                 } else {
                     return Tzaar.Phase.PASS;
@@ -74,12 +76,12 @@ Tzaar.RandomPlayer = function (color, e) {
     };
 
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.first_move = function (origin, destination) {
         var found = false;
-        var list = engine.get_no_free_intersections(mycolor);
+        var list = _engine.get_no_free_intersections(_color);
         var origin = new Tzaar.Coordinates('X', -1);
         var destination = new Tzaar.Coordinates('X', -1);
 
@@ -87,7 +89,7 @@ Tzaar.RandomPlayer = function (color, e) {
             var index = Math.floor(Math.random() * list.length);
 
             origin = list[index];
-            var destination_list = engine.get_distant_neighbors(origin.coordinates(), mycolor === Tzaar.Color.BLACK ? Tzaar.Color.WHITE : Tzaar.Color.BLACK, true);
+            var destination_list = _engine.get_distant_neighbors(origin.coordinates(), _color === Tzaar.Color.BLACK ? Tzaar.Color.WHITE : Tzaar.Color.BLACK, true);
 
             if (destination_list.length > 0) {
                 var destination_index = Math.floor(Math.random() * destination_list.length);
@@ -96,7 +98,7 @@ Tzaar.RandomPlayer = function (color, e) {
                 found = true;
             }
         }
-        return { origin: origin, destination: destination };
+        return { origin: origin.coordinates(), destination: destination };
     };
 
     this.is_remote = function () {
@@ -105,7 +107,7 @@ Tzaar.RandomPlayer = function (color, e) {
 
     this.make_stack = function () {
         var found = false;
-        var list = engine.get_no_free_intersections(mycolor);
+        var list = _engine.get_no_free_intersections(_color);
         var origin = new Tzaar.Coordinates('X', -1);
         var destination = new Tzaar.Coordinates('X', -1);
 
@@ -113,7 +115,7 @@ Tzaar.RandomPlayer = function (color, e) {
             var index = Math.floor(Math.random() * list.length);
 
             origin = list[index];
-            var destination_list = engine.get_distant_neighbors(origin.coordinates(), mycolor, false);
+            var destination_list = _engine.get_distant_neighbors(origin.coordinates(), _color, false);
 
             if (destination_list.length > 0) {
                 var destination_index = Math.floor(Math.random() * destination_list.length);
@@ -134,15 +136,38 @@ Tzaar.RandomPlayer = function (color, e) {
                 list.splice(index2, 1);
             }
         }
-        return { origin: origin, destination: destination };
+        return { origin: origin.coordinates(), destination: destination };
+    };
+
+    this.move = function () {
+        var m;
+        var move = null;
+
+        if (_engine.phase() === Tzaar.Phase.FIRST_MOVE) {
+            m = this.first_move();
+            move = new Tzaar.Move(Tzaar.MoveType.FIRST_MOVE, _engine.current_color(), m.origin, m.destination);
+        } else if (_engine.phase() === Tzaar.Phase.CAPTURE) {
+            m = this.capture();
+            move = new Tzaar.Move(Tzaar.MoveType.CAPTURE, _engine.current_color(), m.origin, m.destination);
+        } else if (_engine.phase() === Tzaar.Phase.CHOOSE) {
+            move = new Tzaar.Move(Tzaar.MoveType.CHOOSE, _engine.current_color(), null, null, this.choose());
+        } else if (_engine.phase() === Tzaar.Phase.SECOND_CAPTURE) {
+            m = this.capture();
+            move = new Tzaar.Move(Tzaar.MoveType.SECOND_CAPTURE, _engine.current_color(), m.origin, m.destination);
+        } else if (_engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
+            m = this.make_stack();
+            move = new Tzaar.Move(Tzaar.MoveType.MAKE_STRONGER, _engine.current_color(), m.origin, m.destination);
+        }
+        return move;
+    };
+
+    this.reinit = function (e) {
+        _engine = e;
     };
 
     this.set_level = function (l) {
-        level = l;
     };
 
-// private attributes
-    var mycolor = color;
-    var engine = e;
-    var level = 10;
+    this.set_manager = function () {
+    };
 };
