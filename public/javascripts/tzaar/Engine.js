@@ -241,7 +241,7 @@ Tzaar.Piece = function (c, t) {
 
 // public methods
     this.clone = function () {
-        return new Tzaar.Piece(_color);
+        return new Tzaar.Piece(_color, _type);
     };
 
     this.color = function () {
