@@ -22,6 +22,9 @@ OpenXum.Manager = function (e, g, o, s) {
 
     var _move;
     var _moves;
+    var _move_list;
+    var _index;
+    var _loop;
 
 // private methods
     var update_status = function () {
@@ -87,11 +90,28 @@ OpenXum.Manager = function (e, g, o, s) {
         if (_ready) {
             _gui.ready(true);
         }
+        _move = null;
+        _moves = '';
+    };
+
+    var replay = function () {
+        _move = _move_list[_index];
+        _engine.move(_move);
+        _gui.draw();
+        _index++;
+        if (_index === _move_list.length) {
+            clearInterval(_loop);
+            _gui.ready(true);
+        }
     };
 
 // public methods
     this.engine = function () {
         return _engine;
+    };
+
+    this.get_moves = function () {
+        return _moves;
     };
 
     this.gui = function () {
@@ -157,18 +177,6 @@ OpenXum.Manager = function (e, g, o, s) {
         _gui.move(move, _opponent.color());
     };
 
-    this.replay = function (moves) {
-        _moves = moves;
-        moves.split(";").forEach(function (move) {
-            if (move !== '') {
-                _move = _that.build_move();
-                _move.parse(move);
-                _engine.move(_move);
-            }
-        });
-        this.ready(true);
-    };
-
     this.ready = function (r) {
         _ready = r;
         _gui.ready(r);
@@ -177,6 +185,27 @@ OpenXum.Manager = function (e, g, o, s) {
 
     this.redraw = function () {
         _gui.draw();
+    };
+
+    this.replay = function (moves, pause) {
+        _moves = moves;
+        _index = 0;
+        _move_list = [];
+        moves.split(";").forEach(function (move) {
+            if (move !== '') {
+                _move = _that.build_move();
+                _move.parse(move);
+                _move_list.push(_move);
+                if (!pause) {
+                    _engine.move(move);
+                }
+            }
+        });
+        if (pause) {
+            _loop = setInterval(replay, 1000);
+        } else {
+            this.ready(true);
+        }
     };
 
     this.that = function (t) {

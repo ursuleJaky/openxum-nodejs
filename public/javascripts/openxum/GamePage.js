@@ -91,7 +91,15 @@ OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) 
             opponent.replay_game();
         }
         $("#replay").click(function () {
-            opponent.replay_game();
+            var moves = manager.get_moves();
+
+            build_engine(namespace, mode, first_color);
+            build_gui(namespace, color, game_id);
+            build_opponent(namespace, color, game_type, game_id, opponent_color, username, owner_id, opponent_id);
+            build_manager(namespace);
+            set_gui();
+            set_opponent(game_id);
+            manager.replay(moves, true);
         });
     };
 
