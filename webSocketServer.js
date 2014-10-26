@@ -1,7 +1,5 @@
 var wss = require('websocket').server;
 
-var yinsh = require('./web_sockets/games/yinsh');
-
 exports.Server = function (app) {
 
     this.init = function (app) {
