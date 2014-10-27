@@ -666,18 +666,15 @@ Zertz.Gui = function (c, e, l) {
         if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
             move = new Zertz.Move(Zertz.MoveType.PUT_MARBLE, engine.current_color(), this.get_selected_coordinates(),
                 this.get_selected_color(), null);
-            this.unselect();
         } else if (engine.phase() === Zertz.Phase.REMOVE_RING) {
             move = new Zertz.Move(Zertz.MoveType.REMOVE_RING, engine.current_color(), this.get_selected_coordinates(),
                 null, null);
-            this.unselect();
         } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-            var state = engine.get_intersection_state(this.get_selected_marble().letter(), this.get_selected_marble().number);
+            var state = engine.get_intersection_state(this.get_selected_marble().letter(), this.get_selected_marble().number());
 
             move = new Zertz.Move(Zertz.MoveType.CAPTURE, engine.current_color(), this.get_selected_coordinates(),
                 (state === Zertz.State.BLACK_MARBLE ? Zertz.MarbleColor.BLACK :
                     (state === Zertz.State.WHITE_MARBLE ? Zertz.MarbleColor.WHITE : Zertz.MarbleColor.GREY)), this.get_selected_marble());
-            this.unselect();
         }
         return move;
     };

@@ -17,8 +17,8 @@ Zertz.MoveType = { PUT_MARBLE: 0, REMOVE_RING: 1, CAPTURE: 2 };
 Zertz.Coordinates = function (l, n) {
 
 // private attributes
-    var letter = l;
-    var number = n;
+    var _letter = l;
+    var _number = n;
 
 // public methods
     this.clone = function () {
@@ -26,29 +26,29 @@ Zertz.Coordinates = function (l, n) {
     };
 
     this.hash = function () {
-        return (letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (number - 1) * 7;
+        return (_letter.charCodeAt(0) - 'A'.charCodeAt(0)) + (_number - 1) * 7;
     };
 
     this.is_valid = function () {
-        return (letter === 'A' && number >= 1 && number <= 4) ||
-            (letter === 'B' && number >= 1 && number <= 5) ||
-            (letter === 'C' && number >= 1 && number <= 6) ||
-            (letter === 'D' && number >= 1 && number <= 7) ||
-            (letter === 'E' && number >= 2 && number <= 7) ||
-            (letter === 'F' && number >= 3 && number <= 7) ||
-            (letter === 'G' && number >= 4 && number <= 7);
+        return (_letter === 'A' && _number >= 1 && _number <= 4) ||
+            (_letter === 'B' && _number >= 1 && _number <= 5) ||
+            (_letter === 'C' && _number >= 1 && _number <= 6) ||
+            (_letter === 'D' && _number >= 1 && _number <= 7) ||
+            (_letter === 'E' && _number >= 2 && _number <= 7) ||
+            (_letter === 'F' && _number >= 3 && _number <= 7) ||
+            (_letter === 'G' && _number >= 4 && _number <= 7);
     };
 
     this.letter = function () {
-        return letter;
+        return _letter;
     };
 
     this.number = function () {
-        return number;
+        return _number;
     };
 
     this.to_string = function () {
-        return letter + number;
+        return _letter + _number;
     };
 };
 
@@ -594,7 +594,6 @@ Zertz.Engine = function (t, c) {
 
     this.get_intersection_state = function (letter, number) {
         return get_intersection(letter, number).state();
-
     };
 
     /*    this.get_possible_move_list = function () {
