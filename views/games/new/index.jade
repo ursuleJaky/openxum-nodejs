@@ -18,17 +18,17 @@ block body
         div.col-md-8.col-md-offset-2
             div.panel.panel-primary
                 div.panel-heading
-                    h3(class='panel-title') Games [#{game}]
+                    h3(class='panel-title') #{__('Games')} [#{game}]
                 div.panel-body
                     a(class='btn btn-primary btn-md active',href='/games/create/?game=#{game}')
                         i(class='glyphicon glyphicon-plus')
-                        |  Create
+                        |  #{__('Create')}
                     | &nbsp;&nbsp;
                     a(class='btn btn-success btn-md active',href='/games/competition/?game=#{game}')
                         i(class='glyphicon glyphicon-random')
-                        |  AI competition
+                        |  #{__('AI competition')}
                     br
-                    - var list = [ 'My online games', 'My offline games', 'Other online games', 'Other offline games' ]
+                    - var list = [ __('My online games'), __('My offline games'), __('Other online games'), __('Other offline games') ]
                     - each item in list
                         br
                         h3 #{item}
@@ -36,16 +36,16 @@ block body
                         table.table
                             tr
                                 th
-                                  | Name
+                                  | #{__('Name')}
                                 th
-                                  | Color
+                                  | #{__('Color')}
                                 th
-                                  | Mode
+                                  | #{__('Mode')}
                                 th
-                                  | Opponent
+                                  | #{__('Opponent')}
                                 th
-                                  | Actions
-                            if item == 'My online games'
+                                  | #{__('Actions')}
+                            if item == __('My online games')
                                 each game in my_online_games
                                     tr
                                         td #{game.name}
@@ -57,7 +57,7 @@ block body
                                             a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='#')
                                                 i(class='glyphicon glyphicon-pause')
                                                 | &nbsp;waiting...
-                            if item == 'My offline games'
+                            if item == __('My offline games')
                                 each game in my_offline_games
                                     tr
                                         td #{game.name}
@@ -68,7 +68,7 @@ block body
                                            a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href='#')
                                              i(class='glyphicon glyphicon-pause')
                                              | &nbsp;waiting...
-                            if item == 'Other online games'
+                            if item == __('Other online games')
                                 each game in other_online_games
                                     tr
                                         td #{game.name}
@@ -79,7 +79,7 @@ block body
                                             a(id='button_game_#{game._id}',class='btn btn-success btn-md active',href="javascript:client.join('#{user_id}','#{game._id}');")
                                                 i(class='glyphicon glyphicon-share')
                                                 | &nbsp;join
-                            if item == 'Other offline games'
+                            if item == __('Other offline games')
                                 each game in other_offline_games
                                     tr
                                         td #{game.name}

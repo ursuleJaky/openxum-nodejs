@@ -123,5 +123,7 @@
 	"Opponent": "Opponent",
 	"Actions": "Actions",
 	"Type": "Type",
-	"Welcome to OpenXum": "Welcome to OpenXum"
+	"Welcome to OpenXum": "Welcome to OpenXum",
+	"Create": "Create",
+	"AI competition": "AI competition"
 }

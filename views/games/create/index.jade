@@ -11,73 +11,73 @@ block body
     - var button_classes = [ 'btn-primary', 'btn-success', 'btn-info', 'btn-warning', 'btn-danger' ]
     if game=="dvonn"
         - var color_keys = ['black','white']
-        - var colors = ['Black','White']
+        - var colors = [__('Black'),__('White')]
         - var default_color = 'black'
         - var mode_keys = [ 'regular' ]
-        - var modes = [ 'Regular' ]
+        - var modes = [ __('Regular') ]
         - var default_mode = 'regular'
         - var type_keys = [ 'gui', 'online', 'ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), 'Offline' ]
         - var default_type = 'ai'
     if game=="tzaar"
         - var color_keys = ['black','white']
-        - var colors = ['Black','White']
+        - var colors = [__('Black'),__('White')]
         - var default_color = 'black'
         - var mode_keys = [ 'regular' ]
-        - var modes = [ 'Regular' ]
+        - var modes = [ __('Regular') ]
         - var default_mode = 'regular'
         - var type_keys = [ 'gui', 'online', 'ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), 'Offline' ]
         - var default_type = 'ai'
     if game=="gipf"
         - var color_keys = ['black','white']
-        - var colors = ['Black','White']
+        - var colors = [__('Black'),__('White')]
         - var default_color = 'black'
         - var mode_keys = [ 'basic', 'standard', 'tournament' ]
         - var modes = [ 'Basic', 'Standard', 'Tournament' ]
         - var default_mode = 'basic'
         - var type_keys = [ 'gui', 'online', 'ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), 'Offline' ]
         - var default_type = 'ai'
     if game=="yinsh"
         - var color_keys = ['black','white']
-        - var colors = ['Black','White']
+        - var colors = [__('Black'),__('White')]
         - var default_color = 'black'
         - var mode_keys = [ 'regular' , 'blitz' ]
-        - var modes = [ 'Regular', 'Blitz' ]
+        - var modes = [ __('Regular'), 'Blitz' ]
         - var default_mode = 'regular'
         - var type_keys = [ 'gui', 'online', 'ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), 'Offline' ]
         - var default_type = 'ai'
     if game=="kamisado"
         - var color_keys = [ 'black', 'white' ]
-        - var colors = [ 'Black', 'White' ]
+        - var colors = [ __('Black'), __('White') ]
         - var default_color = 'black'
         - var mode_keys = [ 'simple' , 'standard', 'long', 'marathon' ]
         - var modes = [ 'Simple', 'Standard', 'Long', 'Marathon' ]
         - var default_mode = 'simple'
         - var type_keys = [ 'gui', 'online', 'ai', 'remote_ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Remote AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), __('Remote AI'), 'Offline' ]
         - var default_type = 'ai'
     if game=="invers"
         - var color_keys = [ 'red', 'yellow' ]
-        - var colors = [ 'Red', 'Yellow' ]
+        - var colors = [ __('Red'), __('Yellow') ]
         - var default_color = 'red'
         - var mode_keys = [ 'standard' ]
         - var modes = [ 'Standard' ]
         - var default_mode = 'standard'
         - var type_keys = [ 'gui', 'online', 'ai', 'remote_ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Remote AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), __('Remote AI'), 'Offline' ]
         - var default_type = 'ai'
     if game=="zertz"
         - var color_keys = ['one','two']
-        - var colors = ['One','Two']
+        - var colors = [__('One'),__('Two')]
         - var default_color = 'one'
         - var mode_keys = [ 'regular' , 'blitz' ]
-        - var modes = [ 'Regular', 'Blitz' ]
+        - var modes = [ __('Regular'), 'Blitz' ]
         - var default_mode = 'regular'
         - var type_keys = [ 'gui', 'online', 'ai', 'offline' ]
-        - var types = [ 'GUI', 'Online', 'AI', 'Offline' ]
+        - var types = [ 'GUI', 'Online', __('AI'), 'Offline' ]
         - var default_type = 'ai'
 
     br
@@ -85,7 +85,7 @@ block body
         div.col-md-8.col-md-offset-2
             div.panel.panel-primary
                 div.panel-heading
-                    h3(class='panel-title') New game [#{game}]
+                    h3(class='panel-title') #{__('New game')} [#{game}]
                 div.panel-body
                     - var i = 2
                     form.form-horizontal.col-md-10.col-md-offset-1(role='form', action='/games/create/',method='post')
@@ -93,9 +93,9 @@ block body
                             div.input-group
                                 span.input-group-addon
                                     span.glyphicon.glyphicon-tower
-                                input.form-control(type="text", name="name", value="", placeholder="Game name")
+                                input.form-control(type="text", name="name", value="", placeholder="#{__('Game name')}")
                         div.form-group
-                            label.control-label.col-sm-3 Color
+                            label.control-label.col-sm-3 #{__('Color')}
                             div.col-sm-9
                                 div.btn-group.input-group(data-toggle="buttons")
                                     each color,index in color_keys
@@ -111,7 +111,7 @@ block body
                                     if i == 5
                                         - i = 0
                         div.form-group
-                            label.control-label.col-sm-3 Mode
+                            label.control-label.col-sm-3 #{__('Mode')}
                             div.col-sm-9
                                 div.btn-group.input-group(data-toggle="buttons")
                                     each mode, index in mode_keys
@@ -127,7 +127,7 @@ block body
                                     if i == 5
                                         - i = 0
                         div.form-group
-                            label.control-label.col-sm-3 Type
+                            label.control-label.col-sm-3 #{__('Type')}
                             div.col-sm-9
                                 div.btn-group.input-group(data-toggle="buttons")
                                     each type, index in type_keys
@@ -143,4 +143,4 @@ block body
                                     if i == 5
                                         - i = 0
                         input(type='hidden',name='game',value='#{game}')
-                        input(type='submit',name='create',value='Create',class='btn btn-md btn-success btn-block')
+                        input(type='submit',name='create',value="#{__('Create')}",class='btn btn-md btn-success btn-block')
