@@ -64,11 +64,8 @@ OpenXum.Manager = function (e, g, o, s) {
 
     var finish = function () {
         if (_engine.is_finished()) {
-            var popup = document.getElementById("winnerModalText");
-
-            popup.innerHTML = "<h4>The winner is " + _that.get_winner_color() + "!</h4>";
+            $('#winnerBodyText').html('<h4>The winner is ' + _that.get_winner_color() + '!</h4>');
             $("#winnerModal").modal("show");
-
             if (_engine.winner_is() === _gui.color()) {
                 var win = load_win() + 1;
 

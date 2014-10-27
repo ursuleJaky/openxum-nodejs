@@ -10,12 +10,62 @@ OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) 
     var opponent;
 
 // private methods
+    var build_buttons = function () {
+        var row = $('<div/>', { class: 'row' });
+        var col = $('<div/>', { class: 'col-md-6 col-md-offset-3' });
+
+        $('<a/>', { class: 'btn btn-success btn-md active', id: 'status', href: '#', html: 'Ready!' }).appendTo(col);
+        $('<a/>', { class: 'btn btn-warning btn-md active', id: 'replay', href: '#', html: 'Replay' }).appendTo(col);
+        $('<a/>', { class: 'btn btn-danger btn-md active', id: 'list', href: '#', html: 'Move list',
+            'data-toggle': 'modal', 'data-target': '#moveListModal' }).appendTo(col);
+        col.appendTo(row);
+        row.appendTo($('#main'));
+    };
+
+    var build_canvas = function () {
+        var row = $('<div/>', { class: 'row' });
+        var col = $('<div>', { class: 'col-md-12', id: 'boardDiv' });
+
+        $('<canvas/>', {
+            id: 'board',
+            style: 'width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;'
+        }).appendTo(col);
+        col.appendTo(row);
+        row.appendTo($('#main'));
+    };
+
     var build_engine = function (namespace, mode, color) {
         engine = new namespace.Engine(mode, color);
     };
 
     var build_gui = function (namespace, color, game_id) {
         gui = new namespace.Gui(color, engine, game_id === '-1');
+    };
+
+    var build_move_list_modal = function () {
+        var modal = $('<div/>', {
+            class: 'modal fade',
+            id: 'moveListModal',
+            tabindex: '-1',
+            role: 'dialog',
+            'aria-labelledby': 'moveListModal',
+            'aria-hidden': 'true'
+        });
+        var modalDialog = $('<div/>', { class: 'modal-dialog'});
+        var modalContent = $('<div/>', { class: 'modal-content'});
+        var modalHeader = $('<div/>', { class: 'modal-header'});
+        var button = $('<button/>', { class: 'close', 'data-dismiss': 'modal' });
+        var modalBody = $('<div/>', { class: 'modal-body', id: 'moveListBody' });
+
+        $('<span/>', { 'aria-hidden': true, html: '&times;' }).appendTo(button);
+        $('<span/>', { class: 'sr-only', html: 'Close' }).appendTo(button);
+        button.appendTo(modalHeader);
+        $('<h4/>', { class: 'modal-title', id: 'moveListModalLabel', html: 'Move list' }).appendTo(modalHeader);
+        modalHeader.appendTo(modalContent);
+        modalBody.appendTo(modalContent);
+        modalContent.appendTo(modalDialog);
+        modalDialog.appendTo(modal);
+        modal.appendTo($('#main'));
     };
 
     var build_opponent = function (namespace, color, game_type, game_id, opponent_color, username, owner_id, opponent_id) {
@@ -41,6 +91,32 @@ OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) 
 
     var build_manager = function (namespace) {
         manager = new namespace.Manager(engine, gui, opponent, new OpenXum.Status(document.getElementById("status")));
+    };
+
+    var build_winner_modal = function () {
+        var modal = $('<div/>', {
+            class: 'modal fade',
+            id: 'winnerModal',
+            tabindex: '-1',
+            role: 'dialog',
+            'aria-labelledby': 'winnerModalLabel',
+            'aria-hidden': 'true'
+        });
+        var modalDialog = $('<div/>', { class: 'modal-dialog'});
+        var modalContent = $('<div/>', { class: 'modal-content'});
+        var button = $('<button/>', { class: 'close', 'data-dismiss': 'modal' });
+        var modalBody = $('<div/>', { class: 'modal-body', id: 'winnerBodyText' });
+        var modalFooter = $('<div/>', { class: 'modal-footer'});
+
+        $('<a/>', {
+            class: 'btn btn-primary new-game-button',
+            href: '#',
+            html: 'New game'}).appendTo($('<div/>', { class: 'btn-group' }).appendTo(modalFooter));
+        modalBody.appendTo(modalContent);
+        modalFooter.appendTo(modalContent);
+        modalContent.appendTo(modalDialog);
+        modalDialog.appendTo(modal);
+        modal.appendTo($('#main'));
     };
 
     var set_gui = function () {
@@ -72,6 +148,12 @@ OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) 
     };
 
     var init = function (namespace, name, first_color, color, opponent_color, game_type, game_id, mode, username, owner_id, opponent_id, replay) {
+        build_winner_modal();
+        build_move_list_modal();
+        $('<br/>').appendTo($('#main'));
+        build_buttons();
+        build_canvas();
+
         $('#winnerModal .new-game-button').click(function () {
             $('#winnerModal').modal('hide');
             window.location.href = '/games/play/?game=' + name;
@@ -100,6 +182,24 @@ OpenXum.GamePage = function (namespace, n, fc, c, oc, gt, gi, m, u, oi, opi, r) 
             set_gui();
             set_opponent(game_id);
             manager.replay(moves, true);
+        });
+        $("#list").click(function () {
+            var body = $('#moveListBody');
+            var moves = manager.get_moves();
+            var list = $('<ol>');
+
+            body.empty();
+            moves.split(";").forEach(function (str) {
+                if (str !== '') {
+                    var item = $('<li>');
+                    var move = manager.build_move();
+
+                    move.parse(str);
+                    item.html(move.to_string());
+                    item.appendTo(list);
+                }
+            });
+            list.appendTo(body);
         });
     };
 

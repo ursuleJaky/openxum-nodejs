@@ -313,6 +313,7 @@ Dvonn.Move = function (t, c, f, to, l) {
     this.parse = function (str) {
         var type = str.substring(0, 2);
 
+        _color = str.charAt(2) === 'B' ? Dvonn.Color.BLACK : Dvonn.Color.WHITE;
         if (type === 'PP') {
             _type = Dvonn.Phase.PUT_DVONN_PIECE;
             _from = new Dvonn.Coordinates(str.charAt(3), parseInt(str.charAt(4)));

@@ -125,5 +125,20 @@
 	"Type": "Type",
 	"Welcome to OpenXum": "Welcome to OpenXum",
 	"Create": "Create",
-	"AI competition": "AI competition"
+	"AI competition": "AI competition",
+	"play": "play",
+	"My online games": "My online games",
+	"Other online games": "Other online games",
+	"Other offline games": "Other offline games",
+	"One": "One",
+	"Two": "Two",
+	"Regular": "Regular",
+	"AI": "AI",
+	"New game": "New game",
+	"Game name": "Game name",
+	"Black": "Black",
+	"White": "White",
+	"Red": "Red",
+	"Yellow": "Yellow",
+	"Remote AI": "Remote AI"
 }

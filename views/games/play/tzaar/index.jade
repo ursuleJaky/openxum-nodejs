@@ -15,21 +15,3 @@ block body
                 new OpenXum.GamePage(Tzaar, 'tzaar', 1, #{color}, #{opponent_color}, '#{game_type}', '#{game_id}', #{mode}, '#{user.username}', '#{owner_id}', '#{opponent_id}', #{replay});
             });
         });
-
-    br
-    div.modal.fade(id='winnerModal',tabindex='-1',role='dialog',aria-labelledby='winnerModelLabel',aria-hidden='true')
-        div.modal-dialog
-            div.modal-content
-                div.modal-body(id='winnerModalText')
-                div.modal-footer
-                    div.btn-group
-                        a.btn.btn-primary.new-game-button(href='#') New game
-
-    div.row
-        div.col-md-6.col-md-offset-3
-            a#status(class='btn btn-success btn-md active',href='#') Ready!
-            a#replay(class='btn btn-warning btn-md active',href='#') Replay
-            a#list(class='btn btn-danger btn-md active',href='#') Move list
-    div.row
-        div.col-md-12(id='boardDiv')
-            canvas(id='board',style='width: 600px; height: 600px; padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block; border-radius: 15px; -moz-border-radius: 15px; box-shadow: 8px 8px 2px #aaa;')
