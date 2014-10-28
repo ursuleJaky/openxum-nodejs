@@ -8,7 +8,9 @@ block neck
   link(rel='stylesheet', href='/layouts/openxum.css?#{cacheBreaker}')
 
 block body
+  script(src='/javascripts/Global.js')
   script(src='/javascripts/AdminClient.js')
+
   script(language='javascript').
     var client = new AdminClient();
     client.start();

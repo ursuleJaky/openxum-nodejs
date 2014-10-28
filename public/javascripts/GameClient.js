@@ -44,7 +44,7 @@ var GameClient = function (u, g) {
                 return;
             }
 
-            connection = new WebSocket('ws://127.0.0.1:3000');
+            connection = new WebSocket('ws://' + WebSocketURL + ':' + WebSocketPort);
 
             connection.onopen = function () {
                 console.log('open');

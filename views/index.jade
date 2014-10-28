@@ -1,6 +1,4 @@
 extends ../layouts/default
-script(src='/javascripts/GameClient.js')
-
 
 block head
   title OpenXum
@@ -9,10 +7,13 @@ block neck
   link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
 block body
+  script(src='/javascripts/Global.js')
   script(src='/javascripts/InfoClient.js')
+
   script(language='javascript').
-      var client = new InfoClient();
-      client.start();
+    var client = new InfoClient();
+    client.start();
+
   div.row
     div.col-sm-10
       div.page-header
