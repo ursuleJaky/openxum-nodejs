@@ -1,10 +1,10 @@
 "use strict";
 
-Zertz.Gui = function (c, e, l) {
-
+Zertz.Gui = function (c, e, l, g) {
 // private attributes
-    var mycolor = c;
-    var engine = e;
+    var _color = c;
+    var _engine = e;
+    var _gui = g;
 
     var canvas;
     var context;
@@ -106,7 +106,7 @@ Zertz.Gui = function (c, e, l) {
             var number = compute_number(x, y);
 
             if (number !== -1) {
-                if (engine.exist_intersection(letter, number)) {
+                if (_engine.exist_intersection(letter, number)) {
                     var pt = compute_coordinates(letter.charCodeAt(0), number);
 
                     pointerX = pt[0];
@@ -158,7 +158,7 @@ Zertz.Gui = function (c, e, l) {
         var c = 0;
         var nc = [ 8, 7, 5, 3, 1 ];
 
-        while (i < engine.get_captured_black_marble_number(player)) {
+        while (i < _engine.get_captured_black_marble_number(player)) {
             if (player === Zertz.Color.ONE) {
                 draw_marble(20 + 30 * c, height - (20 + 30 * l), 25, Zertz.MarbleColor.BLACK);
             } else {
@@ -173,7 +173,7 @@ Zertz.Gui = function (c, e, l) {
         }
 
         i = 0;
-        while (i < engine.get_captured_grey_marble_number(player)) {
+        while (i < _engine.get_captured_grey_marble_number(player)) {
             if (player === Zertz.Color.ONE) {
                 draw_marble(20 + 30 * c, height - (20 + 30 * l), 25, Zertz.MarbleColor.GREY);
             } else {
@@ -188,7 +188,7 @@ Zertz.Gui = function (c, e, l) {
         }
 
         i = 0;
-        while (i < engine.get_captured_white_marble_number(player)) {
+        while (i < _engine.get_captured_white_marble_number(player)) {
             if (player === Zertz.Color.ONE) {
                 draw_marble(20 + 30 * c, height - (20 + 30 * l), 25, Zertz.MarbleColor.WHITE);
             } else {
@@ -233,8 +233,8 @@ Zertz.Gui = function (c, e, l) {
     }; */
 
     var draw_marbles = function () {
-        for (var index in engine.get_intersections()) {
-            var intersection = engine.get_intersections()[index];
+        for (var index in _engine.get_intersections()) {
+            var intersection = _engine.get_intersections()[index];
             var state = intersection.state();
 
             if (state !== Zertz.State.EMPTY) {
@@ -274,8 +274,8 @@ Zertz.Gui = function (c, e, l) {
     };
 
     var draw_rings = function () {
-        for (var index in engine.get_intersections()) {
-            var intersection = engine.get_intersections()[index];
+        for (var index in _engine.get_intersections()) {
+            var intersection = _engine.get_intersections()[index];
 
             if (intersection.state() !== Zertz.State.EMPTY) {
                 var pt = compute_coordinates(intersection.letter().charCodeAt(0), intersection.number());
@@ -291,7 +291,7 @@ Zertz.Gui = function (c, e, l) {
         var c = 0;
         var nc = [ 8, 7, 5, 3, 1 ];
 
-        while (i < engine.get_black_marble_number()) {
+        while (i < _engine.get_black_marble_number()) {
             draw_marble(20 + 30 * c, 20 + 30 * l, 25, Zertz.MarbleColor.BLACK);
             ++c;
             ++i;
@@ -302,7 +302,7 @@ Zertz.Gui = function (c, e, l) {
         }
 
         i = 0;
-        while (i < engine.get_grey_marble_number()) {
+        while (i < _engine.get_grey_marble_number()) {
             draw_marble(20 + 30 * c, 20 + 30 * l, 25, Zertz.MarbleColor.GREY);
             ++c;
             ++i;
@@ -313,7 +313,7 @@ Zertz.Gui = function (c, e, l) {
         }
 
         i = 0;
-        while (i < engine.get_white_marble_number()) {
+        while (i < _engine.get_white_marble_number()) {
             draw_marble(20 + 30 * c, 20 + 30 * l, 25, Zertz.MarbleColor.WHITE);
             ++c;
             ++i;
@@ -337,47 +337,49 @@ Zertz.Gui = function (c, e, l) {
     };
 
     var onClick = function (event) {
-        var pos = getClickPosition(event);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
 
-        if (engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
-            if (pointerX !== -1 && pointerY !== -1) {
-                selected_marble_in_pool = { x: pointerX, y: pointerY };
-                manager.play();
-            }
-        } else {
-            var letter = compute_letter(pos.x, pos.y);
+            if (_engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
+                if (pointerX !== -1 && pointerY !== -1) {
+                    selected_marble_in_pool = {x: pointerX, y: pointerY};
+                    manager.play();
+                }
+            } else {
+                var letter = compute_letter(pos.x, pos.y);
 
-            if (letter !== 'X') {
-                var number = compute_number(pos.x, pos.y);
+                if (letter !== 'X') {
+                    var number = compute_number(pos.x, pos.y);
 
-                if (number !== -1) {
-                    var ok = false;
-                    var coordinates;
+                    if (number !== -1) {
+                        var ok = false;
+                        var coordinates;
 
-                    if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
-                        if (engine.get_intersection(letter, number).state() === Zertz.State.VACANT) {
-                            selected_coordinates = new Zertz.Coordinates(letter, number);
-                            ok = true;
-                        }
-                    } else if (engine.phase() === Zertz.Phase.REMOVE_RING) {
-                        coordinates = new Zertz.Coordinates(letter, number);
-                        if (engine.verify_remove_ring(coordinates)) {
-                            selected_coordinates = coordinates;
-                            ok = true;
-                        }
-                    } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-                        coordinates = new Zertz.Coordinates(letter, number);
-                        if (selected_marble && engine.is_possible_capturing_marble_with(selected_marble, coordinates)) {
-                            selected_coordinates = coordinates;
-                            ok = true;
-                        } else {
-                            if (engine.is_possible_to_capture_with(engine.get_intersection(letter, number))) {
-                                selected_marble = coordinates;
+                        if (_engine.phase() === Zertz.Phase.PUT_MARBLE) {
+                            if (_engine.get_intersection(letter, number).state() === Zertz.State.VACANT) {
+                                selected_coordinates = new Zertz.Coordinates(letter, number);
+                                ok = true;
+                            }
+                        } else if (_engine.phase() === Zertz.Phase.REMOVE_RING) {
+                            coordinates = new Zertz.Coordinates(letter, number);
+                            if (_engine.verify_remove_ring(coordinates)) {
+                                selected_coordinates = coordinates;
+                                ok = true;
+                            }
+                        } else if (_engine.phase() === Zertz.Phase.CAPTURE) {
+                            coordinates = new Zertz.Coordinates(letter, number);
+                            if (selected_marble && _engine.is_possible_capturing_marble_with(selected_marble, coordinates)) {
+                                selected_coordinates = coordinates;
+                                ok = true;
+                            } else {
+                                if (_engine.is_possible_to_capture_with(_engine.get_intersection(letter, number))) {
+                                    selected_marble = coordinates;
+                                }
                             }
                         }
-                    }
-                    if (ok) {
-                        manager.play();
+                        if (ok) {
+                            manager.play();
+                        }
                     }
                 }
             }
@@ -390,7 +392,7 @@ Zertz.Gui = function (c, e, l) {
         var c = 0;
         var nc = [ 8, 7, 5, 3, 1 ];
 
-        while (i < engine.get_black_marble_number()) {
+        while (i < _engine.get_black_marble_number()) {
             if (ref_l === l && ref_c === c) {
                 return Zertz.MarbleColor.BLACK;
             }
@@ -403,7 +405,7 @@ Zertz.Gui = function (c, e, l) {
         }
 
         i = 0;
-        while (i < engine.get_grey_marble_number()) {
+        while (i < _engine.get_grey_marble_number()) {
             if (ref_l === l && ref_c === c) {
                 return Zertz.MarbleColor.GREY;
             }
@@ -416,7 +418,7 @@ Zertz.Gui = function (c, e, l) {
         }
 
         i = 0;
-        while (i < engine.get_white_marble_number()) {
+        while (i < _engine.get_white_marble_number()) {
             if (ref_l === l && ref_c === c) {
                 return Zertz.MarbleColor.WHITE;
             }
@@ -430,27 +432,38 @@ Zertz.Gui = function (c, e, l) {
     };
 
     var onMove = function (event) {
-        var pos = getClickPosition(event);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
 
-        if (engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
-            var l = Math.floor((pos.y - 8.5) / 30);
+            if (_engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
+                var l = Math.floor((pos.y - 8.5) / 30);
 
-            if (l < 6) {
-                var c = Math.floor(pos.x / 30);
-                var nc = [ 8, 7, 5, 3, 1 ];
+                if (l < 6) {
+                    var c = Math.floor(pos.x / 30);
+                    var nc = [8, 7, 5, 3, 1];
 
-                if (c < nc[l]) {
-                    var n = 0;
+                    if (c < nc[l]) {
+                        var n = 0;
 
-                    for (var i = 0; i < l; ++i) {
-                        n += nc[i];
-                    }
-                    n += c + 1;
-                    if (n <= engine.get_black_marble_number() + engine.get_grey_marble_number() + engine.get_white_marble_number()) {
-                        selected_color = find_marble_color(l, c);
-                        pointerX = 20 + 30 * c;
-                        pointerY = 20 + 30 * l;
-                        manager.redraw();
+                        for (var i = 0; i < l; ++i) {
+                            n += nc[i];
+                        }
+                        n += c + 1;
+                        if (n <= _engine.get_black_marble_number() + _engine.get_grey_marble_number() + _engine.get_white_marble_number()) {
+                            selected_color = find_marble_color(l, c);
+                            pointerX = 20 + 30 * c;
+                            pointerY = 20 + 30 * l;
+                            manager.redraw();
+                        }
+                    } else {
+                        if (pointerX !== -1 && pointerY !== -1) {
+                            pointerX = -1;
+                            pointerY = -1;
+                            manager.redraw();
+                        } else {
+                            pointerX = -1;
+                            pointerY = -1;
+                        }
                     }
                 } else {
                     if (pointerX !== -1 && pointerY !== -1) {
@@ -463,25 +476,22 @@ Zertz.Gui = function (c, e, l) {
                     }
                 }
             } else {
-                if (pointerX !== -1 && pointerY !== -1) {
-                    pointerX = -1;
-                    pointerY = -1;
-                    manager.redraw();
-                } else {
-                    pointerX = -1;
-                    pointerY = -1;
-                }
-            }
-        } else {
-            var change = pointerX !== -1 && pointerY !== -1;
-            var letter = compute_letter(pos.x, pos.y);
+                var change = pointerX !== -1 && pointerY !== -1;
+                var letter = compute_letter(pos.x, pos.y);
 
-            if (letter !== 'X') {
-                var number = compute_number(pos.x, pos.y);
+                if (letter !== 'X') {
+                    var number = compute_number(pos.x, pos.y);
 
-                if (number !== -1) {
-                    if (compute_pointer(pos.x, pos.y)) {
-                        manager.redraw();
+                    if (number !== -1) {
+                        if (compute_pointer(pos.x, pos.y)) {
+                            manager.redraw();
+                        }
+                    } else {
+                        if (change) {
+                            pointerX = -1;
+                            pointerY = -1;
+                            manager.redraw();
+                        }
                     }
                 } else {
                     if (change) {
@@ -489,12 +499,6 @@ Zertz.Gui = function (c, e, l) {
                         pointerY = -1;
                         manager.redraw();
                     }
-                }
-            } else {
-                if (change) {
-                    pointerX = -1;
-                    pointerY = -1;
-                    manager.redraw();
                 }
             }
         }
@@ -552,7 +556,7 @@ Zertz.Gui = function (c, e, l) {
     };
 
     var show_possible_capturing_marbles = function () {
-        var list = engine.get_possible_capturing_marbles(selected_marble);
+        var list = _engine.get_possible_capturing_marbles(selected_marble);
 
         for (var index = 0; index < list.length; ++index) {
             var pt = compute_coordinates(list[index].letter().charCodeAt(0), list[index].number());
@@ -568,7 +572,7 @@ Zertz.Gui = function (c, e, l) {
     };
 
     var show_possible_capture = function () {
-        var list = engine.get_can_capture_marbles();
+        var list = _engine.get_can_capture_marbles();
 
         for (var index = 0; index < list.length; ++index) {
             var pt = compute_coordinates(list[index].letter().charCodeAt(0), list[index].number());
@@ -584,7 +588,7 @@ Zertz.Gui = function (c, e, l) {
     };
 
     var show_possible_removing_rings = function () {
-        var list = engine.get_possible_removing_rings();
+        var list = _engine.get_possible_removing_rings();
 
         for (var index = 0; index < list.length; ++index) {
             var pt = compute_coordinates(list[index].letter().charCodeAt(0), list[index].number());
@@ -613,7 +617,7 @@ Zertz.Gui = function (c, e, l) {
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.draw = function () {
@@ -633,16 +637,16 @@ Zertz.Gui = function (c, e, l) {
 
         draw_captured_marbles();
 
-        if (engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
+        if (_engine.phase() === Zertz.Phase.SELECT_MARBLE_IN_POOL) {
             show_marble_in_pool();
         }
-        if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
+        if (_engine.phase() === Zertz.Phase.PUT_MARBLE) {
             show_selected_marble_in_pool();
         }
-        if (engine.phase() === Zertz.Phase.REMOVE_RING) {
+        if (_engine.phase() === Zertz.Phase.REMOVE_RING) {
             show_possible_removing_rings();
         }
-        if (engine.phase() === Zertz.Phase.CAPTURE) {
+        if (_engine.phase() === Zertz.Phase.CAPTURE) {
             if (selected_marble) {
                 show_possible_capturing_marbles();
             } else {
@@ -651,28 +655,28 @@ Zertz.Gui = function (c, e, l) {
         }
 
         // intersection
-        if (engine.phase() === Zertz.Phase.PUT_MARBLE || engine.phase() === Zertz.Phase.REMOVE_RING) {
+        if (_engine.phase() === Zertz.Phase.PUT_MARBLE || _engine.phase() === Zertz.Phase.REMOVE_RING) {
             show_intersection();
         }
     };
 
     this.engine = function () {
-        return engine;
+        return _engine;
     };
 
     this.get_move = function () {
         var move = null;
 
-        if (engine.phase() === Zertz.Phase.PUT_MARBLE) {
-            move = new Zertz.Move(Zertz.MoveType.PUT_MARBLE, engine.current_color(), this.get_selected_coordinates(),
+        if (_engine.phase() === Zertz.Phase.PUT_MARBLE) {
+            move = new Zertz.Move(Zertz.MoveType.PUT_MARBLE, _engine.current_color(), this.get_selected_coordinates(),
                 this.get_selected_color(), null);
-        } else if (engine.phase() === Zertz.Phase.REMOVE_RING) {
-            move = new Zertz.Move(Zertz.MoveType.REMOVE_RING, engine.current_color(), this.get_selected_coordinates(),
+        } else if (_engine.phase() === Zertz.Phase.REMOVE_RING) {
+            move = new Zertz.Move(Zertz.MoveType.REMOVE_RING, _engine.current_color(), this.get_selected_coordinates(),
                 null, null);
-        } else if (engine.phase() === Zertz.Phase.CAPTURE) {
-            var state = engine.get_intersection_state(this.get_selected_marble().letter(), this.get_selected_marble().number());
+        } else if (_engine.phase() === Zertz.Phase.CAPTURE) {
+            var state = _engine.get_intersection_state(this.get_selected_marble().letter(), this.get_selected_marble().number());
 
-            move = new Zertz.Move(Zertz.MoveType.CAPTURE, engine.current_color(), this.get_selected_coordinates(),
+            move = new Zertz.Move(Zertz.MoveType.CAPTURE, _engine.current_color(), this.get_selected_coordinates(),
                 (state === Zertz.State.BLACK_MARBLE ? Zertz.MarbleColor.BLACK :
                     (state === Zertz.State.WHITE_MARBLE ? Zertz.MarbleColor.WHITE : Zertz.MarbleColor.GREY)), this.get_selected_marble());
         }

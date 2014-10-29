@@ -1,9 +1,10 @@
 "use strict";
 
-Dvonn.Gui = function (c, e, l) {
+Dvonn.Gui = function (c, e, l, g) {
 // private attributes
-    var engine = e;
-    var mycolor = c;
+    var _engine = e;
+    var _color = c;
+    var _gui = g;
 
     var canvas;
     var context;
@@ -32,7 +33,7 @@ Dvonn.Gui = function (c, e, l) {
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.draw = function () {
@@ -54,27 +55,27 @@ Dvonn.Gui = function (c, e, l) {
         //intersection
         show_intersection();
 
-        if (engine.phase() === Dvonn.Phase.MOVE_STACK && selected_piece && selected_piece.is_valid()) {
+        if (_engine.phase() === Dvonn.Phase.MOVE_STACK && selected_piece && selected_piece.is_valid()) {
             draw_possible_moving();
          }
     };
 
     this.engine = function () {
-        return engine;
+        return _engine;
     };
 
     this.get_move = function () {
         var move = null;
 
-        if (engine.phase() === Dvonn.Phase.PUT_DVONN_PIECE) {
-            move = new Dvonn.Move(Dvonn.Phase.PUT_DVONN_PIECE, engine.current_color(), this.get_selected_coordinates());
-        } else if (engine.phase() === Dvonn.Phase.PUT_PIECE) {
-            move = new Dvonn.Move(Dvonn.Phase.PUT_PIECE, engine.current_color(), this.get_selected_coordinates());
-        } else if (engine.phase() === Dvonn.Phase.MOVE_STACK) {
-            var e = engine.clone();
+        if (_engine.phase() === Dvonn.Phase.PUT_DVONN_PIECE) {
+            move = new Dvonn.Move(Dvonn.Phase.PUT_DVONN_PIECE, _engine.current_color(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Dvonn.Phase.PUT_PIECE) {
+            move = new Dvonn.Move(Dvonn.Phase.PUT_PIECE, _engine.current_color(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Dvonn.Phase.MOVE_STACK) {
+            var e = _engine.clone();
 
             e.move_stack(this.get_selected_piece(), this.get_selected_coordinates());
-            move = new Dvonn.Move(Dvonn.Phase.MOVE_STACK, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates(), e.remove_isolated_stacks());
+            move = new Dvonn.Move(Dvonn.Phase.MOVE_STACK, _engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates(), e.remove_isolated_stacks());
         }
         return move;
     };
@@ -190,7 +191,7 @@ Dvonn.Gui = function (c, e, l) {
             var number = compute_number(x, y);
 
             if (number != -1) {
-                if (engine.exist_intersection(letter, number)) {
+                if (_engine.exist_intersection(letter, number)) {
                     var pt = compute_coordinates(letter.charCodeAt(0), number);
 
                     pointerX = pt[0];
@@ -290,7 +291,7 @@ Dvonn.Gui = function (c, e, l) {
     };
 
     var draw_possible_moving = function() {
-        var list = engine.get_stack_possible_move(selected_piece);
+        var list = _engine.get_stack_possible_move(selected_piece);
 
         for (var index in list) {
             var coordinates = list[index];
@@ -334,8 +335,8 @@ Dvonn.Gui = function (c, e, l) {
     };
 
     var draw_state = function () {
-        for (var index in engine.get_intersections()) {
-            var intersection = engine.get_intersections()[index];
+        for (var index in _engine.get_intersections()) {
+            var intersection = _engine.get_intersections()[index];
 
             if (intersection.state() === Dvonn.State.NO_VACANT) {
                 var pt = compute_coordinates(intersection.letter().charCodeAt(0), intersection.number());
@@ -391,58 +392,62 @@ Dvonn.Gui = function (c, e, l) {
     };
 
     var onClick = function (event) {
-        var pos = getClickPosition(event);
-        var letter = compute_letter(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var letter = compute_letter(pos.x, pos.y);
 
-        if (letter !== 'X') {
-            var number = compute_number(pos.x, pos.y);
+            if (letter !== 'X') {
+                var number = compute_number(pos.x, pos.y);
 
-            if (number !== -1) {
-                var ok = false;
+                if (number !== -1) {
+                    var ok = false;
 
-                if (engine.phase() === Dvonn.Phase.PUT_DVONN_PIECE && engine.get_intersection(letter, number).state() === Dvonn.State.VACANT) {
-                    selected_coordinates = new Dvonn.Coordinates(letter, number);
-                    ok = true;
-                } else if (engine.phase() === Dvonn.Phase.PUT_PIECE && engine.get_intersection(letter, number).state() === Dvonn.State.VACANT) {
-                    selected_coordinates = new Dvonn.Coordinates(letter, number);
-                    ok = true;
-                } else if (engine.phase() === Dvonn.Phase.MOVE_STACK && engine.get_intersection(letter, number).state() === Dvonn.State.NO_VACANT) {
-                    if (selected_piece && selected_piece.is_valid()) {
-                        if (engine.verify_moving(selected_piece, new Dvonn.Coordinates(letter, number))) {
-                            selected_coordinates = new Dvonn.Coordinates(letter, number);
-                            ok = true;
-                        }
-                    } else {
-                        var coordinates = new Dvonn.Coordinates(letter, number);
+                    if (_engine.phase() === Dvonn.Phase.PUT_DVONN_PIECE && _engine.get_intersection(letter, number).state() === Dvonn.State.VACANT) {
+                        selected_coordinates = new Dvonn.Coordinates(letter, number);
+                        ok = true;
+                    } else if (_engine.phase() === Dvonn.Phase.PUT_PIECE && _engine.get_intersection(letter, number).state() === Dvonn.State.VACANT) {
+                        selected_coordinates = new Dvonn.Coordinates(letter, number);
+                        ok = true;
+                    } else if (_engine.phase() === Dvonn.Phase.MOVE_STACK && _engine.get_intersection(letter, number).state() === Dvonn.State.NO_VACANT) {
+                        if (selected_piece && selected_piece.is_valid()) {
+                            if (_engine.verify_moving(selected_piece, new Dvonn.Coordinates(letter, number))) {
+                                selected_coordinates = new Dvonn.Coordinates(letter, number);
+                                ok = true;
+                            }
+                        } else {
+                            var coordinates = new Dvonn.Coordinates(letter, number);
 
-                        if (engine.can_move(coordinates)) {
-                            var color = engine.get_intersection(letter, number).color();
+                            if (_engine.can_move(coordinates)) {
+                                var color = _engine.get_intersection(letter, number).color();
 
-                            if (color !== Dvonn.Color.RED && engine.current_color() === color) {
-                                selected_piece = coordinates;
-                                selected_color = color;
-                                manager.redraw();
+                                if (color !== Dvonn.Color.RED && _engine.current_color() === color) {
+                                    selected_piece = coordinates;
+                                    selected_color = color;
+                                    manager.redraw();
+                                }
                             }
                         }
                     }
-                }
-                if (ok) {
-                    manager.play();
+                    if (ok) {
+                        manager.play();
+                    }
                 }
             }
         }
     };
 
     var onMove = function (event) {
-        var pos = getClickPosition(event);
-        var letter = compute_letter(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var letter = compute_letter(pos.x, pos.y);
 
-        if (letter != 'X') {
-            var number = compute_number(pos.x, pos.y);
+            if (letter != 'X') {
+                var number = compute_number(pos.x, pos.y);
 
-            if (number != -1) {
-                if (compute_pointer(pos.x, pos.y)) {
-                    manager.redraw();
+                if (number != -1) {
+                    if (compute_pointer(pos.x, pos.y)) {
+                        manager.redraw();
+                    }
                 }
             }
         }

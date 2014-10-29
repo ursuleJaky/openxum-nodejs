@@ -1,9 +1,10 @@
 "use strict";
 
-Gipf.Gui = function (c, e, l) {
+Gipf.Gui = function (c, e, l, g) {
 // private attributes
-    var engine = e;
-    var mycolor = c;
+    var _engine = e;
+    var _color = c;
+    var _gui = g;
 
     var canvas;
     var context;
@@ -31,7 +32,7 @@ Gipf.Gui = function (c, e, l) {
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.draw = function () {
@@ -56,11 +57,11 @@ Gipf.Gui = function (c, e, l) {
         //intersection
         show_intersection();
 
-        if (engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
+        if (_engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
             show_possible_first_putting();
-        } else if (engine.phase() === Gipf.Phase.PUT_PIECE) {
+        } else if (_engine.phase() === Gipf.Phase.PUT_PIECE) {
             show_possible_putting();
-        } else if (engine.phase() === Gipf.Phase.PUSH_PIECE && engine.current_color() === mycolor) {
+        } else if (_engine.phase() === Gipf.Phase.PUSH_PIECE && _engine.current_color() === _color) {
             show_possible_pushing();
         }
         /*else if (parent()->phase() == Gui::REMOVE_ROWS) {
@@ -69,22 +70,22 @@ Gipf.Gui = function (c, e, l) {
     };
 
     this.engine = function () {
-        return engine;
+        return _engine;
     };
 
     this.get_move = function () {
         var move = null;
 
-        if (engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
-            move = new Gipf.Move(Gipf.MoveType.PUT_FIRST_PIECE, engine.current_color(), this.get_selected_coordinates());
-        } else if (engine.phase() === Gipf.Phase.PUT_PIECE) {
-            move = new Gipf.Move(Gipf.MoveType.PUT_PIECE, engine.current_color(), this.get_selected_piece());
-        } else if (engine.phase() === Gipf.Phase.PUSH_PIECE) {
-            move = new Gipf.Move(Gipf.MoveType.PUSH_PIECE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
-        } else if (engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER) {
-            move = new Gipf.Move(Gipf.MoveType.REMOVE_ROW_AFTER, engine.current_color(), this.get_selected_coordinates());
-        } else if (engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
-            move = new Gipf.Move(Gipf.MoveType.REMOVE_ROW_BEFORE, engine.current_color(), this.get_selected_coordinates());
+        if (_engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
+            move = new Gipf.Move(Gipf.MoveType.PUT_FIRST_PIECE, _engine.current_color(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Gipf.Phase.PUT_PIECE) {
+            move = new Gipf.Move(Gipf.MoveType.PUT_PIECE, _engine.current_color(), this.get_selected_piece());
+        } else if (_engine.phase() === Gipf.Phase.PUSH_PIECE) {
+            move = new Gipf.Move(Gipf.MoveType.PUSH_PIECE, _engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER) {
+            move = new Gipf.Move(Gipf.MoveType.REMOVE_ROW_AFTER, _engine.current_color(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
+            move = new Gipf.Move(Gipf.MoveType.REMOVE_ROW_BEFORE, _engine.current_color(), this.get_selected_coordinates());
         }
         return move;
     };
@@ -137,7 +138,7 @@ Gipf.Gui = function (c, e, l) {
 
     this.unselect = function () {
         selected_coordinates = null;
-        if (engine.phase() !== Gipf.Phase.PUSH_PIECE) {
+        if (_engine.phase() !== Gipf.Phase.PUSH_PIECE) {
             selected_piece = null;
         }
     };
@@ -215,7 +216,7 @@ Gipf.Gui = function (c, e, l) {
             var number = compute_number(x, y);
 
             if (number != -1) {
-                if (engine.exist_intersection(letter, number)) {
+                if (_engine.exist_intersection(letter, number)) {
                     var pt = compute_coordinates(letter.charCodeAt(0), number);
 
                     pointerX = pt[0];
@@ -365,7 +366,7 @@ Gipf.Gui = function (c, e, l) {
         context.lineWidth = 1;
         context.strokeStyle = "#000000";
         context.fillStyle = "#000000";
-        for (var i = 0; i < engine.get_black_piece_number(); ++i) {
+        for (var i = 0; i < _engine.get_black_piece_number(); ++i) {
             context.beginPath();
             context.rect(10 + i * 10, 10, 5, 15);
             context.closePath();
@@ -373,7 +374,7 @@ Gipf.Gui = function (c, e, l) {
             context.fill();
         }
         context.fillStyle = "#ffffff";
-        for (var i = 0; i < engine.get_white_piece_number(); ++i) {
+        for (var i = 0; i < _engine.get_white_piece_number(); ++i) {
             context.beginPath();
             context.rect(10 + i * 10, 30, 5, 15);
             context.closePath();
@@ -383,17 +384,17 @@ Gipf.Gui = function (c, e, l) {
         context.lineWidth = 3;
         context.strokeStyle = "#ff0000";
         context.fillStyle = "#000000";
-        for (var i = 0; i < engine.get_black_captured_piece_number(); ++i) {
+        for (var i = 0; i < _engine.get_black_captured_piece_number(); ++i) {
             context.beginPath();
-            context.rect(10 + (engine.get_black_piece_number() + i) * 10, 10, 5, 15);
+            context.rect(10 + (_engine.get_black_piece_number() + i) * 10, 10, 5, 15);
             context.closePath();
             context.stroke();
             context.fill();
         }
         context.fillStyle = "#ffffff";
-        for (var i = 0; i < engine.get_white_captured_piece_number(); ++i) {
+        for (var i = 0; i < _engine.get_white_captured_piece_number(); ++i) {
             context.beginPath();
-            context.rect(10 + (engine.get_white_piece_number() + i) * 10, 30, 5, 15);
+            context.rect(10 + (_engine.get_white_piece_number() + i) * 10, 30, 5, 15);
             context.closePath();
             context.stroke();
             context.fill();
@@ -401,8 +402,8 @@ Gipf.Gui = function (c, e, l) {
     };
 
     var draw_rows = function () {
-        if (engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER || engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
-            var srows = [engine.get_rows(engine.current_color())];
+        if (_engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER || _engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
+            var srows = [_engine.get_rows(_engine.current_color())];
 
             for (var i = 0; i < srows.length; ++i) {
                 for (var j = 0; j < srows[i].length; ++j) {
@@ -477,8 +478,8 @@ Gipf.Gui = function (c, e, l) {
     };
 
     var draw_state = function () {
-        for (var index in engine.get_intersections()) {
-            var intersection = engine.get_intersections()[index];
+        for (var index in _engine.get_intersections()) {
+            var intersection = _engine.get_intersections()[index];
 
             if (intersection.state() != Gipf.State.VACANT) {
                 var pt = compute_coordinates(intersection.letter().charCodeAt(0), intersection.number());
@@ -501,51 +502,55 @@ Gipf.Gui = function (c, e, l) {
     };
 
     var onClick = function (event) {
-        var pos = getClickPosition(event);
-        var letter = compute_letter(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var letter = compute_letter(pos.x, pos.y);
 
-        if (letter !== 'X') {
-            var number = compute_number(pos.x, pos.y);
+            if (letter !== 'X') {
+                var number = compute_number(pos.x, pos.y);
 
-            if (number !== -1) {
-                var ok = false;
+                if (number !== -1) {
+                    var ok = false;
 
-                if (engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
-                    if (engine.verify_first_putting(letter, number)) {
+                    if (_engine.phase() === Gipf.Phase.PUT_FIRST_PIECE) {
+                        if (_engine.verify_first_putting(letter, number)) {
+                            selected_coordinates = new Gipf.Coordinates(letter, number);
+                            ok = true;
+                        }
+                    } else if (_engine.phase() === Gipf.Phase.PUT_PIECE) {
+                        if (_engine.verify_putting(letter, number)) {
+                            selected_piece = new Gipf.Coordinates(letter, number);
+                            ok = true;
+                        }
+                    } else if (_engine.phase() === Gipf.Phase.PUSH_PIECE) {
+                        if (_engine.verify_pushing(selected_piece, letter, number)) {
+                            selected_coordinates = new Gipf.Coordinates(letter, number);
+                            ok = true;
+                        }
+                    } else if (_engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER || _engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
                         selected_coordinates = new Gipf.Coordinates(letter, number);
                         ok = true;
                     }
-                } else if (engine.phase() === Gipf.Phase.PUT_PIECE) {
-                    if (engine.verify_putting(letter, number)) {
-                        selected_piece = new Gipf.Coordinates(letter, number);
-                        ok = true;
+                    if (ok) {
+                        manager.play();
                     }
-                } else if (engine.phase() === Gipf.Phase.PUSH_PIECE) {
-                    if (engine.verify_pushing(selected_piece, letter, number)) {
-                        selected_coordinates = new Gipf.Coordinates(letter, number);
-                        ok = true;
-                    }
-                } else if (engine.phase() === Gipf.Phase.REMOVE_ROW_AFTER || engine.phase() === Gipf.Phase.REMOVE_ROW_BEFORE) {
-                    selected_coordinates = new Gipf.Coordinates(letter, number);
-                    ok = true;
-                }
-                if (ok) {
-                    manager.play();
                 }
             }
         }
     };
 
     var onMove = function (event) {
-        var pos = getClickPosition(event);
-        var letter = compute_letter(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var letter = compute_letter(pos.x, pos.y);
 
-        if (letter !== 'X') {
-            var number = compute_number(pos.x, pos.y);
+            if (letter !== 'X') {
+                var number = compute_number(pos.x, pos.y);
 
-            if (number !== -1) {
-                if (compute_pointer(pos.x, pos.y)) {
-                    manager.redraw();
+                if (number !== -1) {
+                    if (compute_pointer(pos.x, pos.y)) {
+                        manager.redraw();
+                    }
                 }
             }
         }
@@ -578,7 +583,7 @@ Gipf.Gui = function (c, e, l) {
     };
 
     var show_possible_first_putting = function () {
-        var list = engine.get_possible_first_putting_list();
+        var list = _engine.get_possible_first_putting_list();
 
         for (var index in list) {
             var coordinates = list[index];
@@ -595,7 +600,7 @@ Gipf.Gui = function (c, e, l) {
     };
 
     var show_possible_pushing = function () {
-        var list = engine.get_possible_pushing_list(selected_piece);
+        var list = _engine.get_possible_pushing_list(selected_piece);
 
         for (var index in list) {
             var coordinates = list[index];
@@ -612,7 +617,7 @@ Gipf.Gui = function (c, e, l) {
     };
 
     var show_possible_putting = function () {
-        var list = engine.get_possible_putting_list();
+        var list = _engine.get_possible_putting_list();
 
         for (var index in list) {
             var coordinates = list[index];

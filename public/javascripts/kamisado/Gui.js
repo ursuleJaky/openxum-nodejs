@@ -1,10 +1,11 @@
 "use strict";
 
-Kamisado.Gui = function (c, e, l) {
+Kamisado.Gui = function (c, e, l, g) {
 
 // private attributes
-    var engine = e;
-    var mycolor = c;
+    var _engine = e;
+    var _color = c;
+    var _gui = g;
 
     var canvas;
     var context;
@@ -61,8 +62,8 @@ Kamisado.Gui = function (c, e, l) {
 
             context.beginPath();
             context.lineWidth = 2;
-            context.strokeStyle = engine.current_color === Kamisado.Color.BLACK ? "#ffffff" : "#000000";
-            context.fillStyle = engine.current_color === Kamisado.Color.BLACK ? "#000000" : "#ffffff";
+            context.strokeStyle = _engine.current_color === Kamisado.Color.BLACK ? "#ffffff" : "#000000";
+            context.fillStyle = _engine.current_color === Kamisado.Color.BLACK ? "#000000" : "#ffffff";
             context.arc(x, y, deltaX / 3, 0.0, 2 * Math.PI, false);
             context.stroke();
             context.fill();
@@ -96,14 +97,14 @@ Kamisado.Gui = function (c, e, l) {
         var tower;
 
         for (i = 0; i < 8; ++i) {
-            tower = engine.get_white_towers()[i];
+            tower = _engine.get_white_towers()[i];
             if (!hidden || (hidden && (selected_tower.x !== tower.x || selected_tower.y !== tower.y))) {
                 draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY + 4,
                         deltaX - 10, deltaY - 10, "#ffffff", tower.color);
             }
         }
         for (i = 0; i < 8; ++i) {
-            tower = engine.get_black_towers()[i];
+            tower = _engine.get_black_towers()[i];
             if (!hidden || (hidden && (selected_tower.x !== tower.x || selected_tower.y !== tower.y))) {
                 draw_tower(offsetX + tower.x * deltaX + 4, offsetY + tower.y * deltaY + 4,
                         deltaX - 10, deltaY - 10, "#000000", tower.color);
@@ -142,15 +143,15 @@ Kamisado.Gui = function (c, e, l) {
     };
 
     var show_selectable_tower = function () {
-        if (engine.get_play_color()) {
-            var selectable_tower = engine.find_playable_tower(engine.current_color());
+        if (_engine.get_play_color()) {
+            var selectable_tower = _engine.find_playable_tower(_engine.current_color());
             var x = offsetX + deltaX / 2 + selectable_tower.x * deltaX;
             var y = offsetY + deltaY / 2 + selectable_tower.y * deltaY;
 
             context.beginPath();
             context.lineWidth = 2;
-            context.strokeStyle = engine.current_color !== Kamisado.Color.BLACK ? "#ffffff" : "#000000";
-            context.fillStyle = engine.current_color !== Kamisado.Color.BLACK ? "#000000" : "#ffffff";
+            context.strokeStyle = _engine.current_color !== Kamisado.Color.BLACK ? "#ffffff" : "#000000";
+            context.fillStyle = _engine.current_color !== Kamisado.Color.BLACK ? "#000000" : "#ffffff";
             context.arc(x, y, deltaX / 4, 0.0, 2 * Math.PI, false);
             context.stroke();
             context.fill();
@@ -187,10 +188,10 @@ Kamisado.Gui = function (c, e, l) {
         var found = false;
         var towers;
 
-        if (engine.current_color() === Kamisado.Color.BLACK) {
-            towers = engine.get_black_towers();
+        if (_engine.current_color() === Kamisado.Color.BLACK) {
+            towers = _engine.get_black_towers();
         } else {
-            towers = engine.get_white_towers();
+            towers = _engine.get_white_towers();
         }
         while (!found && k < 8) {
             if (towers[k].x === coordinates.x && towers[k].y === coordinates.y) {
@@ -200,7 +201,7 @@ Kamisado.Gui = function (c, e, l) {
             }
         }
         if (found) {
-            return { x: towers[k].x, y: towers[k].y, color: engine.current_color(), tower_color: towers[k].color };
+            return { x: towers[k].x, y: towers[k].y, color: _engine.current_color(), tower_color: towers[k].color };
         } else {
             return null;
         }
@@ -251,32 +252,34 @@ Kamisado.Gui = function (c, e, l) {
     };
 
     var onClick = function (event) {
-        var pos = getClickPosition(event);
-        var select = find_tower(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var select = find_tower(pos.x, pos.y);
 
-        if (select) {
-            if (select.color === engine.current_color()) {
-                if (engine.phase() === Kamisado.Phase.MOVE_TOWER &&
-                    (!engine.get_play_color() || select.tower_color === engine.get_play_color())) {
-                    selected_tower = select;
-                    possible_move_list = engine.get_possible_moving_list(selected_tower);
-                    manager.play();
+            if (select) {
+                if (select.color === _engine.current_color()) {
+                    if (_engine.phase() === Kamisado.Phase.MOVE_TOWER &&
+                        (!_engine.get_play_color() || select.tower_color === _engine.get_play_color())) {
+                        selected_tower = select;
+                        possible_move_list = _engine.get_possible_moving_list(selected_tower);
+                        manager.play();
+                    }
                 }
-            }
-        } else {
-            var coordinates = compute_coordinates(pos.x, pos.y);
+            } else {
+                var coordinates = compute_coordinates(pos.x, pos.y);
 
-            if (engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list && engine.is_possible_move(coordinates, possible_move_list)) {
-                selected_cell = coordinates;
-                possible_move_list = null;
-                animate(engine.current_color());
+                if (_engine.phase() === Kamisado.Phase.MOVE_TOWER && possible_move_list && _engine.is_possible_move(coordinates, possible_move_list)) {
+                    selected_cell = coordinates;
+                    possible_move_list = null;
+                    animate(_engine.current_color());
+                }
             }
         }
     };
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.draw = function () {
@@ -284,11 +287,11 @@ Kamisado.Gui = function (c, e, l) {
     };
 
     this.engine = function () {
-        return engine;
+        return _engine;
     };
 
     this.get_move = function () {
-        if (engine.phase() === Kamisado.Phase.MOVE_TOWER && selected_tower && selected_cell) {
+        if (_engine.phase() === Kamisado.Phase.MOVE_TOWER && selected_tower && selected_cell) {
             return new Kamisado.Move(selected_tower, selected_cell);
         }
         return null;
@@ -312,7 +315,7 @@ Kamisado.Gui = function (c, e, l) {
 
     this.move = function (move, color) {
         selected_tower = move.from();
-        selected_tower = engine.find_tower(move.from(), color);
+        selected_tower = _engine.find_tower(move.from(), color);
         selected_cell = move.to();
         animate(color);
     };

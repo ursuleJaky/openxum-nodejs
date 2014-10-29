@@ -1,9 +1,10 @@
 "use strict";
 
-Tzaar.Gui = function (c, e, l) {
+Tzaar.Gui = function (c, e, l, g) {
 // private attributes
-    var engine = e;
-    var mycolor = c;
+    var _engine = e;
+    var _color = c;
+    var _gui = g;
 
     var canvas;
     var context;
@@ -34,7 +35,7 @@ Tzaar.Gui = function (c, e, l) {
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.draw = function () {
@@ -56,37 +57,37 @@ Tzaar.Gui = function (c, e, l) {
         //intersection
         show_intersection();
 
-        if (engine.phase() === Tzaar.Phase.CHOOSE || engine.phase() === Tzaar.Phase.SECOND_CAPTURE || engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
+        if (_engine.phase() === Tzaar.Phase.CHOOSE || _engine.phase() === Tzaar.Phase.SECOND_CAPTURE || _engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
             draw_choice();
         }
 
-        if ((engine.phase() === Tzaar.Phase.FIRST_MOVE || engine.phase() === Tzaar.Phase.CAPTURE ||
-            engine.phase() === Tzaar.Phase.SECOND_CAPTURE) && selected_piece && selected_piece.is_valid()) {
+        if ((_engine.phase() === Tzaar.Phase.FIRST_MOVE || _engine.phase() === Tzaar.Phase.CAPTURE ||
+            _engine.phase() === Tzaar.Phase.SECOND_CAPTURE) && selected_piece && selected_piece.is_valid()) {
             draw_possible_capture();
         }
 
-        if (engine.phase() === Tzaar.Phase.MAKE_STRONGER && selected_piece && selected_piece.is_valid()) {
+        if (_engine.phase() === Tzaar.Phase.MAKE_STRONGER && selected_piece && selected_piece.is_valid()) {
             draw_possible_make_stack();
         }
     };
 
     this.engine = function () {
-        return engine;
+        return _engine;
     };
 
     this.get_move = function () {
         var move = null;
 
-        if (engine.phase() === Tzaar.Phase.FIRST_MOVE) {
-            move = new Tzaar.Move(Tzaar.MoveType.FIRST_MOVE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
-        } else if (engine.phase() === Tzaar.Phase.CAPTURE) {
-            move = new Tzaar.Move(Tzaar.MoveType.CAPTURE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
-        } else if (engine.phase() === Tzaar.Phase.CHOOSE) {
-            move = new Tzaar.Move(Tzaar.MoveType.CHOOSE, engine.current_color(), null, null, this.get_selected_capture() ? Tzaar.Phase.SECOND_CAPTURE : this.get_selected_make_stack() ? Tzaar.Phase.MAKE_STRONGER : Tzaar.Phase.PASS);
-        } else if (engine.phase() === Tzaar.Phase.SECOND_CAPTURE) {
-            move = new Tzaar.Move(Tzaar.MoveType.SECOND_CAPTURE, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
-        } else if (engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
-            move = new Tzaar.Move(Tzaar.MoveType.MAKE_STRONGER, engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        if (_engine.phase() === Tzaar.Phase.FIRST_MOVE) {
+            move = new Tzaar.Move(Tzaar.MoveType.FIRST_MOVE, _engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Tzaar.Phase.CAPTURE) {
+            move = new Tzaar.Move(Tzaar.MoveType.CAPTURE, _engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Tzaar.Phase.CHOOSE) {
+            move = new Tzaar.Move(Tzaar.MoveType.CHOOSE, _engine.current_color(), null, null, this.get_selected_capture() ? Tzaar.Phase.SECOND_CAPTURE : this.get_selected_make_stack() ? Tzaar.Phase.MAKE_STRONGER : Tzaar.Phase.PASS);
+        } else if (_engine.phase() === Tzaar.Phase.SECOND_CAPTURE) {
+            move = new Tzaar.Move(Tzaar.MoveType.SECOND_CAPTURE, _engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
+        } else if (_engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
+            move = new Tzaar.Move(Tzaar.MoveType.MAKE_STRONGER, _engine.current_color(), this.get_selected_piece(), this.get_selected_coordinates());
         }
         return move;
     };
@@ -150,7 +151,7 @@ Tzaar.Gui = function (c, e, l) {
     };
 
     this.unselect = function (all) {
-        if (engine.phase() === Tzaar.Phase.FIRST_MOVE || engine.phase() === Tzaar.Phase.CAPTURE || engine.phase() === Tzaar.Phase.CHOOSE) {
+        if (_engine.phase() === Tzaar.Phase.FIRST_MOVE || _engine.phase() === Tzaar.Phase.CAPTURE || _engine.phase() === Tzaar.Phase.CHOOSE) {
             selected_capture = false;
             selected_make_stack = false;
             selected_pass = false;
@@ -225,7 +226,7 @@ Tzaar.Gui = function (c, e, l) {
             var number = compute_number(x, y);
 
             if (number != -1) {
-                if (engine.exist_intersection(letter, number)) {
+                if (_engine.exist_intersection(letter, number)) {
                     var pt = compute_coordinates(letter.charCodeAt(0), number);
 
                     pointerX = pt[0];
@@ -509,7 +510,7 @@ Tzaar.Gui = function (c, e, l) {
     };
 
     var draw_possible_capture = function () {
-        var list = engine.get_possible_capture(selected_piece);
+        var list = _engine.get_possible_capture(selected_piece);
 
         for (var index in list) {
             var pt;
@@ -526,7 +527,7 @@ Tzaar.Gui = function (c, e, l) {
     };
 
     var draw_possible_make_stack = function () {
-        var list = engine.get_possible_make_stack(selected_piece);
+        var list = _engine.get_possible_make_stack(selected_piece);
 
         for (var index in list) {
             var pt;
@@ -543,8 +544,8 @@ Tzaar.Gui = function (c, e, l) {
     };
 
     var draw_state = function () {
-        for (var index in engine.get_intersections()) {
-            var intersection = engine.get_intersections()[index];
+        for (var index in _engine.get_intersections()) {
+            var intersection = _engine.get_intersections()[index];
 
             if (intersection.state() === Tzaar.State.NO_VACANT) {
                 var pt = compute_coordinates(intersection.letter().charCodeAt(0), intersection.number());
@@ -591,70 +592,74 @@ Tzaar.Gui = function (c, e, l) {
     };
 
     var onClick = function (event) {
-        var pos = getClickPosition(event);
-        var letter = compute_letter(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var letter = compute_letter(pos.x, pos.y);
 
-        if (engine.phase() != Tzaar.Phase.CHOOSE) {
-            if (letter != 'X') {
-                var number = compute_number(pos.x, pos.y);
+            if (_engine.phase() != Tzaar.Phase.CHOOSE) {
+                if (letter != 'X') {
+                    var number = compute_number(pos.x, pos.y);
 
-                if (number != -1) {
-                    if (letter != 'E' || number != 5) {
-                        var ok = false;
+                    if (number != -1) {
+                        if (letter != 'E' || number != 5) {
+                            var ok = false;
 
-                        if (engine.phase() === Tzaar.Phase.FIRST_MOVE) {
-                            if (selected_piece && selected_piece.is_valid() && engine.get_intersection(letter, number).state() === Tzaar.State.NO_VACANT && engine.get_intersection(letter, number).color() != engine.current_color()) {
-                                selected_coordinates = new Tzaar.Coordinates(letter, number);
-                                ok = true;
-                            } else if (engine.get_intersection(letter, number).color() === engine.current_color()) {
-                                selected_piece = new Tzaar.Coordinates(letter, number);
-                                manager.redraw();
+                            if (_engine.phase() === Tzaar.Phase.FIRST_MOVE) {
+                                if (selected_piece && selected_piece.is_valid() && _engine.get_intersection(letter, number).state() === Tzaar.State.NO_VACANT && _engine.get_intersection(letter, number).color() != _engine.current_color()) {
+                                    selected_coordinates = new Tzaar.Coordinates(letter, number);
+                                    ok = true;
+                                } else if (_engine.get_intersection(letter, number).color() === _engine.current_color()) {
+                                    selected_piece = new Tzaar.Coordinates(letter, number);
+                                    manager.redraw();
+                                }
+                            } else if (_engine.phase() === Tzaar.Phase.CAPTURE || _engine.phase() === Tzaar.Phase.SECOND_CAPTURE) {
+                                if (selected_piece && selected_piece.is_valid() && _engine.verify_capture(selected_piece, new Tzaar.Coordinates(letter, number))) {
+                                    selected_coordinates = new Tzaar.Coordinates(letter, number);
+                                    ok = true;
+                                } else if (_engine.get_intersection(letter, number).color() === _engine.current_color()) {
+                                    selected_piece = new Tzaar.Coordinates(letter, number);
+                                    manager.redraw();
+                                }
+                            } else if (_engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
+                                if (selected_piece && selected_piece.is_valid() && _engine.get_intersection(letter, number).state() === Tzaar.State.NO_VACANT && _engine.get_intersection(letter, number).color() === _engine.current_color()) {
+                                    selected_coordinates = new Tzaar.Coordinates(letter, number);
+                                    ok = true;
+                                } else if (_engine.get_intersection(letter, number).color() === _engine.current_color()) {
+                                    selected_piece = new Tzaar.Coordinates(letter, number);
+                                    manager.redraw();
+                                }
                             }
-                        } else if (engine.phase() === Tzaar.Phase.CAPTURE || engine.phase() === Tzaar.Phase.SECOND_CAPTURE) {
-                            if (selected_piece && selected_piece.is_valid() && engine.verify_capture(selected_piece, new Tzaar.Coordinates(letter, number))) {
-                                selected_coordinates = new Tzaar.Coordinates(letter, number);
-                                ok = true;
-                            } else if (engine.get_intersection(letter, number).color() === engine.current_color()) {
-                                selected_piece = new Tzaar.Coordinates(letter, number);
-                                manager.redraw();
+                            if (ok) {
+                                manager.play();
                             }
-                        } else if (engine.phase() === Tzaar.Phase.MAKE_STRONGER) {
-                            if (selected_piece && selected_piece.is_valid() && engine.get_intersection(letter, number).state() === Tzaar.State.NO_VACANT && engine.get_intersection(letter, number).color() === engine.current_color()) {
-                                selected_coordinates = new Tzaar.Coordinates(letter, number);
-                                ok = true;
-                            } else if (engine.get_intersection(letter, number).color() === engine.current_color()) {
-                                selected_piece = new Tzaar.Coordinates(letter, number);
-                                manager.redraw();
-                            }
-                        }
-                        if (ok) {
-                            manager.play();
                         }
                     }
                 }
-            }
-        } else {
-            var x = (width - (2 * 150 + 100)) / 2;
+            } else {
+                var x = (width - (2 * 150 + 100)) / 2;
 
-            selected_capture = pos.x >= x && pos.x <= x + 100 && pos.y >= 3 && pos.y <= 28;
-            selected_make_stack = pos.x >= x + 150 && pos.x <= x + 250 && pos.y >= 3 && pos.y <= 28;
-            selected_pass = pos.x >= x + 300 && pos.x <= x + 400 && pos.y >= 3 && pos.y <= 28;
-            if (selected_capture || selected_make_stack || selected_pass) {
-                manager.play();
+                selected_capture = pos.x >= x && pos.x <= x + 100 && pos.y >= 3 && pos.y <= 28;
+                selected_make_stack = pos.x >= x + 150 && pos.x <= x + 250 && pos.y >= 3 && pos.y <= 28;
+                selected_pass = pos.x >= x + 300 && pos.x <= x + 400 && pos.y >= 3 && pos.y <= 28;
+                if (selected_capture || selected_make_stack || selected_pass) {
+                    manager.play();
+                }
             }
         }
     };
 
     var onMove = function (event) {
-        var pos = getClickPosition(event);
-        var letter = compute_letter(pos.x, pos.y);
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var letter = compute_letter(pos.x, pos.y);
 
-        if (letter != 'X') {
-            var number = compute_number(pos.x, pos.y);
+            if (letter != 'X') {
+                var number = compute_number(pos.x, pos.y);
 
-            if (number != -1) {
-                if (compute_pointer(pos.x, pos.y)) {
-                    manager.redraw();
+                if (number != -1) {
+                    if (compute_pointer(pos.x, pos.y)) {
+                        manager.redraw();
+                    }
                 }
             }
         }

@@ -1,10 +1,11 @@
 "use strict";
 
-Invers.Gui = function (c, e, l) {
+Invers.Gui = function (c, e, l, g) {
 
 // private attributes
-    var engine = e;
-    var mycolor = c;
+    var _engine = e;
+    var _color = c;
+    var _gui = g;
 
     var canvas;
     var context;
@@ -62,12 +63,12 @@ Invers.Gui = function (c, e, l) {
         var index = 0;
         var i;
 
-        for (i = 0; i < engine.getRedTileNumber(); ++i) {
+        for (i = 0; i < _engine.getRedTileNumber(); ++i) {
             draw_free_tile(index, 'red', selected_color === index);
             free_colors[index] = Invers.Color.RED;
             ++index;
         }
-        for (i = 0; i < engine.getYellowTileNumber(); ++i) {
+        for (i = 0; i < _engine.getYellowTileNumber(); ++i) {
             draw_free_tile(index, 'yellow', selected_color === index);
             free_colors[index] = Invers.Color.YELLOW;
             ++index;
@@ -81,8 +82,8 @@ Invers.Gui = function (c, e, l) {
         context.strokeStyle = "#000000";
         for (i = 0; i < 6; ++i) {
             for (j = 0; j < 6; ++j) {
-                context.fillStyle = (engine.get_state()[i][j] === Invers.State.RED_FULL ||
-                    engine.get_state()[i][j] === Invers.State.RED_REVERSE) ? 'red' : 'yellow';
+                context.fillStyle = (_engine.get_state()[i][j] === Invers.State.RED_FULL ||
+                    _engine.get_state()[i][j] === Invers.State.RED_REVERSE) ? 'red' : 'yellow';
                 context.lineWidth = 1;
                 context.beginPath();
                 context.moveTo(offsetX + i * deltaX, offsetY + j * deltaY);
@@ -92,8 +93,8 @@ Invers.Gui = function (c, e, l) {
                 context.moveTo(offsetX + i * deltaX, offsetY + j * deltaY);
                 context.closePath();
                 context.fill();
-                if (engine.get_state()[i][j] === Invers.State.RED_REVERSE ||
-                    engine.get_state()[i][j] === Invers.State.YELLOW_REVERSE) {
+                if (_engine.get_state()[i][j] === Invers.State.RED_REVERSE ||
+                    _engine.get_state()[i][j] === Invers.State.YELLOW_REVERSE) {
                     context.fillStyle = "#000000";
                     context.beginPath();
                     context.moveTo(offsetX + (i + 0.4) * deltaX, offsetY + (j + 0.4) * deltaY);
@@ -146,7 +147,7 @@ Invers.Gui = function (c, e, l) {
 
     var draw_inputs = function () {
         var i;
-        var list = engine.get_possible_move_list();
+        var list = _engine.get_possible_move_list();
 
         context.lineWidth = 1;
         context.strokeStyle = "#ffffff";
@@ -215,56 +216,58 @@ Invers.Gui = function (c, e, l) {
     };
 
     var onClick = function (event) {
-        var pos = getClickPosition(event);
-        var change_color = false;
+        if (_engine.current_color() === _color || _gui) {
+            var pos = getClickPosition(event);
+            var change_color = false;
 
-        selected_index = -1;
-        selected_position = Invers.Position.NONE;
-        if (pos.y < offsetY - 5 && pos.y > offsetY - 25) { // TOP
-            if (pos.x < offsetX - 5 && pos.x > offsetX - 25) {
-                selected_color = free_colors[0];
-                change_color = true;
-            } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) {
-                selected_color = free_colors[1];
-                change_color = true;
-            } else {
+            selected_index = -1;
+            selected_position = Invers.Position.NONE;
+            if (pos.y < offsetY - 5 && pos.y > offsetY - 25) { // TOP
+                if (pos.x < offsetX - 5 && pos.x > offsetX - 25) {
+                    selected_color = free_colors[0];
+                    change_color = true;
+                } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) {
+                    selected_color = free_colors[1];
+                    change_color = true;
+                } else {
+                    selected_index = Math.round((pos.x - offsetX) / deltaX + 0.5);
+                    if (selected_index > 0 && selected_index < 7) {
+                        selected_position = Invers.Position.TOP;
+                    } else {
+                        selected_index = -1;
+                    }
+                }
+            } else if (pos.y > offsetY + 6 * deltaY + 5 && pos.y < offsetY + 6 * deltaY + 25) { // BOTTOM
                 selected_index = Math.round((pos.x - offsetX) / deltaX + 0.5);
                 if (selected_index > 0 && selected_index < 7) {
-                    selected_position = Invers.Position.TOP;
+                    selected_position = Invers.Position.BOTTOM;
+                } else {
+                    selected_index = -1;
+                }
+            } else if (pos.x < offsetX - 5 && pos.x > offsetX - 25) { // LEFT
+                selected_index = Math.round((pos.y - offsetY) / deltaY + 0.5);
+                if (selected_index > 0 && selected_index < 7) {
+                    selected_position = Invers.Position.LEFT;
+                } else {
+                    selected_index = -1;
+                }
+            } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) { // RIGHT
+                selected_index = Math.round((pos.y - offsetY) / deltaY + 0.5);
+                if (selected_index > 0 && selected_index < 7) {
+                    selected_position = Invers.Position.RIGHT;
                 } else {
                     selected_index = -1;
                 }
             }
-        } else if (pos.y > offsetY + 6 * deltaY + 5 && pos.y < offsetY + 6 * deltaY + 25) { // BOTTOM
-            selected_index = Math.round((pos.x - offsetX) / deltaX + 0.5);
-            if (selected_index > 0 && selected_index < 7) {
-                selected_position = Invers.Position.BOTTOM;
-            } else {
-                selected_index = -1;
-            }
-        } else if (pos.x < offsetX - 5 && pos.x > offsetX - 25) { // LEFT
-            selected_index = Math.round((pos.y - offsetY) / deltaY + 0.5);
-            if (selected_index > 0 && selected_index < 7) {
-                selected_position = Invers.Position.LEFT;
-            } else {
-                selected_index = -1;
-            }
-        } else if (pos.x > offsetX + 6 * deltaX + 5 && pos.x < offsetX + 6 * deltaX + 25) { // RIGHT
-            selected_index = Math.round((pos.y - offsetY) / deltaY + 0.5);
-            if (selected_index > 0 && selected_index < 7) {
-                selected_position = Invers.Position.RIGHT;
-            } else {
-                selected_index = -1;
-            }
-        }
 
-        if (change_color) {
-            draw_free_tiles();
-        }
+            if (change_color) {
+                draw_free_tiles();
+            }
 
-        if (engine.phase() === Invers.Phase.PUSH_TILE && selected_color !== Invers.Color.NONE &&
-            selected_index !== -1 && selected_position !== Invers.Position.NONE) {
-            manager.play();
+            if (_engine.phase() === Invers.Phase.PUSH_TILE && selected_color !== Invers.Color.NONE &&
+                selected_index !== -1 && selected_position !== Invers.Position.NONE) {
+                manager.play();
+            }
         }
     };
 
@@ -296,7 +299,7 @@ Invers.Gui = function (c, e, l) {
 
 // public methods
     this.color = function () {
-        return mycolor;
+        return _color;
     };
 
     this.draw = function () {
@@ -312,7 +315,7 @@ Invers.Gui = function (c, e, l) {
     };
 
     this.engine = function () {
-        return engine;
+        return _engine;
     };
 
     this.get_move = function () {
