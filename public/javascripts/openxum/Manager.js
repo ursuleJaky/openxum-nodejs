@@ -52,6 +52,19 @@ OpenXum.Manager = function (e, g, o, s) {
         update_status();
     };
 
+    var computeElo = function (elo, win) {
+        var k = 20;
+        var difference = elo.ai - elo.player;
+        var expectedScoreWinner = 1 / (1 + Math.pow(10, difference / 400));
+        var e = k * (1 - expectedScoreWinner);
+
+        if (win) {
+            return ({'ai': elo.ai - e, 'player': elo.player + e, 'last': elo.last - 1});
+        } else {
+            return ({'ai': elo.ai + e, 'player': elo.player - e, 'last': elo.last - 1});
+        }
+    };
+
     var load_win = function () {
         var key = 'openxum' + _that.get_name() + ':win';
         var win = 0;
@@ -62,17 +75,43 @@ OpenXum.Manager = function (e, g, o, s) {
         return win;
     };
 
+    var load_elo = function () {
+        var key = 'openxum:' + _that.get_name() + ':elo';
+        var elo = {'ai': 1000, 'player': 1000, 'last': 3};
+
+        if (localStorage[key]) {
+            elo = JSON.parse(localStorage[key]);
+        }
+        return elo;
+    };
+
     var finish = function () {
         if (_engine.is_finished()) {
+            var winner = false;
+
             $('#winnerBodyText').html('<h4>The winner is ' + _that.get_winner_color() + '!</h4>');
             $("#winnerModal").modal("show");
             if (_engine.winner_is() === _gui.color()) {
-                var win = load_win() + 1;
+                winner = true;
+            }
+            var elo = load_elo();
+            var new_elo = computeElo(elo, winner);
 
-                localStorage['openxum:' + _that.get_name() + ':win'] = JSON.stringify(win);
-                if (win > 5) {
-                    localStorage['openxum:' + _that.get_name() + ':level'] = JSON.stringify(_level + 10);
-                    localStorage['openxum:' + _that.get_name() + ':win'] = JSON.stringify(0);
+            localStorage['openxum:' + _that.get_name() + ':elo'] = JSON.stringify(new_elo);
+
+            var eloDiff = elo.ai - elo.player;
+
+            if (eloDiff < -40 && new_elo.last < 1) {
+                localStorage['openxum:' + _that.get_name() + ':level'] = JSON.stringify(_level + 10);
+                localStorage['openxum:' + _that.get_name() + ':elo'] = JSON.stringify(
+                    {
+                        'ai': new_elo.ai,
+                        'player': new_elo.player,
+                        'last': 3
+                    });
+            } else if (eloDiff > 40 && new_elo.last < 1) {
+                if (_level > 10) {
+                    localStorage['openxum:' + _that.get_name() + ':level'] = JSON.stringify(_level - 10);
                 }
             }
         }

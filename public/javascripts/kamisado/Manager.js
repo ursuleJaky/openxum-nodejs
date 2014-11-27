@@ -7,6 +7,7 @@ Kamisado.Manager = function (e, g, o, s) {
 // public methods
     this.engine = _super.engine;
     this.get_moves = _super.get_moves;
+    this.load_elo = _super.load_elo;
     this.load_level = _super.load_level;
     this.next = _super.next;
     this.play = _super.play;
