@@ -32,10 +32,7 @@
         "bcrypt": "^0.7.8",
         "websocket": "^1.0.8",
         "easy-captcha": "^0.1.5",
-        "i18n-2": "^0.4.6",
-        "zombie": "^2.0.4",
-        "cucumber": "^0.4.4",
-        "chai": "^1.9.2"
+        "i18n-2": "^0.4.6"
     },
     "devDependencies": {
         "grunt": "^0.4.4",

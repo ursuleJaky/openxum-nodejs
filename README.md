@@ -71,6 +71,7 @@ db.gametypes.insert({name: 'dvonn'});
 db.gametypes.insert({name: 'invers'});
 db.gametypes.insert({name: 'gipf'});
 db.gametypes.insert({name: 'kamisado'});
+db.gametypes.insert({name: 'pentago'});
 db.gametypes.insert({name: 'tzaar'});
 db.gametypes.insert({name: 'yinsh'});
 db.gametypes.insert({name: 'zertz'});
