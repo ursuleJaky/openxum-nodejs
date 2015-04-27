@@ -28,20 +28,14 @@ block body
                     h4 #{__("The first phase: placing pieces")}
                     | #{__("1. The game starts with an empty board. The players take turns placing their pieces on the board, one at a time. They must start with the DVONN pieces and then continue with their own color:")}
                     br
-                    | #{__("White: first DVONN piece")}
-                    br
-                    | #{__("Black: second DVONN piece")}
-                    br
-                    | #{__("White: third DVONN piece")}
-                    br
-                    | #{__("Black: first black piece")}
-                    br
-                    | #{__("White: first white piece")}
-                    br
-                    | #{__("Black: second black piece")}
-                    br
-                    | #{__("And so on ...")}
-                    br
+                    ul
+                      li #{__("White: first DVONN piece")}
+                      li #{__("Black: second DVONN piece")}
+                      li #{__("White: third DVONN piece")}
+                      li #{__("Black: first black piece")}
+                      li #{__("White: first white piece")}
+                      li #{__("Black: second black piece")}
+                      li #{__("And so on ...")}
                     | #{__("2. A piece may be put on any vacant space, without restriction.")}
                     br
                     | #{__("3. When all the pieces are placed on the board, all spaces will be occupied. This is the end of the first phase.")}
@@ -57,11 +51,15 @@ block body
                     br
                     | #{__("5. A move may never end in an empty space, but it is allowed to move across one or more empty spaces. When making a move, each space must be counted, no matter whether it is empty or occupied (see diagram below).")}
                     br
-                    | #{__("The indicated stack may be moved 3 spaces in the direction of the arrows.")}
+                    img(src="/images/dvonn/dvonn-diagram1.gif")
+                    br
+                    i #{__("The indicated stack may be moved 3 spaces in the direction of the arrows.")}
                     br
                     | #{__("6. Important: a piece or stack that is surrounded on all 6 sides may not be moved. So, at the beginning of the game only the pieces at the edge of the board may move. The pieces that are not positioned at the edge remain blocked for as long as they remain completely surrounded (see diagram below).")}
                     br
-                    | #{__("The pieces and stacks marked with an 'x' are surrounded on all 6 sides and may not be moved.")}
+                    img(src="/images/dvonn/dvonn-diagram2.gif")
+                    br
+                    i #{__("The pieces and stacks marked with an 'x' are surrounded on all 6 sides and may not be moved.")}
                     br
                     | #{__("7. A single DVONN piece may not be moved, but a piece or stack may move on top of it. When a DVONN pieces is part of a stack, it is perfectly legal to move the stack containing the DVONN piece - but, as explained above, only by the player who controls the stack.")}
                     br
@@ -72,13 +70,17 @@ block body
                     br
                     | #{__("Be careful: it may happen that a great number of pieces are suddenly removed as a result of one single move (see diagram below).")}
                     br
-                    | #{__("If White moves the indicated piece, the pieces on the left will no longer be in contact with a DVONN piece. They must all be removed from the board at once.")}
+                    img(src="/images/dvonn/dvonn-diagram3.gif")
+                    br
+                    i #{__("If White moves the indicated piece, the pieces on the left will no longer be in contact with a DVONN piece. They must all be removed from the board at once.")}
                     br
                     | #{__("2. All removed pieces go out of the game. It doesn't matter who makes the move through which the pieces and/or stacks become isolated. Watch out for this, especially in the endgame. Since you may not pass, you may be forced to make a move that isolates one or more of your own stacks (see Diagram below).")}
                     br
                     | #{__("3. All 3 DVONN pieces remain in play until the end of the game, even if one of them becomes isolated, as it will always remain in contact with itself.")}
                     br
-                    | #{__("The endgame. It is White's turn. White has only one stack left to play with. Since he must make a move he has no other choice than to play it, as a result of which the stacks marked with an 'x' are out of the game ...")}
+                    img(src="/images/dvonn/dvonn-diagram4.gif")
+                    br
+                    i #{__("The endgame. It is White's turn. White has only one stack left to play with. Since he must make a move he has no other choice than to play it, as a result of which the stacks marked with an 'x' are out of the game ...")}
 
                     h4 #{__("The end")}
                     | #{__("1. The players must play for as long as they can do so. If one player can't make a move any more, the other must continue to play until he, too, has made his very last possible move. In the rare event that a player who must pass gets the opportunity to make a move again, he must do so. This can happen when one or more of his pieces are blocked (i.e. completely surrounded).")}
