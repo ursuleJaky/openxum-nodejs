@@ -238,5 +238,11 @@
 	"Diagram 4: Fixed start position.": "Diagram 4: Fixed start position.",
 	"H. Tournament version": "H. Tournament version",
 	"When playing the tournament version, the game begins with an empty board. The players take turns putting one of their pieces after another on the board. The pieces may be placed on the board in any order and it is allowed to switch from one type of piece to another as often as you want.": "When playing the tournament version, the game begins with an empty board. The players take turns putting one of their pieces after another on the board. The pieces may be placed on the board in any order and it is allowed to switch from one type of piece to another as often as you want.",
-	"When all pieces are on the board, all spaces will be occupied and the game starts according the rules described above.": "When all pieces are on the board, all spaces will be occupied and the game starts according the rules described above."
+	"When all pieces are on the board, all spaces will be occupied and the game starts according the rules described above.": "When all pieces are on the board, all spaces will be occupied and the game starts according the rules described above.",
+	"Rules - Pentago": "Règles du jeu - Pentago",
+	"Rules - Kamisado": "Règles du jeu - Kamisado",
+	"Rules - Zertz by Kris Burm": "Règles du jeu - Zertz de Kris Burm",
+	"Rules - Gipf by Kris Burm": "Règles du jeu - Gipf de Kris Burm",
+	"Rules - Tzaar by Kris Burm": "Règles du jeu - Tzaar de Kris Burm",
+	"Place and turn": "Place and turn"
 }
