@@ -242,5 +242,10 @@
 	"The first move is always a \"forced capture\". You must capture! You can capture a piece in an adjacent space, but during the course of the game more and more spaces will become vacant. You may also capture by moving a piece in a straight line over any number of vacant spaces, to the first space occupied by an opponent’s piece. Take the opponent’s piece from the board and put your piece in that space. (See diagram 2.) The opponent’s piece goes out of the game.": "The first move is always a \"forced capture\". You must capture! You can capture a piece in an adjacent space, but during the course of the game more and more spaces will become vacant. You may also capture by moving a piece in a straight line over any number of vacant spaces, to the first space occupied by an opponent’s piece. Take the opponent’s piece from the board and put your piece in that space. (See diagram 2.) The opponent’s piece goes out of the game.",
 	"Diagram 3: a single piece can jump onto a stack (of any height) and vice versa! Also, stacks can jump on top of each other.": "Diagram 3: a single piece can jump onto a stack (of any height) and vice versa! Also, stacks can jump on top of each other.",
 	"Rules - Pentago": "Rules - Pentago",
-	"Place and turn": "Place and turn"
+	"Place and turn": "Place and turn",
+	"Rules - Zertz by Kris Burm": "Rules - Zertz by Kris Burm",
+	"Making a move": "Making a move",
+	"Placing a marble and removing a board piece": "Placing a marble and removing a board piece",
+	"Capturing marbles": "Capturing marbles",
+	"You must try to capture either": "You must try to capture either"
 }
