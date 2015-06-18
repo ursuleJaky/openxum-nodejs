@@ -280,5 +280,7 @@
 	"Liste des Commentaires": "Liste des Commentaires",
 	"ajouter une categorie": "ajouter une categorie",
 	"ajouter une question": "ajouter une question",
-	"ajouter une nouvelle categorie": "ajouter une nouvelle categorie"
+	"ajouter une nouvelle categorie": "ajouter une nouvelle categorie",
+	"par": "par",
+	"le": "le"
 }

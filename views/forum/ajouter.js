@@ -12,7 +12,6 @@ exports.init = function(req, res){
             name: req.user.username
         }
     };
-    console.log(fieldsToSet);
     req.app.db.models.reponses.create(fieldsToSet, function(err, user){});
     res.redirect('/forum');
 };

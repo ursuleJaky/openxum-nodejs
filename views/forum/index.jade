@@ -19,21 +19,26 @@ block body
 
              if rep == true
 
-                  h3(style="text-align: center; width: 100%; height: 30px; font-family: purisa; border-radius:5px; background-color: #d3d3d3; color: #528CE0") #{question.titre}
-                  p
-                   #{question.contenu}
+                  h3(style="text-align: left; text-decoration: underline; font-family: purisa; color: #000000") #{question.titre}
+                    br
+                  p(style="font-size: 20px;") #{question.contenu}
+                    br
+                    br
                   if reponses.length != 0
-                    table.table
+                    table.table(style="font-family : Verdana, arial, helvetica, sans-serif; position : relative; left: 10px; top : 30px;")
                       each reponse in reponses
                          tr
                            td
-                             p #{reponse.contenu}
+                             p(style="font-size: 20px; padding-top: 10px;") #{reponse.contenu}
+                             p(style="padding-top: 10px;") #{__('par')} #{reponse.userCreated.name}
+                             p #{__('le')} #{reponse.date}
 
                   if user && user.username
                           h3(style="text-decoration: underline; font-family: purisa; color: #528CE0") #{__('ajouter un reponse')}
                              br
                              br
-                          form(name="postez", method ="post" action = "/forum/ajouter")
+                          form(name="reponse", method ="post" action = "/forum/ajouter")
+                             input(type="hidden" name="question_id" value="#{question._id}", repuired)
                              textarea(style="width: 50%; height: 100px;", id="reponse" name="contenu" placeholder="contenu de la reponse")
                              br
                              br
@@ -48,27 +53,34 @@ block body
                   h3(style="text-align: center; width: 100%; height: 30px; font-family: purisa; border-radius:5px; background-color: #d3d3d3; color: #528CE0") #{categorie.nom}
                     br
                     br
-                  h3(style="text-decoration: underline; font-family: purisa; color: #528CE0") #{__('ajouter une question')}
-                    br
-                  form(name="cat", method ="post" action = "/forum/poster")
-                    input(type="text", name="titre", placeholder="titre")
-                    br
-                    br
-                    textarea(style="width: 50%; height: 100px;", id="questions", name="contenu" placeholder="contenu du sujet")
-                    br
-                    br
-                    input(type="submit", value="postez")
-                    br
-                    br
+                  if user && user.username
+                    h3(style="text-decoration: underline; font-family: purisa; color: #528CE0") #{__('ajouter une question')}
+                      br
+                    form(name="question", method ="post" action = "/forum/poster")
+                      input(type="text", name="titre", placeholder="titre", repuired)
+                      input(type="hidden" name="categorie_id" value="#{categorie._id}", repuired)
+                      br
+                      br
+                      textarea(style="width: 50%; height: 100px;", id="questions", name="contenu" placeholder="contenu du sujet", required)
+                      br
+                      br
+                      input(type="submit", value="postez")
+                      br
+                      br
                   h3(style="text-align: center; width: 100%; height: 30px; font-family: liberation serif; border-radius:5px; background-color: #d3d3d3; color: #528CE0") #{__('Discussion/Auteur')}
                     br
                     br
                   if questions.length != 0
-                    table.table
+                    table.table(style="font-family : Verdana, arial, helvetica, sans-serif; position : relative; left: 10px; top : 30px;")
+
                       each question in questions
                           tr
-                            td
-                              a(style="color: #000000; font-size: 20px;", href='/forum?question_id=#{question._id}') #{question.titre}
+                            td(style="background: -moz-linear-gradient(#d3d3d3 5%, #ffffff);")
+                              a(style="padding-top: 20px; color: #000000; font-size: 20px;", href='/forum?question_id=#{question._id}') #{question.titre}
+                            td(style="background: -moz-linear-gradient(#d3d3d3 5%, #ffffff);")
+                              p(style="padding-top: 20px;") #{__('par')} #{question.userCreated.name}
+                            td(style="background: -moz-linear-gradient(#d3d3d3 5%, #ffffff);")
+                              p(style="padding-top: 20px;") #{__('le')} #{question.date}
 
 
 
@@ -78,21 +90,24 @@ block body
                h2(style="text-align: center; width: 100%; height: 40px; font-family: liberation serif; border-radius:5px; background-color: #d3d3d3; color: #0000ff") #{__('Bienvenu sur le forum')}
 
                if user && user.username
-                 h3(style="text-decoration: underline; font-family: purisa; color: #528CE0") #{__('ajouter une nouvelle categorie')}
-                    br
-                 form(name="cat", method ="post" action = "/forum/valider")
-                    input(type="text", name="categorie", placeholder="entrez votre categorie")
-                    br
-                    br
-                    input(type="submit", value="postez")
-                    br
-                    br
+                 //
+                   h3(style="text-decoration: underline; font-family: purisa; color: #528CE0") #{__('ajouter une nouvelle categorie')}
+                      br
+                   form(name="cat", method ="post" action = "/forum/valider")
+                      input(type="text", name="categorie", placeholder="entrez votre categorie", repuired)
+                      br
+                      br
+                      input(type="submit", value="postez")
+                      br
+                      br
 
                h3(style="text-align: center; width: 100%; height: 30px; font-family: liberation serif; border-radius:5px; background-color: #d3d3d3; color: #528CE0") #{__('Mes differentes categories')}
                   br
                   br
-               table.table
-                  each categorie in categories
-                    tr
-                      td
-                        a(style="color: #000000; font-size: 20px;", href='/forum/?categorie_id=#{categorie._id}') #{categorie.nom}
+               if categories.length != 0
+                  table.table(style="font-family : Verdana, arial, helvetica, sans-serif; position : relative; left: 10px; top : 30px;")
+                    each categorie in categories
+                      tr
+                        td(style="background: -moz-linear-gradient(#d3d3d3 5%, #ffffff); text-align: center;")
+                          a(style="color: #000000; font-size: 20px; padding-top: 20px;", href='/forum/?categorie_id=#{categorie._id}') #{categorie.nom}
+
