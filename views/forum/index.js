@@ -21,6 +21,8 @@ exports.init = function(req, res){
             });
     }
 
+    //test
+
     else if (req.param('question_id')){
         req.app.db.models.reponses.find({question_id: req.param('question_id')}, null,
             { safe: true }, function(err, reponses) {
