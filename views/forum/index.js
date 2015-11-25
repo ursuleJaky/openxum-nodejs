@@ -21,13 +21,12 @@ exports.init = function(req, res){
             });
     }
 
-    //test
-
     else if (req.param('question_id')){
+
         req.app.db.models.reponses.find({question_id: req.param('question_id')}, null,
             { safe: true }, function(err, reponses) {
-                var mes_reponses = reponses ? reponses : [];
 
+                var mes_reponses = reponses ? reponses : [];
                 req.app.db.models.questions.findOne({_id: req.param('question_id')}, null,
                     { safe: true }, function(err, question) {
 
@@ -43,14 +42,18 @@ exports.init = function(req, res){
     }
 
     else{
+        var obj = ['a, b, c'];
+
+        for (var prop in obj) {
+            console.log('mes objects')
+            console.log(prop)
+        }
         req.app.db.models.categories.find({}, null,
             { safe: true }, function(err, categories) {
                 var mes_categories = categories ? categories : [];
-                //var day = req.app.moment(categories.dateCreated).format('MMM. d, YYYY HH.mm');
 
                 res.render('forum/index',{
                     categories: mes_categories,
-                    //date: day,
                     cat: true,
                     quest: false,
                     rep: false

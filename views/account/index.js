@@ -258,13 +258,22 @@ exports.init = function (req, res) {
             } else if (req.i18n.getLocale() === 'fr') {
                 day = req.app.moment(user.timeCreated).format('d MMMM YYYY');
             }
-            res.render('account/index', {
-                email: user.email,
-                name: user.username,
-                timeCreated: day,
-                account: account,
-                country: isoCountries[account.country],
-                flag: 'flag ' + account.country.toLowerCase()});
+
+            req.app.db.models.questions.find({"userCreated.id": req.user.id}, null,
+                { safe: true }, function(err, questions) {
+                    var mes_questions = questions ? questions : [];
+
+                    res.render('account/index', {
+                        email: user.email,
+                        name: user.username,
+                        timeCreated: day,
+                        account: account,
+                        country: isoCountries[account.country],
+                        flag: 'flag ' + account.country.toLowerCase(),
+                        questions: mes_questions,
+                        notification: req.user.notification
+                    });
+            });
         });
     });
 };

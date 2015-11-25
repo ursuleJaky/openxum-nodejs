@@ -7,7 +7,12 @@ block neck
   link(rel='stylesheet', href='bootstrap.min.css')
   link(rel='stylesheet', href='/views/index.min.css?#{cacheBreaker}')
 
+
 block body
+    //script(type='text/javascript')
+    //script.function submitForm()
+        alert("entre")
+        #{'pouce'}.submit()
     br
     div.row
        div.col-sm-12
@@ -32,6 +37,18 @@ block body
                              p(style="font-size: 20px; padding-top: 10px;") #{reponse.contenu}
                              p(style="padding-top: 10px;") #{__('par')} #{reponse.userCreated.name}
                              p #{__('le')} #{reponse.date}
+                           td
+                             form(name="pouce", method ="post", action = "/forum/pouceleve")
+                                 input(type="hidden" name="reponse_id", value="#{reponse._id}", repuired)
+                                 button(type="submit", onClick="")
+                                       i(class='glyphicon glyphicon-thumbs-up')
+                                 span #{reponse.pleve}
+                           td
+                             form(name="pouce", method ="post", action = "/forum/poucebaisse")
+                                 input(type="hidden", name="reponse_id", value="#{reponse._id}", repuired)
+                                 button(type="submit", onClick="")
+                                     i(class='glyphicon glyphicon-thumbs-down')
+                                 span #{reponse.pbaisse}
 
                   if user && user.username
                           h3(style="text-decoration: underline; font-family: purisa; color: #528CE0") #{__('ajouter un reponse')}
@@ -81,6 +98,8 @@ block body
                               p(style="padding-top: 20px;") #{__('par')} #{question.userCreated.name}
                             td(style="background: -moz-linear-gradient(#d3d3d3 5%, #ffffff);")
                               p(style="padding-top: 20px;") #{__('le')} #{question.date}
+                            td(style="background: -moz-linear-gradient(#d3d3d3 5%, #ffffff);")
+                              p(style="padding-top: 20px;") #{question.rep}
 
 
 

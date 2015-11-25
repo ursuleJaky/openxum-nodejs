@@ -18,7 +18,8 @@ exports = module.exports = function (app, mongoose) {
         facebook: {},
         google: {},
         tumblr: {},
-        search: [String]
+        search: [String],
+        notification: {type: Number, default: '0'}
     });
     userSchema.methods.canPlayRoleOf = function (role) {
         if (role === "admin" && this.roles.admin) {

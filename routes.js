@@ -62,8 +62,12 @@ exports = module.exports = function (app, passport) {
     app.post('/forum/valider', require('./views/forum/valider').init);
     app.post('/forum/poster', require('./views/forum/poster').init);
     app.post('/forum/ajouter', require('./views/forum/ajouter').init);
+    app.get('/forum/modifier/', require('./views/forum/modifier/index').init);
+    app.post('/forum/modifier/modification', require('./views/forum/modifier/modification').init);
+    app.post('/forum/pouceleve', require('./views/forum/pouceleve').init);
+    app.post('/forum/poucebaisse', require('./views/forum/poucebaisse').init);
     app.get('/faq/', require('./views/faq/index').init);
-	 app.get('/mygames/', require('./views/mygames/index').init);
+	app.get('/mygames/', require('./views/mygames/index').init);
 
     //social sign up
     app.post('/signup/social/', require('./views/signup/index').signupSocial);

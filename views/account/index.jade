@@ -15,6 +15,8 @@ block feet
 block body
     br
     div.f32.row.vertical-offset-100
+        .circle(style="display: inline; padding-top: 10px; float: left; border-radius: 50%; width: 40px; height: 40px; background-color: lightgray; margin-right: 25px; text-align: center;")
+            span #{notification}
         div.col-md-6.col-md-offset-3
             div.panel.panel-primary
                 div.panel-heading
@@ -47,3 +49,12 @@ block body
                 div.panel-heading
                     h3(class='panel-title') #{__("Stats")}
                 div.panel-body
+
+            div.panel.panel-primary
+                div.panel-heading
+                    h3(class='panel-title') #{__("my questions")}
+                div.panel-body
+                    each question in questions
+                        a(style="padding-top: 20px; color: #000000; font-size: 20px;", href='/forum?question_id=#{question._id}') #{question.titre}
+                        a(class='btn btn-link', href='/forum/modifier?question_id=#{question._id}') #{__("Modify")}
+                        br

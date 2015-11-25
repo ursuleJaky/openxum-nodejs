@@ -282,5 +282,7 @@
 	"ajouter une question": "ajouter une question",
 	"ajouter une nouvelle categorie": "ajouter une nouvelle categorie",
 	"par": "par",
-	"le": "le"
+	"le": "le",
+	"my questions": "my questions",
+	"Forummmm": "Forummmm"
 }

@@ -11,9 +11,27 @@ exports.init = function(req, res){
             name: req.user.username
         }
     }
+
+    req.app.db.models.User.find({}, null,
+        { safe: true }, function(err, users) {
+            console.log(users)
+
+            for(var utilisateur in users){
+                console.log('notification initiale')
+                console.log(utilisateur.notification)
+                console.log(utilisateur)
+
+                var notif = utilisateur.notification;
+                notif++;
+                req.app.db.models.User.update({_id: utilisateur._id},{$set:{notification: notif}}, function(err, user){});
+
+                console.log('notification finale')
+                console.log(utilisateur.notification)
+            }
+        });
+
     req.app.db.models.questions.create(fieldsToSet, function(err, user){});
 
-    //var id_cat = req.param('categorie_id');
     //res.redirect('/forum/?categorie_id=#');
     res.redirect('/forum');
 };

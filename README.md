@@ -8,16 +8,16 @@ Technology
 
 | On The Server | On The Client  | Development |
 | ------------- | -------------- | ----------- |
-| Express       | Bootstrap      | Grunt       |
+| X Express   X | Bootstrap      | Grunt       |
 | Jade          | Backbone.js    | Bower       |
-| Mongoose      | jQuery         |             |
-| Passport      | Underscore.js  |             |
-| Async         | Font-Awesome   |             |
-| EmailJS       | Moment.js      |             |
-| WebSocket     |                |             |
-| Easy-captcha  |                |             |
-| I18n-2        |                |             |
-| Zombie        |                |             |
+| X Mongoose X  | jQuery         |             |
+| X Passport X  | Underscore.js  |             |
+| X Async    X  | Font-Awesome   |             |
+| X EmailJS  X  | Moment.js      |             |
+| X WebSocket X |                |             |
+| XEasy-captchaX|                |             |
+| X I18n-2    X |                |             |
+| X Zombie   X  |                |             |
 | Cucumber      |                |             |
 
 Requirements
